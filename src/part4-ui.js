@@ -203,10 +203,12 @@ const EMIs = {
   const t = today();
   const all = Object.values(Store.s.emis).filter(e => !e.deleted);
   const started = (e) => e.paid > 0 || cmpYmd(e.firstDue, t) <= 0;
+  const q = ($('#emiFilter') ? $('#emiFilter').value : '').trim().toLowerCase();
+  const match = (e) => !q || (e.name + ' ' + ((LMAP[e.lender] || {}).n || '')).toLowerCase().includes(q);
   const groups = {
-    active: all.filter(e => started(e) && EMI.active(e)),
-    upcoming: all.filter(e => !started(e)),
-    done: all.filter(e => !EMI.active(e)),
+    active: all.filter(e => started(e) && EMI.active(e) && match(e)),
+    upcoming: all.filter(e => !started(e) && match(e)),
+    done: all.filter(e => !EMI.active(e) && match(e)),
   };
   document.querySelector('#emitabs [data-t=active]').textContent = `Active (${groups.active.length})`;
   document.querySelector('#emitabs [data-t=upcoming]').textContent = `Upcoming (${groups.upcoming.length})`;
@@ -325,7 +327,7 @@ const Edit2 = {
   renderCats() {
     $('#addCats').innerHTML = CATS.map(c =>
       `<div class="cattile ${c.id === this.cat ? 'on' : ''}" onclick="Edit2.cat='${c.id}';Edit2.renderCats()">
-        <span class="cic" style="background:${c.c}">${ic(c.ic, 'ic sm')}</span><span>${c.n}</span></div>`).join('');
+        <span class="cic">${ic(c.ic, 'ic sm')}</span><span>${c.n}</span></div>`).join('');
   },
   save() {
     const amt = Number($('#addAmt').value), n = Math.round(Number($('#addN').value));

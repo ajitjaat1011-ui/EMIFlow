@@ -147,6 +147,7 @@
       <h1 class="grow">My EMIs</h1>
       <button class="tb-ic" onclick="toast('Sorted by next due date')"><svg class="ic sm"><use href="#i-kebab"/></svg></button>
     </header>
+    <div class="fsearch"><svg class="ic sm"><use href="#i-search"/></svg><input id="emiFilter" placeholder="Search EMIs…" oninput="EMIs.render()" autocomplete="off"></div>
     <div class="seg2" id="emitabs">
       <button class="on" data-t="active" onclick="EMIs.switchTo('active')">Active</button>
       <button data-t="upcoming" onclick="EMIs.switchTo('upcoming')">Upcoming</button>

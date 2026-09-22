@@ -33,7 +33,7 @@ const LENDERS = [
 ];
 const LMAP = Object.fromEntries(LENDERS.map(l => [l.id, l]));
 const CMAP = Object.fromEntries(CATS.map(c => [c.id, c]));
-const APP_VERSION = '3.2.0';
+const APP_VERSION = '3.3.0';
 
 /* ---------------- tiny utils ---------------- */
 const $ = (s) => document.querySelector(s);
