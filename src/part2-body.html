@@ -4,23 +4,23 @@
 
   <div class="ob-hero">
     <img class="ob-logo" src="/icons/icon-192.png" alt="EMIFlow">
-    <div class="ob-brand">EMIFlow</div>
-    <div class="ob-tag">Every EMI. Every lender. <b>Zero surprises.</b></div>
+    <div class="ob-brand">EMI<em>Flow</em></div>
+    <div class="ob-tag">Every EMI. Every lender. Zero surprises.</div>
   </div>
 
   <div class="feats">
-    <div class="feat"><div class="fic g1"><svg class="ic"><use href="#i-cloud"/></svg></div>
-      <div><b>Synced to your private cloud</b><p>Add on one device — it's there on every other. Salted &amp; hashed passwords, revocable sessions.</p></div></div>
-    <div class="feat"><div class="fic g2"><svg class="ic"><use href="#i-wallet"/></svg></div>
-      <div><b>15 real lenders, real icons</b><p>Bajaj, Paytm, PhonePe, GPay, CRED, banks &amp; BNPL — each EMI tagged with the app you pay through.</p></div></div>
-    <div class="feat"><div class="fic g3"><svg class="ic"><use href="#i-cal"/></svg></div>
-      <div><b>Never miss a due date</b><p>Overdue alerts, reminder windows, autopay flags and a full calendar of the month ahead.</p></div></div>
-    <div class="feat"><div class="fic g4"><svg class="ic"><use href="#i-chart"/></svg></div>
-      <div><b>See your outflow coming</b><p>Six-month projections and lender-wise outstanding — before it lands on you.</p></div></div>
+    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-cloud"/></svg></div>
+      <div><b>Synced to your private cloud</b><p>Add on one device — it's there on every other.</p></div></div>
+    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-wallet"/></svg></div>
+      <div><b>15 real lenders, real icons</b><p>Bajaj, Paytm, PhonePe, GPay, CRED, banks &amp; BNPL apps.</p></div></div>
+    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-bell"/></svg></div>
+      <div><b>Never miss a due date</b><p>Overdue alerts, reminder windows, autopay flags.</p></div></div>
+    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-chart"/></svg></div>
+      <div><b>See your outflow coming</b><p>Six-month projections, lender-wise outstanding.</p></div></div>
   </div>
 
   <div class="ob-cta">
-    <button class="btn pri wide" onclick="Auth.open('register')"><svg class="ic sm"><use href="#i-spark"/></svg>Create free account</button>
+    <button class="btn pri wide" onclick="Auth.open('register')">Create free account</button>
     <button class="btn line wide" onclick="Auth.open('login')">I already have an account</button>
     <button class="ob-demo" onclick="App.demo()">Take a tour with sample data →</button>
     <div class="ob-terms">By continuing you agree to the Terms &amp; Privacy Policy.<br>Passwords are PBKDF2-hashed · your data is never sold or shared.</div>
@@ -48,17 +48,16 @@
 
     <!-- ============ STATS ============ -->
     <section class="screen" id="scr-stats">
-      <div class="sect"><h2>Reports</h2></div>
-      <div class="statgrid" id="statcards"></div>
-      <div class="sect"><h2>Outflow forecast</h2><span class="chip">next 6 months</span></div>
+      <div class="statgrid" id="statcards" style="margin-top:6px"></div>
+      <div class="sect"><h2>Outflow forecast</h2><span class="chip">6 months</span></div>
       <div class="card"><div class="bars" id="projbars"></div></div>
-      <div class="card"><h3><svg class="ic sm"><use href="#i-wallet"/></svg>Lender-wise outstanding</h3><div id="lenderrows"></div></div>
-      <div class="card"><h3><svg class="ic sm"><use href="#i-tag"/></svg>Category split</h3><div id="catrows"></div></div>
+      <div class="card"><h3>Lender-wise outstanding</h3><div id="lenderrows"></div></div>
+      <div class="card"><h3>Category split</h3><div id="catrows"></div></div>
     </section>
 
     <!-- ============ CALENDAR ============ -->
     <section class="screen" id="scr-calendar">
-      <div class="card">
+      <div class="card" style="margin-top:6px">
         <div class="calhead">
           <button class="calnav" onclick="Cal.nav(-1)" aria-label="Previous month"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
           <b id="caltitle">—</b>
@@ -67,10 +66,9 @@
         <div class="calgrid" id="calgrid"></div>
       </div>
       <div class="card hidden caldays" id="calday"></div>
-      <div class="row small mut" style="justify-content:center;gap:16px;margin:2px 0 14px;font-weight:700">
-        <span class="row" style="gap:6px"><i class="d-red" style="width:8px;height:8px;border-radius:50%"></i> overdue</span>
-        <span class="row" style="gap:6px"><i class="d-amb" style="width:8px;height:8px;border-radius:50%"></i> due</span>
-        <span class="row" style="gap:6px"><i class="d-teal" style="width:8px;height:8px;border-radius:50%"></i> paid</span>
+      <div class="row small mut" style="justify-content:center;gap:16px;margin:2px 0 14px">
+        <span class="row" style="gap:6px"><i class="d-red" style="width:7px;height:7px;border-radius:50%"></i> overdue</span>
+        <span class="row" style="gap:6px"><i class="d-amb" style="width:7px;height:7px;border-radius:50%"></i> due</span>
       </div>
     </section>
 
@@ -78,71 +76,62 @@
     <section class="screen" id="scr-profile">
       <div class="pcard">
         <div class="pavatar" id="pavatar">A</div>
-        <div class="grow"><h2 id="pname">—</h2><div class="small mut" id="pemail" style="font-weight:600">—</div><div class="tiny mut" id="pmeta" style="margin-top:3px;font-weight:600"></div></div>
+        <div class="grow"><h2 id="pname">—</h2><div class="small mut" id="pemail">—</div><div class="tiny mut" id="pmeta" style="margin-top:2px"></div></div>
       </div>
 
-      <div class="sect"><h2>Appearance</h2></div>
+      <div class="sect"><h2>Preferences</h2></div>
       <div class="pgroup">
-        <div class="prow"><div class="pic violet"><svg class="ic sm"><use href="#i-palette"/></svg></div>
-          <div class="grow"><div class="t">Theme</div><div class="s">Follows system by default</div></div>
+        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-palette"/></svg></div>
+          <div class="grow"><div class="t">Theme</div></div>
           <div class="seg" id="segtheme"><button data-v="system">Auto</button><button data-v="light">Light</button><button data-v="dark">Dark</button></div></div>
         <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-bolt"/></svg></div>
-          <div><div class="t">Motion</div><div class="s">Transitions &amp; effects</div></div>
+          <div class="grow"><div class="t">Animations</div></div>
           <label class="switch"><input type="checkbox" id="swanim" checked><i></i></label></div>
-      </div>
-
-      <div class="sect"><h2>Reminders</h2></div>
-      <div class="pgroup">
-        <div class="prow"><div class="pic amber"><svg class="ic sm"><use href="#i-bell"/></svg></div>
-          <div class="grow"><div class="t">Notifications</div><div class="s">Nudge me before a due date</div></div>
+        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-bell"/></svg></div>
+          <div class="grow"><div class="t">Due-date reminders</div></div>
           <label class="switch"><input type="checkbox" id="swnotify"><i></i></label></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-clock"/></svg></div>
-          <div class="grow"><div class="t">Reminder window</div><div class="s">Set per-EMI when you add it</div></div>
-          <span class="chip acc">per EMI</span></div>
       </div>
 
-      <div class="sect"><h2>Data &amp; sync</h2></div>
+      <div class="sect"><h2>Data</h2></div>
       <div class="pgroup">
-        <div class="prow"><div class="pic teal"><svg class="ic sm"><use href="#i-sync"/></svg></div>
+        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-sync"/></svg></div>
           <div class="grow"><div class="t">Sync status</div><div class="s" id="syncline2">—</div></div>
           <button class="btn ghost sm" onclick="Sync.pull(true)">Sync now</button></div>
         <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-dl"/></svg></div>
-          <div class="grow"><div class="t">Export data</div><div class="s">Full JSON backup, yours forever</div></div>
+          <div class="grow"><div class="t">Export data</div><div class="s">Full JSON backup</div></div>
           <button class="btn ghost sm" onclick="Sync.exportCloud()">Export</button></div>
-        <div class="prow"><div class="pic red"><svg class="ic sm"><use href="#i-out"/></svg></div>
-          <div class="grow"><div class="t">Log out everywhere</div><div class="s">Ends all sessions, all devices</div></div>
+        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-out"/></svg></div>
+          <div class="grow"><div class="t">Log out everywhere</div></div>
           <button class="btn ghost sm" onclick="Auth.logoutAll()">Log out</button></div>
       </div>
 
       <div class="sect"><h2>Danger zone</h2></div>
-      <div class="pgroup" style="border-color:rgba(224,52,44,.3)">
-        <div class="prow"><div class="pic red"><svg class="ic sm"><use href="#i-trash"/></svg></div>
+      <div class="pgroup" style="border-color:rgba(207,58,49,.25)">
+        <div class="prow"><div class="pic" style="color:var(--danger)"><svg class="ic sm"><use href="#i-trash"/></svg></div>
           <div class="grow"><div class="t" style="color:var(--danger)">Delete account</div><div class="s">Erases everything, permanently</div></div>
           <button class="btn danger sm" onclick="Auth.deleteAccount()">Delete</button></div>
       </div>
 
-      <div class="card tiny mut" style="line-height:1.65;margin-top:16px">
-        <b style="color:var(--ink2)">EMIFlow</b> v2.1 “Aurora” · <span id="buildid"></span><br>
-        Your payment history and preferences live only in your account — never sold, never shared. Passwords are salted + PBKDF2-hashed; sessions are revocable any time.<br><br>
-        Lender names &amp; logos are trademarks of their respective owners, used solely as visual tags in your personal tracker. EMIFlow is not affiliated with any of them and never touches your bank.
+      <div class="card tiny mut" style="line-height:1.7;margin-top:16px">
+        <b style="color:var(--ink2)">EMIFlow</b> v2.2 “Calm” · <span id="buildid"></span><br>
+        Your data lives only in your account — never sold, never shared. Lender names &amp; logos are trademarks of their respective owners, used solely as visual tags. EMIFlow never touches your bank.
       </div>
     </section>
   </main>
 
-  <nav class="nav"><div class="dock" id="dock">
-    <div class="dockpill" id="dockpill"></div>
+  <nav class="nav"><div class="navin">
     <button class="navbtn on" data-tab="home" onclick="App.go('home')"><svg class="ic"><use href="#i-home"/></svg>Home</button>
     <button class="navbtn" data-tab="stats" onclick="App.go('stats')"><svg class="ic"><use href="#i-chart"/></svg>Reports</button>
     <button class="navadd" onclick="Sheet.openAdd()" aria-label="Add EMI"><svg class="ic lg"><use href="#i-plus"/></svg></button>
     <button class="navbtn" data-tab="calendar" onclick="App.go('calendar')"><svg class="ic"><use href="#i-cal"/></svg>Calendar</button>
-    <button class="navbtn" data-tab="profile" onclick="App.go('profile')"><svg class="ic"><use href="#i-user"/></svg>Profile</button>
+    <button class="navbtn" data-tab="profile" onclick="App.go('profile')"><svg class="ic"><use href="#i-user"/></svg></button>
   </div></nav>
 </div>
 
 <!-- ======================= AUTH SHEET ======================= -->
 <div class="ov" id="ov-auth"><div class="sheet">
   <div class="grab"></div>
-  <div class="row" style="margin-bottom:8px">
+  <div class="row" style="margin-bottom:6px">
     <button class="btn ghost sm" id="authtab-login" onclick="Auth.tab('login')">Sign in</button>
     <button class="btn ghost sm" id="authtab-register" onclick="Auth.tab('register')">Create account</button>
     <div class="grow"></div>
@@ -152,9 +141,9 @@
   <div id="auth-main">
     <label>Your name</label><input id="au-name" placeholder="Ajit Sharma" autocomplete="name">
     <label>Email</label><input id="au-email" type="email" placeholder="you@example.com" autocomplete="email">
-    <label>Password <span style="text-transform:none;letter-spacing:0">(min 8 chars)</span></label>
+    <label>Password <span class="mut">(min 8 chars)</span></label>
     <input id="au-pass" type="password" placeholder="••••••••" autocomplete="current-password">
-    <div id="au-err" class="small hidden" style="color:var(--danger);margin-top:10px;font-weight:700"></div>
+    <div id="au-err" class="small hidden" style="color:var(--danger);margin-top:10px;font-weight:550"></div>
     <button class="btn pri wide" id="au-go" style="margin-top:18px" onclick="Auth.submit()">Create account</button>
     <button class="ob-demo" onclick="Auth.forgotView()">Forgot password?</button>
   </div>
@@ -168,7 +157,7 @@
       <label>New password</label><input id="fg-pass" type="password" placeholder="min 8 chars">
       <button class="btn pri wide" style="margin-top:14px" onclick="Auth.resetDo()">Set new password</button>
     </div>
-    <div id="fg-msg" class="small" style="margin-top:12px;color:var(--mut);font-weight:600"></div>
+    <div id="fg-msg" class="small" style="margin-top:12px;color:var(--mut)"></div>
     <button class="ob-demo" onclick="Auth.forgotView(false)">← Back to sign in</button>
   </div>
 </div></div>
@@ -191,13 +180,13 @@
     <div><label>Already paid</label><input id="ed-paid" type="number" inputmode="numeric" min="0" placeholder="0"></div>
   </div>
   <div class="prow" style="padding:14px 2px;border-bottom:0">
-    <div class="pic" style="width:36px;height:36px;border-radius:12px;background:var(--field);display:flex;align-items:center;justify-content:center;color:#e0830a"><svg class="ic sm"><use href="#i-bolt"/></svg></div>
-    <div class="grow"><div class="t" style="font-weight:700;font-size:14.5px">Autopay</div><div class="s small mut" style="font-weight:600">Auto-debited each month</div></div>
+    <div class="pic"><svg class="ic sm"><use href="#i-bolt"/></svg></div>
+    <div class="grow"><div class="t">Autopay</div><div class="s">Auto-debited each month</div></div>
     <label class="switch"><input type="checkbox" id="ed-autopay"><i></i></label></div>
   <label>Remind me</label>
   <select id="ed-remind"><option value="0">On due day only</option><option value="1">1 day before</option><option value="2" selected>2 days before</option><option value="4">4 days before</option><option value="7">1 week before</option></select>
   <label>Notes (optional)</label><textarea id="ed-notes" rows="2" maxlength="240" placeholder="Loan account no., amount variation…"></textarea>
-  <div id="ed-err" class="small hidden" style="color:var(--danger);margin-top:10px;font-weight:700"></div>
+  <div id="ed-err" class="small hidden" style="color:var(--danger);margin-top:10px;font-weight:550"></div>
   <button class="btn pri wide" style="margin-top:18px" id="ed-save" onclick="Edit.save()">Save EMI</button>
 </div></div>
 
@@ -210,10 +199,10 @@
 </div></div>
 
 <!-- ======================= CONFIRM ======================= -->
-<div class="ov" id="ov-confirm" style="align-items:center"><div class="sheet" style="max-width:390px;border-radius:28px;margin-bottom:18dvh">
+<div class="ov" id="ov-confirm" style="align-items:center"><div class="sheet" style="max-width:380px;border-radius:24px;margin-bottom:18dvh">
   <h2 id="cf-title">Are you sure?</h2>
-  <p class="mut small" id="cf-text" style="margin-top:7px;font-weight:600"></p>
-  <div class="row" style="margin-top:20px;gap:10px">
+  <p class="mut small" id="cf-text" style="margin-top:6px"></p>
+  <div class="row" style="margin-top:18px;gap:10px">
     <button class="btn ghost grow" onclick="UI.closeOv('ov-confirm')">Cancel</button>
     <button class="btn danger grow" id="cf-ok">Confirm</button>
   </div>

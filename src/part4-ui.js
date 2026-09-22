@@ -19,16 +19,16 @@ function lenderTile(id, cls) {
 const licBig = (id) => lenderTile(id, 'lic');
 const licSm = (id) => lenderTile(id, 'lic2');
 
-function statusChip(e) {
+function loanStatus(e) {
   const nd = EMI.nextDue(e);
-  if (!nd) return `<span class="statechip done">${ic('check', 'ic xs')} done</span>`;
+  if (!nd) return {cls: 'done', txt: 'done'};
   const od = EMI.overdueCount(e);
-  if (od) return `<span class="statechip over">${od} overdue</span>`;
+  if (od) return {cls: 'over', txt: od + ' overdue'};
   const diff = Math.round((parseYmd(nd.date) - parseYmd(today())) / 86400000);
-  if (diff === 0) return `<span class="statechip soon">due today</span>`;
-  if (diff === 1) return `<span class="statechip soon">tomorrow</span>`;
-  if (diff <= 7) return `<span class="statechip due">in ${diff}d</span>`;
-  return `<span class="statechip due">${prettyDay(nd.date)}</span>`;
+  if (diff === 0) return {cls: 'soon', txt: 'due today'};
+  if (diff === 1) return {cls: 'soon', txt: 'due tomorrow'};
+  if (diff <= 7) return {cls: 'due', txt: 'in ' + diff + ' days'};
+  return {cls: 'due', txt: 'due ' + prettyDay(nd.date)};
 }
 
 /* ---------------- auth ---------------- */
@@ -194,7 +194,7 @@ const Detail = {
     const hist = (e.paidDates || []).slice(-5).reverse().map((d) =>
       `<div class="hrow"><div class="dd ok"><small>${parseYmd(d).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(d).getDate()}</div>
        <div class="grow"><b>${fmtINR(e.amt)}</b> <span class="mut small" style="font-weight:600">paid</span></div>
-       <span class="statechip done">${ic('check', 'ic xs')}</span></div>`).join('');
+       <span class="chip ok">paid</span></div>`).join('');
     $('#dt-title').textContent = e.name;
     $('#dt-body').innerHTML = `
       <div class="row" style="margin:6px 0 2px">
@@ -212,7 +212,7 @@ const Detail = {
       ${od ? `<div class="banner">${ic('alert', 'ic sm')}<span class="grow">${od} installment${od > 1 ? 's' : ''} overdue</span></div>` : ''}
       ${nd ? `<button class="btn pri wide" style="margin-top:14px" onclick="Detail.pay()">${od ? 'Clear overdue' : 'Mark paid'} · ${fmtINR(e.amt)}</button>`
            : `<div class="chip ok" style="margin-top:14px;width:100%;justify-content:center;padding:11px">${ic('spark', 'ic xs')} Loan completed — well done!</div>`}
-      ${upcoming.length ? `<label>Upcoming</label>${upcoming.map(r => `<div class="hrow"><div class="dd mut2"><small>${parseYmd(r.date).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(r.date).getDate()}</div><div class="grow">${fmtINR(e.amt)} <span class="mut small">· #${r.i + 1}</span></div><span class="statechip ${r.state === 'overdue' ? 'over' : 'due'}">${r.state}</span></div>`).join('')}` : ''}
+      ${upcoming.length ? `<label>Upcoming</label>${upcoming.map(r => `<div class="hrow"><div class="dd mut2"><small>${parseYmd(r.date).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(r.date).getDate()}</div><div class="grow">${fmtINR(e.amt)} <span class="mut small">· #${r.i + 1}</span></div><span class="chip ${r.state === 'overdue' ? 'danger' : ''}">${r.state}</span></div>`).join('')}` : ''}
       ${hist ? `<label>Recent payments</label>${hist}` : ''}
       <div class="row" style="gap:10px;margin-top:20px">
         <button class="btn ghost grow" onclick="UI.closeOv('ov-detail');Edit.open('${e.id}')">Edit</button>
@@ -281,7 +281,7 @@ const Cal = {
       <div class="hrow" style="cursor:pointer" onclick="Detail.open('${x.emi.id}')">
         ${licSm(x.emi.lender)}
         <div class="grow"><b>${esc(x.emi.name)}</b><div class="small mut" style="font-weight:600">${fmtINR(x.emi.amt)}${x.emi.autopay ? ' · autopay' : ''}</div></div>
-        <span class="statechip ${x.state === 'overdue' ? 'over' : 'soon'}">${x.state}</span>
+        <span class="chip ${x.state === 'overdue' ? 'danger' : 'warn'}">${x.state}</span>
       </div>`).join('');
   },
 };
@@ -297,49 +297,46 @@ const Render = {
     $('#greet').textContent = (hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening') + (Store.s.demo ? '' : ', ' + (Store.s.user?.name || 'there').split(' ')[0]);
     hr.innerHTML = `
       <div class="hlabel">${ic('wallet', 'ic sm')} Total outstanding</div>
-      <div class="hamt" id="heroamt">₹0</div>
-      <div class="hsub">across ${s.count} active EMI${s.count === 1 ? '' : 's'}${s.overdue ? ` · <b style="color:#ffd7a0">${fmtINR(s.overdue)} overdue</b>` : ''}</div>
-      <div class="hgrid">
+      <div class="hamt">${fmtINR(s.outstanding)}</div>
+      <div class="hsub">across ${s.count} active EMI${s.count === 1 ? '' : 's'}${s.overdue ? ` · <b>${fmtINR(s.overdue)} overdue</b>` : ''}</div>
+      <div class="hrow">
         <div class="hcell"><div class="k">Due this month</div><div class="v">${fmtINR(s.dueThisMonth)}</div></div>
-        <div class="hcell"><div class="k">Paid this mo</div><div class="v">${fmtINR(s.paidThisMonth)}</div></div>
-        <div class="hcell"><div class="k">Monthly load</div><div class="v">${fmtINR(EMI.monthOutflow(today().slice(0, 7)))}</div></div>
+        <div class="hcell"><div class="k">Paid this month</div><div class="v">${fmtINR(s.paidThisMonth)}</div></div>
       </div>
-      ${s.next ? `<div class="hnext">${ic('clock', 'ic sm')}<div class="grow"><div class="t">Next due</div><div class="v">${prettyDay(s.next.date)} · ${fmtINR(s.next.amt)}</div></div>${statusChip(s.next.emi)}</div>` : ''}`;
-    countUp($('#heroamt'), s.outstanding);
+      ${s.next ? `<div class="hnext"><div><div class="t">Next due · ${prettyDay(s.next.date)}</div><div class="v">${fmtINR(s.next.amt)} — ${esc(s.next.emi.name)}</div></div></div>` : ''}`;
     const list = Object.values(Store.s.emis).filter(e => !e.deleted)
       .sort((a, b) => (EMI.active(b) - EMI.active(a)) || (((EMI.nextDue(a) || {date: '9'}).date < (EMI.nextDue(b) || {date: '9'}).date) ? -1 : 1));
     const host = $('#loans');
-    host.innerHTML = list.length ? list.map((e, i) => {
-      const nd = EMI.nextDue(e), od = EMI.overdueCount(e), prog = EMI.progress(e);
+    host.innerHTML = list.length ? list.map((e) => {
+      const st = loanStatus(e), prog = EMI.progress(e);
       const L = LMAP[e.lender] || LMAP.other;
-      const dl = Store.s.meta.anim === false ? '0' : String(Math.min(i * 55, 440));
-      return `<div class="loan" style="animation-delay:${dl}ms" onclick="Detail.open('${e.id}')">
+      return `<div class="loan" onclick="Detail.open('${e.id}')">
         ${licBig(e.lender)}
         <div class="grow">
-          <div class="t">${esc(e.name)} ${e.autopay ? `<span class="mut" title="autopay">${ic('bolt', 'ic xs')}</span>` : ''}</div>
-          <div class="s">${esc(L.n)} · <span class="num">${e.paid}/${e.n}</span> paid</div>
+          <div class="t">${esc(e.name)}${e.autopay ? ` <span class="mut tiny">· autopay</span>` : ''}</div>
+          <div class="s">${esc(L.n)} · ${e.paid}/${e.n} paid</div>
           <div class="pbar"><i style="width:${prog}%"></i></div>
         </div>
         <div class="right">
           <div class="amt">${fmtINR(e.amt)}</div>
-          <div style="margin-top:5px">${statusChip(e)}</div>
+          <div class="st ${st.cls}">${st.txt}</div>
         </div>
       </div>`;
-    }).join('') : `<div class="card" style="text-align:center;padding:40px 24px">
-      <div style="width:64px;height:64px;border-radius:20px;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;margin:0 auto 14px">${ic('wallet', 'ic lg')}</div>
-      <h3>No EMIs yet</h3><p class="mut small" style="margin-top:5px;font-weight:600">Tap + to add your first — pick a lender,<br>amount and due date. That's it.</p>
-      <button class="btn pri" style="margin-top:18px" onclick="Sheet.openAdd()">${ic('plus', 'ic sm')} Add your first EMI</button></div>`;
+    }).join('') : `<div class="empty">
+      <div class="eic">${ic('wallet', 'ic lg')}</div>
+      <h3>No EMIs yet</h3><p>Tap + to add your first — pick a lender,<br>amount and due date.</p>
+      <button class="btn pri" style="margin-top:16px" onclick="Sheet.openAdd()">Add your first EMI</button></div>`;
   },
   stats() {
     const s = EMI.summary();
     const tiles = [
-      ['wallet', '', 'Active EMIs', s.count],
-      ['cal', 'teal', 'Due this month', fmtINR(s.dueThisMonth)],
-      ['alert', 'amber', 'Overdue', s.overdue ? fmtINR(s.overdue) : '₹0'],
-      ['spark', 'violet', 'Paid this mo', fmtINR(s.paidThisMonth)],
+      ['Active EMIs', s.count],
+      ['Due this month', fmtINR(s.dueThisMonth)],
+      ['Overdue', s.overdue ? fmtINR(s.overdue) : '₹0'],
+      ['Paid this month', fmtINR(s.paidThisMonth)],
     ];
-    $('#statcards').innerHTML = tiles.map(([icn, cls, k, v]) =>
-      `<div class="stat ${cls}">${ic(icn, 'ic sm')}<div class="k">${k}</div><div class="v num">${v}</div></div>`).join('');
+    $('#statcards').innerHTML = tiles.map(([k, v]) =>
+      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
     const proj = EMI.projection(6); const max = Math.max(...proj.map(p => p.amt), 1);
     $('#projbars').innerHTML = proj.map((p, i) =>
       `<div class="b ${i === 0 ? '' : 'past'}"><span class="val">${p.amt ? (p.amt >= 100000 ? Math.round(p.amt / 1000) + 'k' : (p.amt / 1000).toFixed(1) + 'k') : '·'}</span><i style="height:${Math.max(4, Math.round(p.amt / max * 100))}%"></i><span class="l">${p.label}</span></div>`).join('');
@@ -386,12 +383,7 @@ const App = {
     if (tab === 'stats') Render.stats();
     vib(6);
   },
-  pill() {
-    const dock = $('#dock'), pill = $('#dockpill'); if (!dock || !pill) return;
-    const on = dock.querySelector('.navbtn.on'); if (!on) return;
-    pill.style.left = on.offsetLeft + 'px';
-    pill.style.width = on.offsetWidth + 'px';
-  },
+  pill() {},
   demo() {
     const D = [
       {name: 'Smart TV 55″', lender: 'bajaj', cat: 'consumer', amt: 5499, n: 12, paid: 4, off: -4, dayOff: 0, autopay: true, notes: 'Smart TV 55″ 4K'},
@@ -424,7 +416,7 @@ const App = {
     if (logged) {
       if (!Store.s.demo) $('#greet').textContent = 'Hi there';
       Render.all(); Sync.statusUI('', 'syncing…'); Sync.full(); Remind.check();
-      requestAnimationFrame(() => { this.pill(); setTimeout(() => this.pill(), 350); });
+      
     }
   },
 };

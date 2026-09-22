@@ -29,7 +29,7 @@ const LENDERS = [
 ];
 const LMAP = Object.fromEntries(LENDERS.map(l => [l.id, l]));
 const CMAP = Object.fromEntries(CATS.map(c => [c.id, c]));
-const APP_VERSION = '2.1.0';
+const APP_VERSION = '2.2.0';
 
 /* ---------------- tiny utils ---------------- */
 const $ = (s) => document.querySelector(s);
@@ -289,6 +289,6 @@ const Remind = {
     if (!urgent.length) { host.innerHTML = ''; return; }
     const u = urgent.sort((a, b) => a.e.name.localeCompare(b.e.name))[0];
     host.innerHTML = `<div class="banner">${ic('alert', 'ic sm')}<span class="grow">${esc(u.txt)}</span>
-      <button class="btn sm" style="background:var(--warn);color:#fff" onclick="Detail.open('${u.id}',true)">Pay</button></div>`;
+      <button class="bpay" onclick="Detail.open('${u.id}')">Pay →</button></div>`;
   },
 };
