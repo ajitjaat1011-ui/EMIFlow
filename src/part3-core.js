@@ -4,11 +4,12 @@
 'use strict';
 
 const CATS = [
-  {id:'personal', n:'Personal', ic:'briefcase'}, {id:'consumer', n:'Consumer', ic:'tv'},
-  {id:'bike', n:'Bike', ic:'bike'}, {id:'car', n:'Car', ic:'car'},
-  {id:'home', n:'Home', ic:'home'}, {id:'card', n:'Card bill', ic:'card2'},
-  {id:'bnpl', n:'BNPL', ic:'bag'}, {id:'other', n:'Other', ic:'folder'},
+  {id:'personal', n:'Loan',     ic:'briefcase', c:'#565fe9'},
+  {id:'consumer', n:'Phone',    ic:'phone',     c:'#8b5cf6'},
+  {id:'bnpl',     n:'Shopping', ic:'bag',       c:'#f0a32f'},
+  {id:'other',    n:'Other',    ic:'folder',    c:'#64748b'},
 ];
+const CAT_ALIAS = {bike:'personal', car:'personal', home:'personal', card:'other', shopping:'bnpl', phone:'consumer'};
 const LENDERS = [
   {id:'bajaj',    n:'Bajaj Finserv', c:'#2563eb'},
   {id:'paytm',    n:'Paytm',         c:'#002972'},
@@ -29,7 +30,7 @@ const LENDERS = [
 ];
 const LMAP = Object.fromEntries(LENDERS.map(l => [l.id, l]));
 const CMAP = Object.fromEntries(CATS.map(c => [c.id, c]));
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '3.0.0';
 
 /* ---------------- tiny utils ---------------- */
 const $ = (s) => document.querySelector(s);
@@ -75,7 +76,7 @@ function confirmBox(title, text, onOk) {
 /* ---------------- persistent store ---------------- */
 const Store = {
   ls: 'emiflow.v2',
-  s: { token: null, user: null, emis: {}, cursor: 0, meta: {theme:'system', anim:true, notify:false}, lastSync: 0, outbox: [], notifiedOn: '' },
+  s: { token: null, user: null, emis: {}, cursor: 0, meta: {theme:'system', anim:true, notify:false}, lastSync: 0, outbox: [], notifiedOn: '', onboarded: false },
   load() { try { const d = JSON.parse(localStorage.getItem(this.ls)); if (d && typeof d === 'object') Object.assign(this.s, d); } catch {} },
   save() { try { localStorage.setItem(this.ls, JSON.stringify(this.s)); } catch {} },
   reset() { try { localStorage.removeItem(this.ls); } catch {} this.s = { token: null, user: null, emis: {}, cursor: 0, meta: {theme:'system', anim:true, notify:false}, lastSync: 0, outbox: [], notifiedOn: '' }; },
@@ -100,7 +101,7 @@ const EMI = {
     return {
       v: 1, id: d.id, name: String(d.name || 'Untitled EMI').slice(0, 60),
       lender: LMAP[d.lender] ? d.lender : 'other',
-      cat: CMAP[d.cat] ? d.cat : 'other',
+      cat: CMAP[d.cat] ? d.cat : (CAT_ALIAS[d.cat] || 'other'),
       amt: Math.max(0, Number(d.amt) || 0),
       n: Math.max(1, Math.min(480, Math.round(Number(d.n) || 1))),
       paid: Math.max(0, Math.min(Math.round(Number(d.paid) || 0), Math.round(Number(d.n) || 1))),
@@ -145,6 +146,23 @@ const EMI = {
     return out;
   },
   monthOutflow(ymStr) { return this.duesInMonth(ymStr).reduce((s, d) => s + d.emi.amt, 0); },
+  paidInMonth(ymStr) {
+    let sum = 0;
+    for (const e of Object.values(Store.s.emis)) {
+      if (e.deleted) continue;
+      for (const d of (e.paidDates || [])) if (d.startsWith(ymStr)) sum += e.amt;
+    }
+    return sum;
+  },
+  upcomingSoon() { // next installment within 3 days
+    const out = [];
+    for (const e of Object.values(Store.s.emis)) {
+      if (e.deleted || !EMI.active(e)) continue;
+      const nd = this.nextDue(e);
+      if (nd) { const diff = Math.round((parseYmd(nd.date) - parseYmd(today())) / 86400000); if (diff <= 3) out.push({emi: e, date: nd.date, in: diff, amt: e.amt}); }
+    }
+    return out.sort((a, b) => a.date < b.date ? -1 : 1);
+  },
   summary() {
     const all = Object.values(Store.s.emis).filter(e => !e.deleted);
     const act = all.filter(e => this.active(e));

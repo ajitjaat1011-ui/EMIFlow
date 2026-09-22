@@ -1,12 +1,18 @@
 /* ============================================================
-   EMIFlow v2.1 “Aurora” UI — render · auth · sheets · calendar
+   EMI Flow v3.0 — pages: splash · onboarding · auth · dashboard
    ============================================================ */
 'use strict';
 
-/* ---------------- ui helpers ---------------- */
+/* ---------------- shared UI ---------------- */
 const UI = {
   openOv(id) { $('#' + id).classList.add('on'); document.body.style.overflow = 'hidden'; },
   closeOv(id) { $('#' + id).classList.remove('on'); document.body.style.overflow = ''; },
+  eye(inputId, btn) {
+    const i = $('#' + inputId);
+    const show = i.type === 'password';
+    i.type = show ? 'text' : 'password';
+    btn.innerHTML = ic(show ? 'eyeoff' : 'eye', 'ic sm');
+  },
 };
 document.querySelectorAll('.ov').forEach(ov => ov.addEventListener('click', (e) => { if (e.target === ov) UI.closeOv(ov.id); }));
 
@@ -16,63 +22,138 @@ function lenderTile(id, cls) {
   if (icn) return `<img class="${cls}" src="${icn}" alt="${esc(L.n)}" loading="lazy">`;
   return `<div class="${cls} ph" style="background:${L.c}">${esc(L.n.slice(0, 2).toUpperCase())}</div>`;
 }
-const licBig = (id) => lenderTile(id, 'lic');
-const licSm = (id) => lenderTile(id, 'lic2');
 
-function loanStatus(e) {
-  const nd = EMI.nextDue(e);
-  if (!nd) return {cls: 'done', txt: 'done'};
-  const od = EMI.overdueCount(e);
-  if (od) return {cls: 'over', txt: od + ' overdue'};
-  const diff = Math.round((parseYmd(nd.date) - parseYmd(today())) / 86400000);
-  if (diff === 0) return {cls: 'soon', txt: 'due today'};
-  if (diff === 1) return {cls: 'soon', txt: 'due tomorrow'};
-  if (diff <= 7) return {cls: 'due', txt: 'in ' + diff + ' days'};
-  return {cls: 'due', txt: 'due ' + prettyDay(nd.date)};
+function toast(msg, err) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg;
+  $('#toasts').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 420); }, 2400);
 }
+function confirmBox(title, text, onOk) {
+  $('#cf-title').textContent = title; $('#cf-text').textContent = text;
+  $('#cf-ok').onclick = () => { UI.closeOv('ov-confirm'); onOk(); };
+  UI.openOv('ov-confirm');
+}
+
+/* ---------------- router ---------------- */
+const Route = {
+  cur: 'home',
+  to(name) { // top-level: splash onboard login register success app
+    ['scr-splash','scr-onboard','scr-login','scr-register','scr-success'].forEach(id => $('#' + id).classList.add('hidden'));
+    $('#app').classList.add('hidden'); $('#bnav').classList.add('hidden');
+    if (name === 'app') {
+      $('#app').classList.remove('hidden'); $('#bnav').classList.remove('hidden');
+      this.go(this.cur === 'add' ? 'home' : this.cur);
+      return;
+    }
+    const el = $('#scr-' + name);
+    if (el) el.classList.remove('hidden');
+    window.scrollTo(0, 0);
+  },
+  go(tab, hideNav) {
+    this.cur = tab;
+
+    document.querySelectorAll('.app-scr').forEach(s => s.classList.remove('on'));
+    const scr = $('#scr-' + tab); if (scr) scr.classList.add('on');
+    document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+    $('#bnav').classList.toggle('hidden', !!hideNav);
+    if (tab === 'home') Render.home();
+    if (tab === 'emis') EMIs.render();
+    if (tab === 'insights') Render.insights();
+    if (tab === 'calendar') Cal.render();
+    if (tab === 'profile') Render.profile();
+    window.scrollTo(0, 0);
+  },
+  back() { this.go('emis'); },
+};
+
+/* ---------------- onboarding ---------------- */
+const OB = {
+  i: 0,
+  show(n) {
+    this.i = n;
+    document.querySelectorAll('.ob-slide').forEach(s => s.classList.toggle('on', +s.dataset.s === n));
+    document.querySelectorAll('#obdots i').forEach((d, j) => d.classList.toggle('on', j === n));
+    $('#obbtn').innerHTML = (n === 2 ? "Let's Go " : (n === 0 ? 'Get Started ' : 'Next ')) + ic('arrow', 'ic sm');
+  },
+  next() { this.i >= 2 ? this.done() : this.show(this.i + 1); },
+  skip() { this.done(); },
+  done() {
+    Store.s.onboarded = true; Store.save();
+    Route.to(Store.s.token || Store.s.demo ? 'app' : 'login');
+  },
+};
 
 /* ---------------- auth ---------------- */
 const Auth = {
-  mode: 'login',
-  open(mode) { this.tab(mode || 'login'); $('#au-err').classList.add('hidden'); UI.openOv('ov-auth'); },
-  tab(mode) {
-    this.mode = mode;
-    $('#authtab-login').classList.toggle('on', mode === 'login');
-    $('#authtab-register').classList.toggle('on', mode === 'register');
-    $('#authtab-login').style.cssText = mode === 'login' ? 'background:var(--acc);color:#fff' : '';
-    $('#authtab-register').style.cssText = mode === 'register' ? 'background:var(--acc);color:#fff' : '';
-    $('#au-name').parentElement.querySelector('label').style.display = mode === 'register' ? '' : 'none';
-    $('#au-name').style.display = mode === 'register' ? '' : 'none';
-    $('#au-go').textContent = mode === 'register' ? 'Create account' : 'Sign in';
-    $('#au-err').classList.add('hidden');
-  },
-  err(msg) { const e = $('#au-err'); e.textContent = msg; e.classList.remove('hidden'); },
-  async submit() {
-    if (Store.s.demo) { Store.s.demo = false; Store.save(); }
-    const email = $('#au-email').value.trim().toLowerCase();
-    const pass = $('#au-pass').value;
-    const name = $('#au-name').value.trim();
-    if (this.mode === 'register' && name.length < 2) return this.err('Please enter your name.');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return this.err('That email doesn\'t look right.');
-    if (pass.length < 8) return this.err('Password must be at least 8 characters.');
-    const btn = $('#au-go'); btn.disabled = true; btn.textContent = 'Please wait…';
-    const r = await api('/auth/' + (this.mode === 'register' ? 'register' : 'login'), {method: 'POST', body: JSON.stringify({email, password: pass, name})});
-    btn.disabled = false; btn.textContent = this.mode === 'register' ? 'Create account' : 'Sign in';
+  pendingUser: null,
+  err(id, msg) { const e = $('#' + id); e.textContent = msg; e.classList.toggle('hidden', !msg); },
+  async login() {
+    const ident = $('#li-user').value.trim().toLowerCase();
+    const pass = $('#li-pass').value;
+    this.err('li-err', '');
+    if (/^\d{10}$/.test(ident.replace(/\D/g, '')) && !ident.includes('@')) {
+      const p = ident.replace(/\D/g, '');
+      if (p.length !== 10) return this.err('li-err', 'Enter a valid 10-digit mobile number.');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(ident)) {
+      return this.err('li-err', 'Enter a valid mobile number or email.');
+    }
+    if (pass.length < 8) return this.err('li-err', 'Password must be at least 8 characters.');
+    const btn = $('#li-go'); btn.disabled = true; btn.textContent = 'Please wait…';
+    const r = await api('/auth/login', {method: 'POST', body: JSON.stringify({email: ident, password: pass})});
+    btn.disabled = false; btn.innerHTML = 'Login ' + ic('arrow', 'ic sm');
     if (!r.ok) {
-      const M = {email_taken: 'That email is already registered — sign in instead.', bad_credentials: 'Wrong email or password.', rate_limited: 'Too many attempts — wait a few minutes.', bad_email: 'Invalid email.', bad_name: 'Name too short.', bad_password: 'Password must be 8+ characters.', network: 'You appear offline.'};
-      return this.err(M[r.error] || ('Failed (' + (r.error || r._status) + ')'));
+      const M = {bad_credentials: 'Wrong mobile/email or password.', rate_limited: 'Too many attempts — wait a few minutes.', network: 'You appear offline.'};
+      return this.err('li-err', M[r.error] || ('Login failed (' + (r.error || r._status) + ')'));
     }
     Store.s.demo = false;
     Store.s.token = r.token; Store.s.user = r.user; Store.s.emis = {}; Store.s.cursor = 0; Store.save();
-    UI.closeOv('ov-auth');
-    toast('Welcome, ' + (r.user.name.split(' ')[0]) + '!');
-    App.enter();
+    toast('Welcome back, ' + r.user.name.split(' ')[0] + '!');
+    this.enterApp();
     Sync.full();
-    try { fetch('/api/analytics', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({e: 'auth', s: this.mode})}); } catch {}
+  },
+  async register() {
+    const name = $('#rg-name').value.trim();
+    const phone = $('#rg-phone').value.replace(/\D/g, '');
+    const email = $('#rg-email').value.trim().toLowerCase();
+    const pass = $('#rg-pass').value;
+    const terms = $('#rg-terms').checked;
+    this.err('rg-err', '');
+    if (name.length < 2) return this.err('rg-err', 'Please enter your full name.');
+    if (phone.length !== 10) return this.err('rg-err', 'Enter a valid 10-digit mobile number.');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return this.err('rg-err', 'That email doesn\'t look right.');
+    if (pass.length < 8) return this.err('rg-err', 'Password must be at least 8 characters.');
+    if (!terms) return this.err('rg-err', 'Please agree to the Terms & Privacy Policy.');
+    const btn = $('#rg-go'); btn.disabled = true; btn.textContent = 'Creating…';
+    const finalEmail = email || ('user' + phone + '@emiflow.local');
+    const r = await api('/auth/register', {method: 'POST', body: JSON.stringify({name, email: finalEmail, phone, password: pass})});
+    btn.disabled = false; btn.innerHTML = 'Create Account ' + ic('arrow', 'ic sm');
+    if (!r.ok) {
+      const M = {email_taken: 'Account already exists with this mobile/email — Login instead.', bad_phone: 'Invalid mobile number.', rate_limited: 'Too many attempts — wait a bit.', network: 'You appear offline.'};
+      return this.err('rg-err', M[r.error] || ('Could not create account (' + (r.error || r._status) + ')'));
+    }
+    Store.s.demo = false;
+    Store.s.token = r.token; Store.s.user = r.user; Store.s.emis = {}; Store.s.cursor = 0; Store.save();
+    this.pendingUser = r.user;
+    Route.to('success');
+    try { fetch('/api/analytics', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({e: 'auth', s: 'register'})}); } catch {}
+  },
+  finishRegister() {
+    this.enterApp();
+    toast('Start by adding your first EMI');
+    Sync.full();
+  },
+  enterApp() {
+    Route.cur = 'home';
+    Route.to('app');
+    Render.all();
+    Sync.statusUI('', 'syncing…');
+    if (!Store.s.demo) Sync.full();
+    Remind.check();
   },
   forgotView(show = true) {
-    $('#auth-main').classList.toggle('hidden', show);
-    $('#auth-forgot').classList.toggle('hidden', !show);
+    $('#li-forgot').classList.toggle('hidden', !show);
+    if (show) $('#li-forgot').scrollIntoView({behavior: 'smooth', block: 'nearest'});
   },
   async forgotSend() {
     const email = $('#fg-email').value.trim().toLowerCase();
@@ -87,100 +168,78 @@ const Auth = {
   },
   async resetDo() {
     const email = $('#fg-email').value.trim().toLowerCase();
-    const code = $('#fg-code').value.trim(); const pass = $('#fg-pass').value;
+    const code = $('#fg-code').value.trim(), pass = $('#fg-pass').value;
     if (code.length !== 6) return $('#fg-msg').textContent = 'Enter the 6-digit code.';
     if (pass.length < 8) return $('#fg-msg').textContent = 'New password must be 8+ characters.';
     const r = await api('/auth/reset-password', {method: 'POST', body: JSON.stringify({email, code, password: pass})});
-    if (r.ok) { $('#fg-msg').textContent = 'Password set! Sign in with it now.'; setTimeout(() => { this.forgotView(false); this.tab('login'); }, 900); }
+    if (r.ok) { $('#fg-msg').textContent = 'Password set! Login with it now.'; setTimeout(() => this.forgotView(false), 1000); }
     else $('#fg-msg').textContent = 'Invalid or expired code.';
   },
   sessionExpired() {
     if (!Store.s.token || Store.s.demo) return;
     Store.s.token = null; Store.save();
-    toast('Session expired — sign in again', true);
-    App.enter();
+    toast('Session expired — login again', true);
+    Route.to('login');
   },
-  async logout() {
-    if (Store.s.demo) { Store.reset(); App.enter(); return; }
-    await api('/auth/logout', {method: 'POST'});
-    Store.s.token = null; Store.save(); App.enter(); toast('Logged out');
-  },
-  async logoutAll() {
-    if (Store.s.demo) return confirmBox('Leave demo?', 'Sample data will be cleared.', () => { Store.reset(); App.enter(); });
-    confirmBox('Log out everywhere?', 'All sessions on all devices will end. You\'ll sign in again here.', async () => {
-      await api('/auth/logout-all', {method: 'POST'});
-      Store.s.token = null; Store.save(); App.enter(); toast('Logged out of all devices');
-    });
-  },
-  deleteAccount() {
-    if (Store.s.demo) return toast('Nothing to delete in demo', true);
-    confirmBox('Delete account permanently?', 'Every EMI, payment record and your account will be erased. This cannot be undone.', async () => {
-      const pass = prompt('Confirm your password to delete:');
-      if (pass == null) return;
-      const r = await api('/account/delete', {method: 'POST', body: JSON.stringify({password: pass})});
-      if (r.ok) { Store.reset(); App.enter(); toast('Account deleted. Take care!'); }
-      else toast(r.error === 'bad_credentials' ? 'Wrong password.' : 'Delete failed.', true);
-    });
+  logout() {
+    const doIt = async () => {
+      if (!Store.s.demo) await api('/auth/logout', {method: 'POST'});
+      Store.s.token = null; Store.s.demo = false; Store.save();
+      Route.to('login'); toast('Logged out');
+    };
+    confirmBox('Log out?', 'You can login back anytime.', doIt);
   },
 };
 
-/* ---------------- add / edit sheet ---------------- */
-const Sheet = { openAdd() { if (Store.s.demo) toast('Demo — sign up to add your own', true); else Edit.open(null); } };
-const Edit = {
-  current: null, lender: 'other', cat: 'personal',
-  open(id) {
-    this.current = id;
-    const e = id ? Store.s.emis[id] : null;
-    $('#ed-title').textContent = id ? 'Edit EMI' : 'Add EMI';
-    const d = e || {};
-    $('#ed-name').value = d.name || '';
-    this.lender = d.lender || 'other';
-    this.cat = d.cat || 'personal';
-    $('#ed-amt').value = d.amt || '';
-    $('#ed-n').value = d.n || '';
-    $('#ed-first').value = d.firstDue || ymd(addMonths(new Date(), 1));
-    $('#ed-paid').value = d.paid ?? 0;
-    $('#ed-autopay').checked = !!d.autopay;
-    $('#ed-remind').value = String(d.remind ?? 2);
-    $('#ed-notes').value = d.notes || '';
-    $('#ed-err').classList.add('hidden');
-    $('#ed-save').textContent = id ? 'Save changes' : 'Save EMI';
-    this.renderPickers();
-    UI.openOv('ov-edit');
+/* ---------------- my EMIs (tabs) ---------------- */
+const EMIs = {
+  tab: 'active',
+  switchTo(t) {
+    this.tab = t;
+    document.querySelectorAll('#emitabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+    this.render();
   },
-  renderPickers() {
-    $('#ed-lenders').innerHTML = LENDERS.map(l =>
-      `<div class="lpick ${l.id === this.lender ? 'on' : ''}" data-id="${l.id}" onclick="Edit.pickLender('${l.id}')">${LENDER_ICONS[l.id] ? `<img src="${LENDER_ICONS[l.id]}" alt="">` : `<div style="width:34px;height:34px;border-radius:10px;background:${l.c};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px">${esc(l.n.slice(0, 2).toUpperCase())}</div>`}<span>${esc(l.n)}</span></div>`).join('');
-    $('#ed-cats').innerHTML = CATS.map(c =>
-      `<button class="cpick ${c.id === this.cat ? 'on' : ''}" onclick="Edit.pickCat('${c.id}')">${ic(c.ic, 'ic xs')} ${esc(c.n)}</button>`).join('');
-  },
-  pickLender(id) { this.lender = id; this.renderPickers(); vib(8); },
-  pickCat(id) { this.cat = id; this.renderPickers(); vib(8); },
-  save() {
-    const name = $('#ed-name').value.trim();
-    const amt = Number($('#ed-amt').value), n = Math.round(Number($('#ed-n').value));
-    const first = $('#ed-first').value, paid = Math.max(0, Math.round(Number($('#ed-paid').value) || 0));
-    const err = (m) => { const e = $('#ed-err'); e.textContent = m; e.classList.remove('hidden'); };
-    if (name.length < 2) return err('Give this EMI a name.');
-    if (!(amt > 0)) return err('Enter the EMI amount.');
-    if (!(n >= 1 && n <= 480)) return err('Installments must be 1–480.');
-    if (!first) return err('Pick the first due date.');
-    if (paid > n) return err('Already-paid can\'t exceed total installments.');
-    const prev = this.current ? Store.s.emis[this.current] : null;
-    const doc = EMI.normalize({
-      ...(prev || {}), id: this.current || ('e' + Math.random().toString(36).slice(2, 10)),
-      name, lender: this.lender, cat: this.cat, amt, n, paid, firstDue: first,
-      autopay: $('#ed-autopay').checked, remind: Number($('#ed-remind').value),
-      notes: $('#ed-notes').value.trim(), createdAt: prev ? prev.createdAt : Date.now(),
-      paidDates: prev && prev.paid !== paid ? prev.paidDates.slice(0, paid) : (prev ? prev.paidDates : []),
-    });
-    Sync.queueLocal(doc);
-    UI.closeOv('ov-edit');
-    toast(this.current ? 'EMI updated' : 'EMI added');
-    vib(10);
-    Remind.banner(); Render.all(); Sync.full();
+  render() {
+  const t = today();
+  const all = Object.values(Store.s.emis).filter(e => !e.deleted);
+  const started = (e) => e.paid > 0 || cmpYmd(e.firstDue, t) <= 0;
+  const groups = {
+    active: all.filter(e => started(e) && EMI.active(e)),
+    upcoming: all.filter(e => !started(e)),
+    done: all.filter(e => !EMI.active(e)),
+  };
+  document.querySelector('#emitabs [data-t=active]').textContent = `Active (${groups.active.length})`;
+  document.querySelector('#emitabs [data-t=upcoming]').textContent = `Upcoming (${groups.upcoming.length})`;
+  document.querySelector('#emitabs [data-t=done]').textContent = `Completed (${groups.done.length})`;
+  const list = groups[this.tab].sort((a, b) => {
+    const da = (EMI.nextDue(a) || {date: a.firstDue}).date, db2 = (EMI.nextDue(b) || {date: b.firstDue}).date;
+    return da < db2 ? -1 : 1;
+  });
+  $('#emilist').innerHTML = list.length ? list.map(e => {
+    const nd = EMI.nextDue(e);
+    const od = EMI.overdueCount(e);
+    let st, cls;
+    if (!EMI.active(e)) { st = 'Completed'; cls = 'ok'; }
+    else if (od) { st = od + ' overdue'; cls = 'bad'; }
+    else if (nd) {
+      const diff = Math.round((parseYmd(nd.date) - parseYmd(t)) / 86400000);
+      st = diff === 0 ? 'Due today' : diff <= 3 ? 'Due in ' + diff + 'd' : 'Next: ' + prettyDay(nd.date);
+      cls = diff <= 3 ? 'warn' : 'mut';
+    } else { st = '—'; cls = 'mut'; }
+    return `<div class="emirow" onclick="Detail.open('${e.id}')">
+      ${lenderTile(e.lender, 'logo')}
+      <div class="grow"><div class="t">${esc(e.name)}</div><div class="s">${esc((LMAP[e.lender] || LMAP.other).n)} · ${e.paid}/${e.n} paid</div></div>
+      <div style="text-align:right"><div class="amt">${fmtINR(e.amt)}</div><div class="st ${cls}">${st}</div></div>
+    </div>`;
+  }).join('') : `<div class="card" style="text-align:center;padding:36px 20px">
+    <div style="width:56px;height:56px;border-radius:18px;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">${ic('wallet', 'ic lg')}</div>
+    <h3>Nothing here yet</h3><p class="small mut" style="margin-top:4px">Add an EMI and it will show up in this list.</p></div>`;
   },
 };
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#emitabs button');
+  if (b) EMIs.switchTo(b.dataset.t);
+});
 
 /* ---------------- detail sheet ---------------- */
 const Detail = {
@@ -190,33 +249,31 @@ const Detail = {
     this.id = id;
     const L = LMAP[e.lender] || LMAP.other, C = CMAP[e.cat] || CMAP.other;
     const nd = EMI.nextDue(e), od = EMI.overdueCount(e), prog = EMI.progress(e);
-    const upcoming = EMI.statusOf(e).filter(r => r.state !== 'paid').slice(0, 4);
-    const hist = (e.paidDates || []).slice(-5).reverse().map((d) =>
+    const upcoming = EMI.statusOf(e).filter(r => r.state !== 'paid').slice(0, 3);
+    const hist = (e.paidDates || []).slice(-4).reverse().map((d) =>
       `<div class="hrow"><div class="dd ok"><small>${parseYmd(d).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(d).getDate()}</div>
-       <div class="grow"><b>${fmtINR(e.amt)}</b> <span class="mut small" style="font-weight:600">paid</span></div>
-       <span class="chip ok">paid</span></div>`).join('');
+       <div class="grow"><b>${fmtINR(e.amt)}</b> <span class="mut small">paid</span></div><span class="chip ok">paid</span></div>`).join('');
     $('#dt-title').textContent = e.name;
     $('#dt-body').innerHTML = `
-      <div class="row" style="margin:6px 0 2px">
-        ${licSm(e.lender)}
-        <div class="grow" style="min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(L.n)}</b></div>
-        <span class="chip acc">${ic(C.ic, 'ic xs')} ${esc(C.n)}</span> ${e.autopay ? `<span class="chip">${ic('bolt', 'ic xs')}autopay</span>` : ''}
-      </div>
-      <div class="dsumgrid">
+      <div class="row" style="margin:4px 0 2px">${lenderTile(e.lender, 'logo')}
+        <div class="grow" style="min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(L.n)}</b>
+        <span class="tiny mut" style="font-weight:600">${C.n}${e.autopay ? ' · autopay' : ''}</span></div>
+        <span class="chip acc">${e.paid}/${e.n}</span></div>
+      <div class="dsum">
         <div><div class="k">EMI</div><div class="v">${fmtINR(e.amt)}</div></div>
-        <div><div class="k">Paid</div><div class="v">${e.paid}<span class="mut" style="font-size:12px">/${e.n}</span></div></div>
-        <div><div class="k">Left</div><div class="v">${fmtINR(EMI.outstanding(e))}</div></div>
+        <div><div class="k">Remaining</div><div class="v">${fmtINR(EMI.outstanding(e))}</div></div>
+        <div><div class="k">Progress</div><div class="v">${prog}%</div></div>
       </div>
-      <div class="pbar" style="margin:2px 0 6px"><i style="width:${prog}%"></i></div>
-      <div class="small mut" style="text-align:center;font-weight:600">${prog}% done · started ${prettyDate(e.firstDue)}${e.notes ? '<br><span class=mut>note:</span> ' + esc(e.notes) : ''}</div>
-      ${od ? `<div class="banner">${ic('alert', 'ic sm')}<span class="grow">${od} installment${od > 1 ? 's' : ''} overdue</span></div>` : ''}
-      ${nd ? `<button class="btn pri wide" style="margin-top:14px" onclick="Detail.pay()">${od ? 'Clear overdue' : 'Mark paid'} · ${fmtINR(e.amt)}</button>`
-           : `<div class="chip ok" style="margin-top:14px;width:100%;justify-content:center;padding:11px">${ic('spark', 'ic xs')} Loan completed — well done!</div>`}
-      ${upcoming.length ? `<label>Upcoming</label>${upcoming.map(r => `<div class="hrow"><div class="dd mut2"><small>${parseYmd(r.date).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(r.date).getDate()}</div><div class="grow">${fmtINR(e.amt)} <span class="mut small">· #${r.i + 1}</span></div><span class="chip ${r.state === 'overdue' ? 'danger' : ''}">${r.state}</span></div>`).join('')}` : ''}
-      ${hist ? `<label>Recent payments</label>${hist}` : ''}
-      <div class="row" style="gap:10px;margin-top:20px">
-        <button class="btn ghost grow" onclick="UI.closeOv('ov-detail');Edit.open('${e.id}')">Edit</button>
-        <button class="btn danger grow" onclick="Detail.remove()">Delete</button>
+      <div class="prog"><i style="width:${prog}%"></i></div>
+      <div class="tiny mut" style="text-align:center;margin-bottom:6px">started ${prettyDate(e.firstDue)}${e.notes ? ' · ' + esc(e.notes) : ''}</div>
+      ${od ? `<div class="oknote" style="background:var(--dangerbg);color:var(--danger)">${ic('alert', 'ic sm')} ${od} installment${od > 1 ? 's' : ''} overdue</div>` : ''}
+      ${nd ? `<button class="pill" style="margin-top:14px" onclick="Detail.pay()">${od ? 'Clear overdue' : 'Mark paid'} · ${fmtINR(e.amt)} <svg class="ic sm"><use href="#i-arrow"/></svg></button>`
+           : `<div class="oknote" style="margin-top:14px">${ic('check', 'ic sm')} Loan completed — well done!</div>`}
+      ${upcoming.length ? `<label class="fl">Upcoming</label>${upcoming.map(r => `<div class="hrow"><div class="dd mut2"><small>${parseYmd(r.date).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(r.date).getDate()}</div><div class="grow">${fmtINR(e.amt)} <span class="mut small">· #${r.i + 1}</span></div><span class="chip">${r.state}</span></div>`).join('')}` : ''}
+      ${hist ? `<label class="fl">Recent payments</label>${hist}` : ''}
+      <div class="row" style="gap:10px;margin-top:18px">
+        <button class="btn2 grow" onclick="UI.closeOv('ov-detail');Edit2.open('${e.id}')">Edit</button>
+        <button class="btn2 danger grow" onclick="Detail.remove()">Delete</button>
       </div>`;
     UI.openOv('ov-detail');
   },
@@ -229,9 +286,8 @@ const Detail = {
     Sync.queueLocal({...e});
     toast(`Paid ${fmtINR(e.amt)} — ${e.name}`);
     if (!Store.s.demo) { try { fetch('/api/payments', {method: 'POST', headers: {'content-type': 'application/json', authorization: 'Bearer ' + Store.s.token}, body: JSON.stringify({emiId: e.id, amt: e.amt})}); } catch {} }
-    Remind.banner(); Render.all();
     UI.closeOv('ov-detail');
-    Sync.full();
+    Render.all(); Sync.full();
   },
   remove() {
     const e = Store.s.emis[this.id]; if (!e) return;
@@ -240,125 +296,319 @@ const Detail = {
       Sync.queueLocal({...e, deleted: true, updatedAt: Date.now()});
       delete Store.s.emis[e.id];
       UI.closeOv('ov-detail');
-      toast('EMI deleted'); Remind.banner(); Render.all(); Sync.full();
+      toast('EMI deleted'); Render.all(); Sync.full();
     });
+  },
+};
+
+/* ---------------- add / edit page ---------------- */
+const Edit2 = {
+  cat: 'personal', editId: null,
+  open(id) {
+    this.editId = id || null;
+    const e = id ? Store.s.emis[id] : null;
+    $('#addTitle').textContent = id ? 'Edit EMI' : 'Add New EMI';
+    this.cat = e ? (CMAP[e.cat] ? e.cat : 'other') : 'personal';
+    this.lender = e ? e.lender : 'other';
+    $('#addLender').innerHTML = '<option value="" disabled ' + (e ? '' : 'selected') + '>Select provider</option>' +
+      LENDERS.map(l => `<option value="${l.id}" ${e && e.lender === l.id ? 'selected' : ''}>${esc(l.n)}</option>`).join('');
+    $('#addLender').onchange = (ev) => { this.lender = ev.target.value || 'other'; };
+    $('#addAmt').value = e ? e.amt : '';
+    $('#addN').value = e ? String(e.n) : '12';
+    $('#addDate').value = e ? e.firstDue : ymd(addMonths(new Date(), 1));
+    $('#addRemind').checked = e ? e.remind > 0 : true;
+    $('#addErr').classList.add('hidden');
+    $('#addEditWrap').classList.toggle('hidden', !id);
+    this.renderCats();
+    Route.go('add', true);
+  },
+  renderCats() {
+    $('#addCats').innerHTML = CATS.map(c =>
+      `<div class="cattile ${c.id === this.cat ? 'on' : ''}" onclick="Edit2.cat='${c.id}';Edit2.renderCats()">
+        <span class="cic" style="background:${c.c}">${ic(c.ic, 'ic sm')}</span><span>${c.n}</span></div>`).join('');
+  },
+  save() {
+    const amt = Number($('#addAmt').value), n = Math.round(Number($('#addN').value));
+    const first = $('#addDate').value;
+    const err = (m) => { const el = $('#addErr'); el.textContent = m; el.classList.remove('hidden'); };
+    if (!this.lender) this.lender = 'other';
+    const L = this.lenderName();
+    const defName = L === 'Other' ? (CATS.find(c => c.id === this.cat) || {}).n + ' EMI' : L;
+    if (!(amt > 0)) return err('Enter the EMI amount.');
+    if (!(n >= 1 && n <= 480)) return err('Pick a valid tenure.');
+    if (!first) return err('Pick a start date.');
+    const prev = this.editId ? Store.s.emis[this.editId] : null;
+    const remind = $('#addRemind').checked ? 2 : 0;
+    const doc = EMI.normalize({
+      ...(prev || {}), id: this.editId || ('e' + Math.random().toString(36).slice(2, 10)),
+      name: prev ? prev.name : defName + ' · ' + fmtINR(amt),
+      lender: this.lender, cat: this.cat, amt, n,
+      paid: prev ? prev.paid : 0, firstDue: first,
+      autopay: prev ? prev.autopay : false, remind,
+      notes: prev ? prev.notes : '', createdAt: prev ? prev.createdAt : Date.now(),
+      paidDates: prev ? prev.paidDates : [],
+    });
+    Sync.queueLocal(doc);
+    toast(this.editId ? 'EMI updated' : 'EMI added');
+    vib(10);
+    Route.go('emis');
+    Render.all(); Sync.full();
+  },
+  lender: 'other',
+  lenderName() { return (LMAP[this.lender] || LMAP.other).n; },
+  remove() {
+    if (!this.editId) return;
+    Detail.id = this.editId;
+    Detail.remove();
+    Route.go('emis');
   },
 };
 
 /* ---------------- calendar ---------------- */
 const Cal = {
-  off: 0, sel: null,
-  nav(d) { this.off += d; this.sel = null; $('#calday').classList.add('hidden'); this.render(); },
+  off: 0,
+  nav(d) { this.off += d; this.render(); },
   render() {
     const g = $('#calgrid'); if (!g) return;
     const base = new Date(); const m = new Date(base.getFullYear(), base.getMonth() + this.off, 1);
     $('#caltitle').textContent = m.toLocaleDateString('en-IN', {month: 'long', year: 'numeric'});
     const ymStr = ymd(m).slice(0, 7);
-    const firstDow = (m.getDay() + 6) % 7;
+    const firstDow = m.getDay(); // Sun-first (mock)
     const dim = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
     const dues = EMI.duesInMonth(ymStr);
     const byDay = {};
     for (const d of dues) (byDay[d.date] = byDay[d.date] || []).push(d);
-    const t = today(); const sel = this.sel;
-    let html = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(d => `<div class="dow">${d}</div>`).join('');
+    const t = today();
+    let html = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => `<div class="dow">${d}</div>`).join('');
     for (let i = 0; i < firstDow; i++) html += '<div></div>';
     for (let day = 1; day <= dim; day++) {
       const ds = ymStr + '-' + pad(day);
       const list = byDay[ds] || [];
-      const dots = list.slice(0, 3).map(x => `<i class="${x.state === 'overdue' ? 'd-red' : 'd-amb'}"></i>`).join('');
-      const cls = ['day', ds === t ? 'today' : '', ds === sel ? 'sel' : ''].join(' ');
-      html += `<div class="${cls}" onclick="Cal.selDay('${ds}')">${day}<div class="dots">${dots}</div></div>`;
+      const over = list.some(x => x.state === 'overdue');
+      const cls = ['cday', list.length ? (over ? 'odata' : 'due') : '', ds === t ? 'today' : ''].join(' ');
+      html += `<div class="${cls}" onclick="Cal.day('${ds}')"><span>${day}</span></div>`;
     }
     g.innerHTML = html;
+    this.list(ymStr);
   },
-  selDay(ds) {
-    this.sel = ds; this.render();
+  list(ymStr) {
+    const dues = EMI.duesInMonth(ymStr).sort((a, b) => a.date < b.date ? -1 : 1);
+    const el = $('#duelist');
+    el.innerHTML = dues.length ? dues.map(x => `
+      <div class="duerow" onclick="Detail.open('${x.emi.id}')">
+        <div class="d">${parseYmd(x.date).getDate()} ${parseYmd(x.date).toLocaleDateString('en-IN', {month: 'short'})}</div>
+        <div class="n">${esc(x.emi.name)}${x.state === 'overdue' ? ' <span class="tiny" style="color:var(--danger);font-weight:700">overdue</span>' : ''}</div>
+        <div class="a">${fmtINR(x.emi.amt)}</div>
+      </div>`).join('')
+    : `<div class="card" style="text-align:center;color:var(--mut);font-weight:600;font-size:13.5px;padding:22px">No due dates this month 🎉</div>`;
+  },
+  day(ds) {
     const list = EMI.duesInMonth(ds.slice(0, 7)).filter(x => x.date === ds);
-    const el = $('#calday');
-    if (!list.length) { el.classList.add('hidden'); return; }
-    el.classList.remove('hidden');
-    el.innerHTML = `<h3 style="margin-bottom:4px">${prettyDate(ds)}</h3>` + list.map(x => `
-      <div class="hrow" style="cursor:pointer" onclick="Detail.open('${x.emi.id}')">
-        ${licSm(x.emi.lender)}
-        <div class="grow"><b>${esc(x.emi.name)}</b><div class="small mut" style="font-weight:600">${fmtINR(x.emi.amt)}${x.emi.autopay ? ' · autopay' : ''}</div></div>
-        <span class="chip ${x.state === 'overdue' ? 'danger' : 'warn'}">${x.state}</span>
-      </div>`).join('');
+    if (list.length === 1) Detail.open(list[0].emi.id);
+    else if (list.length) Detail.open(list[0].emi.id);
+  },
+};
+
+/* ---------------- charts ---------------- */
+const Charts = {
+  spark(el, values) {
+    const W = 320, H = 74, max = Math.max(...values, 1), min = Math.min(...values, 0);
+    const pts = values.map((v, i) => [i * (W / (values.length - 1)), H - 8 - ((v - min) / (max - min || 1)) * (H - 22)]);
+    let d = `M${pts[0][0]},${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+      const mx = (x0 + x1) / 2;
+      d += ` C${mx},${y0} ${mx},${y1} ${x1},${y1}`;
+    }
+    el.innerHTML = `<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7d86ff" stop-opacity=".38"/><stop offset="1" stop-color="#7d86ff" stop-opacity="0"/></linearGradient></defs>
+      <path d="${d} L${W},${H} L0,${H} Z" fill="url(#sg)"/>
+      <path d="${d}" fill="none" stroke="#565fe9" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="4" fill="#565fe9"/>`;
+  },
+  bars(el, data) { // [{label, val, past}]
+    const max = Math.max(...data.map(d => d.val), 1);
+    el.innerHTML = data.map(d =>
+      `<div class="b ${d.past ? 'past' : ''}"><span class="val">${d.val ? (d.val >= 1000 ? (d.val / 1000).toFixed(d.val >= 10000 ? 0 : 1) + 'k' : d.val) : ''}</span>
+       <i style="height:${Math.max(4, Math.round(d.val / max * 100))}%"></i><span class="l">${d.label}</span></div>`).join('');
+  },
+  donut(svgEl, parts, total) { // [{label, val, color}]
+    const R = 56, C = 2 * Math.PI * R;
+    let off = 0, segs = '', leg = '';
+    for (const p of parts) {
+      const frac = p.val / (total || 1);
+      const len = frac * C;
+      segs += `<circle cx="66" cy="66" r="${R}" fill="none" stroke="${p.color}" stroke-width="14" stroke-dasharray="${Math.max(len - 3, 0)} ${C - Math.max(len - 3, 0)}" stroke-dashoffset="${-off}" stroke-linecap="round"/>`;
+      off += len;
+      leg += `<div class="li"><i style="background:${p.color}"></i>${p.label}<span class="pc">${Math.round(frac * 100)}%</span></div>`;
+    }
+    if (!parts.length) segs = `<circle cx="66" cy="66" r="${R}" fill="none" stroke="var(--field)" stroke-width="14"/>`;
+    svgEl.innerHTML = segs;
+    $('#donutLeg').innerHTML = leg || '<div class="li mut">No data yet</div>';
+    $('#donutTot').textContent = fmtINR(total);
+  },
+  trend(el, data) { // [{label, val}]
+    const W = 320, H = 110, max = Math.max(...data.map(d => d.val), 1);
+    const pts = data.map((d, i) => [18 + i * ((W - 36) / (data.length - 1)), H - 22 - (d.val / max) * (H - 48)]);
+    let d2 = `M${pts[0][0]},${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; const mx = (x0 + x1) / 2;
+      d2 += ` C${mx},${y0} ${mx},${y1} ${x1},${y1}`;
+    }
+    el.innerHTML = `<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8b7cff" stop-opacity=".3"/><stop offset="1" stop-color="#8b7cff" stop-opacity="0"/></linearGradient></defs>
+      <path d="${d2} L${pts[pts.length - 1][0]},${H - 14} L${pts[0][0]},${H - 14} Z" fill="url(#tg)"/>
+      <path d="${d2}" fill="none" stroke="#7c5cf0" stroke-width="2.5" stroke-linecap="round"/>
+      ${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#7c5cf0"/>`).join('')}
+      ${data.map((d, i) => `<text x="${pts[i][0]}" y="${H - 2}" font-size="9.5" fill="var(--mut)" text-anchor="middle" font-weight="600">${d.label}</text>`).join('')}
+      <text x="${pts[pts.length - 1][0] - 4}" y="${pts[pts.length - 1][1] - 9}" font-size="10" fill="#7c5cf0" text-anchor="end" font-weight="700">${fmtINR(data[data.length - 1].val)}</text>`;
   },
 };
 
 /* ---------------- render ---------------- */
 const Render = {
-  all() { this.home(); this.stats(); Cal.render(); this.profile(); Remind.banner(); },
+  all() { this.home(); EMIs.render(); this.insights(); Cal.render(); this.profile(); this.banner(); },
   home() {
     const s = EMI.summary();
-    const hr = $('#herocard'); if (!hr) return;
-    const hour = new Date().getHours();
-    $('#greet').textContent = (hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening') + ', ' + ((Store.s.user?.name || Store.s.demo ? 'Demo' : 'there')).split(' ')[0];
-    $('#greet').textContent = (hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening') + (Store.s.demo ? '' : ', ' + (Store.s.user?.name || 'there').split(' ')[0]);
-    hr.innerHTML = `
-      <div class="hlabel">${ic('wallet', 'ic sm')} Total outstanding</div>
-      <div class="hamt">${fmtINR(s.outstanding)}</div>
-      <div class="hsub">across ${s.count} active EMI${s.count === 1 ? '' : 's'}${s.overdue ? ` · <b>${fmtINR(s.overdue)} overdue</b>` : ''}</div>
-      <div class="hrow">
-        <div class="hcell"><div class="k">Due this month</div><div class="v">${fmtINR(s.dueThisMonth)}</div></div>
-        <div class="hcell"><div class="k">Paid this month</div><div class="v">${fmtINR(s.paidThisMonth)}</div></div>
-      </div>
-      ${s.next ? `<div class="hnext"><div><div class="t">Next due · ${prettyDay(s.next.date)}</div><div class="v">${fmtINR(s.next.amt)} — ${esc(s.next.emi.name)}</div></div></div>` : ''}`;
-    const list = Object.values(Store.s.emis).filter(e => !e.deleted)
-      .sort((a, b) => (EMI.active(b) - EMI.active(a)) || (((EMI.nextDue(a) || {date: '9'}).date < (EMI.nextDue(b) || {date: '9'}).date) ? -1 : 1));
-    const host = $('#loans');
-    host.innerHTML = list.length ? list.map((e) => {
-      const st = loanStatus(e), prog = EMI.progress(e);
-      const L = LMAP[e.lender] || LMAP.other;
-      return `<div class="loan" onclick="Detail.open('${e.id}')">
-        ${licBig(e.lender)}
-        <div class="grow">
-          <div class="t">${esc(e.name)}${e.autopay ? ` <span class="mut tiny">· autopay</span>` : ''}</div>
-          <div class="s">${esc(L.n)} · ${e.paid}/${e.n} paid</div>
-          <div class="pbar"><i style="width:${prog}%"></i></div>
-        </div>
-        <div class="right">
-          <div class="amt">${fmtINR(e.amt)}</div>
-          <div class="st ${st.cls}">${st.txt}</div>
-        </div>
-      </div>`;
-    }).join('') : `<div class="empty">
-      <div class="eic">${ic('wallet', 'ic lg')}</div>
-      <h3>No EMIs yet</h3><p>Tap + to add your first — pick a lender,<br>amount and due date.</p>
-      <button class="btn pri" style="margin-top:16px" onclick="Sheet.openAdd()">Add your first EMI</button></div>`;
+    const h = new Date().getHours();
+    $('#hgreet').textContent = h < 12 ? 'Good Morning,' : h < 17 ? 'Good Afternoon,' : 'Good Evening,';
+    $('#hname').textContent = (Store.s.user?.name || 'Arvind').split(' ')[0] + ' 👋';
+    const heroTotal = s.dueThisMonth + s.overdue;
+    $('#heroAmt').innerHTML = fmtINR(heroTotal) + (s.overdue ? ` <small>overdue</small>` : '');
+    Charts.spark($('#heroSpark'), EMI.projection(6).map(p => p.amt));
+    $('#tUpcoming').textContent = s.next ? fmtINR(s.next.amt) : '₹0';
+    $('#tUpcomingS').textContent = s.next ? prettyDay(s.next.date) : 'nothing due';
+    $('#tPaid').textContent = fmtINR(s.paidThisMonth);
+    $('#tActive').textContent = s.count;
+    $('#tActiveS').textContent = 'in progress';
+    $('#tRemain').textContent = fmtINR(s.outstanding);
+    $('#belldot').classList.toggle('hidden', !EMI.upcomingSoon().length);
+    this.banner();
   },
-  stats() {
+  banner() {
+    const m = $('#motivate'); if (!m) return;
     const s = EMI.summary();
-    const tiles = [
-      ['Active EMIs', s.count],
-      ['Due this month', fmtINR(s.dueThisMonth)],
-      ['Overdue', s.overdue ? fmtINR(s.overdue) : '₹0'],
-      ['Paid this month', fmtINR(s.paidThisMonth)],
-    ];
-    $('#statcards').innerHTML = tiles.map(([k, v]) =>
-      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
-    const proj = EMI.projection(6); const max = Math.max(...proj.map(p => p.amt), 1);
-    $('#projbars').innerHTML = proj.map((p, i) =>
-      `<div class="b ${i === 0 ? '' : 'past'}"><span class="val">${p.amt ? (p.amt >= 100000 ? Math.round(p.amt / 1000) + 'k' : (p.amt / 1000).toFixed(1) + 'k') : '·'}</span><i style="height:${Math.max(4, Math.round(p.amt / max * 100))}%"></i><span class="l">${p.label}</span></div>`).join('');
-    const lr = EMI.byLender(); const lmax = Math.max(...lr.map(x => x.amt), 1);
-    $('#lenderrows').innerHTML = lr.length ? lr.slice(0, 8).map(x =>
-      `<div class="lrow">${licSm(x.lender.id)}<div class="grow"><div class="row" style="justify-content:space-between"><span class="nm">${esc(x.lender.n)}</span><span class="rt">${fmtINR(x.amt)}</span></div><div class="lbar"><i style="width:${Math.round(x.amt / lmax * 100)}%"></i></div><div class="ct">${x.count} EMI${x.count > 1 ? 's' : ''} outstanding</div></div></div>`).join('')
-      : '<div class="emptyst">Lender-wise outstanding shows up once you add EMIs.</div>';
-    const cr = EMI.byCat(); const cmax = Math.max(...cr.map(x => x.amt), 1);
-    $('#catrows').innerHTML = cr.length ? cr.map(x =>
-      `<div class="lrow"><div class="lic2 ph" style="background:var(--field);color:var(--ink)">${ic(x.cat.ic, 'ic sm')}</div><div class="grow"><div class="row" style="justify-content:space-between"><span class="nm">${esc(x.cat.n)}</span><span class="rt">${fmtINR(x.amt)}</span></div><div class="lbar"><i style="width:${Math.round(x.amt / cmax * 100)}%"></i></div></div></div>`).join('')
-      : '<div class="emptyst">Category split appears once you add EMIs.</div>';
+    if (s.overdue) {
+      m.className = 'motivate warn';
+      m.innerHTML = `${ic('alert', 'ic sm')} <span class="grow">${fmtINR(s.overdue)} overdue — clear them to stay on track.</span>`;
+    } else {
+      m.className = 'motivate';
+      m.innerHTML = `${ic('spark2', 'ic sm')} <span class="grow"><b>Keep going!</b> You're one step closer to your goals.</span>`;
+    }
+  },
+  insights() {
+    const t = today();
+    const ym = t.slice(0, 7);
+    const paidThis = EMI.paidInMonth(ym);
+    const prev = new Date(); prev.setMonth(prev.getMonth() - 1);
+    const paidPrev = EMI.paidInMonth(ymd(prev).slice(0, 7));
+    $('#insPaid').textContent = fmtINR(paidThis);
+    const dPct = paidPrev ? Math.round((paidThis - paidPrev) / paidPrev * 100) : (paidThis ? 100 : 0);
+    const dEl = $('#insDelta');
+    dEl.className = 'delta ' + (dPct >= 0 ? 'up' : 'down');
+    dEl.textContent = (dPct >= 0 ? '↑ ' : '↓ ') + Math.abs(dPct) + '%';
+    // bars: paid last 3 + forecast next 3 (incl current)
+    const months = [];
+    const now = new Date();
+    for (let i = -3; i <= 2; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const ymS = ymd(d).slice(0, 7);
+      const label = d.toLocaleDateString('en-IN', {month: 'short'});
+      if (i < 0) months.push({label, val: EMI.paidInMonth(ymS), past: true});
+      else if (i === 0) months.push({label, val: EMI.paidInMonth(ymS) || EMI.monthOutflow(ymS), past: false});
+      else months.push({label, val: EMI.monthOutflow(ymS), past: true});
+    }
+    Charts.bars($('#insBars'), months);
+    // donut
+    const colors = {personal: '#565fe9', consumer: '#8b5cf6', bnpl: '#f0a32f', other: '#94a3b8'};
+    const byCat = {};
+    let tot = 0;
+    for (const e of Object.values(Store.s.emis)) {
+      if (e.deleted || !EMI.active(e)) continue;
+      byCat[e.cat] = (byCat[e.cat] || 0) + EMI.outstanding(e);
+      tot += EMI.outstanding(e);
+    }
+    Charts.donut($('#donutSvg'), Object.entries(byCat).map(([id, val]) => ({label: (CMAP[id] || CMAP.other).n, val, color: colors[id] || '#94a3b8'})).sort((a, b) => b.val - a.val), tot);
+    // trend: paid last 6 months
+    const tr = [];
+    for (let i = -5; i <= 0; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      tr.push({label: d.toLocaleDateString('en-IN', {month: 'short'}), val: EMI.paidInMonth(ymd(d).slice(0, 7))});
+    }
+    Charts.trend($('#trendSvg'), tr);
+    const s = EMI.summary();
+    const note = $('#insNote');
+    if (s.overdue) { note.style.background = 'var(--warnbg)'; note.style.color = 'var(--warn)';
+      note.innerHTML = `${ic('alert', 'ic sm')} ${fmtINR(s.overdue)} is overdue — clear it to keep your streak.`; }
+    else { note.style.background = ''; note.style.color = '';
+      note.innerHTML = `${ic('check', 'ic sm')} You're doing great! On track with your payments.`; }
   },
   profile() {
-    const u = Store.s.user || {name: 'Demo User', email: 'demo · local only', created_at: Date.now()};
-    $('#pavatar').textContent = (u.name || 'A')[0].toUpperCase();
+    const u = Store.s.user || {name: 'Arvind Choudhary', email: 'arvind@example.com'};
+    $('#pava').textContent = (u.name || 'A')[0].toUpperCase();
     $('#pname').textContent = u.name;
-    $('#pemail').textContent = u.email;
-    const n = Object.values(Store.s.emis).filter(e => !e.deleted).length;
-    $('#pmeta').textContent = (Store.s.demo ? 'Sample data · not synced' : `Member since ${new Date(u.created_at).toLocaleDateString('en-IN', {month: 'short', year: 'numeric'})}`) + ` · ${n} EMI${n === 1 ? '' : 's'}`;
-    document.querySelectorAll('#segtheme button').forEach(b => b.classList.toggle('on', b.dataset.v === (Store.s.meta.theme || 'system')));
-    $('#swanim').checked = Store.s.meta.anim !== false;
+    $('#pemail').textContent = Store.s.demo ? 'demo · local only' : u.email;
     $('#swnotify').checked = !!Store.s.meta.notify;
+  },
+};
+
+/* ---------------- profile extras ---------------- */
+const Profile = {
+  payHistory() {
+    const rows = [];
+    for (const e of Object.values(Store.s.emis)) {
+      if (e.deleted) continue;
+      for (const d of (e.paidDates || [])) rows.push({d, e});
+    }
+    rows.sort((a, b) => a.d < b.d ? 1 : -1);
+    $('#gen-title').textContent = 'Payment History';
+    $('#gen-body').innerHTML = rows.length ? rows.slice(0, 30).map(r => `
+      <div class="hrow">${lenderTile(r.e.lender, 'logo')}<div class="grow"><b>${esc(r.e.name)}</b>
+      <div class="tiny mut" style="font-weight:600">${prettyDate(r.d)}</div></div>
+      <b class="num">${fmtINR(r.e.amt)}</b></div>`).join('')
+    : '<p class="mut small" style="padding:10px 0">No payments recorded yet. Mark an EMI as paid to see it here.</p>';
+    UI.openOv('ov-gen');
+  },
+  providers() {
+    const used = new Set(Object.values(Store.s.emis).filter(e => !e.deleted).map(e => e.lender));
+    $('#gen-title').textContent = 'Manage Providers';
+    $('#gen-body').innerHTML = LENDERS.filter(l => l.id !== 'other').map(l => `
+      <div class="hrow">${lenderTile(l.id, 'logo')}<div class="grow"><b>${esc(l.n)}</b></div>
+      ${used.has(l.id) ? '<span class="chip acc">in use</span>' : '<span class="chip">available</span>'}</div>`).join('');
+    UI.openOv('ov-gen');
+  },
+  settings() {
+    $('#gen-title').textContent = 'App Settings';
+    $('#gen-body').innerHTML = `
+      <label class="fl">Theme</label>
+      <div class="seg2" id="segtheme" style="margin:0">
+        <button data-v="system">Auto</button><button data-v="light">Light</button><button data-v="dark">Dark</button>
+      </div>
+      <div class="swrow" style="margin-top:16px"><div class="t">Animations</div>
+        <label class="sw"><input type="checkbox" id="swanim" checked><i></i></label></div>
+      <button class="btn2 danger wfull" style="margin-top:20px" onclick="Auth.deleteAccount()">Delete account</button>`;
+    document.querySelectorAll('#segtheme button').forEach(b => {
+      b.classList.toggle('on', b.dataset.v === (Store.s.meta.theme || 'system'));
+      b.onclick = () => { Sync.saveMeta({theme: b.dataset.v}).then(() => { applyTheme(); Profile.settings(); }); };
+    });
+    $('#swanim').checked = Store.s.meta.anim !== false;
+    $('#swanim').onchange = (e) => Sync.saveMeta({anim: e.target.checked}).then(applyTheme);
+    UI.openOv('ov-gen');
+  },
+  about() {
+    $('#gen-title').textContent = 'About EMI Flow';
+    $('#gen-body').innerHTML = `
+      <div style="text-align:center;padding:8px 0 4px">
+        <img src="/icons/icon-192.png" style="width:64px;height:64px;border-radius:18px" alt="">
+        <div style="font-weight:800;font-size:17px;margin-top:8px">EMI Flow</div>
+        <div class="tiny mut">PLAN · TRACK · PAY · GROW</div>
+        <p class="small mut" style="margin-top:10px;line-height:1.6">“Financial peace isn't a dream. It's a habit.”</p>
+      </div>
+      <div class="dsum"><div><div class="k">Version</div><div class="v">v${APP_VERSION}</div></div>
+        <div><div class="k">Sync</div><div class="v">${Store.s.demo ? 'demo' : 'cloud'}</div></div>
+        <div><div class="k">EMIs</div><div class="v">${Object.values(Store.s.emis).filter(e => !e.deleted).length}</div></div></div>
+      <p class="tiny mut" style="line-height:1.6">Your data lives only in your account — encrypted passwords, revocable sessions, never sold or shared. Lender names &amp; logos are trademarks of their respective owners, used as visual tags only.</p>`;
+    UI.openOv('ov-gen');
   },
 };
 
@@ -368,82 +618,69 @@ function applyTheme() {
   const dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   document.body.classList.toggle('noanim', Store.s.meta.anim === false);
-  document.querySelector('meta[name=theme-color]').content = dark ? '#070b14' : '#eef1f8';
+  document.querySelector('meta[name=theme-color]').content = dark ? '#0e101c' : '#f3f4fb';
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
 
-/* ---------------- app shell ---------------- */
-const App = {
-  go(tab) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
-    $('#scr-' + tab).classList.add('on');
-    document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-    this.pill();
-    if (tab === 'calendar') Cal.render();
-    if (tab === 'stats') Render.stats();
-    vib(6);
-  },
-  pill() {},
-  demo() {
-    const D = [
-      {name: 'Smart TV 55″', lender: 'bajaj', cat: 'consumer', amt: 5499, n: 12, paid: 4, off: -4, dayOff: 0, autopay: true, notes: 'Smart TV 55″ 4K'},
-      {name: 'Card bill', lender: 'phonepe', cat: 'card', amt: 2400, n: 6, paid: 2, off: -3, dayOff: 6, autopay: false, notes: ''},
-      {name: 'Personal loan', lender: 'navi', cat: 'personal', amt: 8250, n: 36, paid: 9, off: -10, dayOff: 0, autopay: false, notes: ''},
-      {name: 'Headphones', lender: 'simpl', cat: 'bnpl', amt: 1299, n: 3, paid: 0, off: 1, dayOff: 0, autopay: false, notes: 'Headphones'},
-      {name: 'Car loan', lender: 'hdfc', cat: 'car', amt: 14750, n: 60, paid: 22, off: -22, dayOff: 0, autopay: true, notes: ''},
-      {name: 'Closed loan', lender: 'kreditbee', cat: 'personal', amt: 3200, n: 6, paid: 6, off: -6, dayOff: 0, autopay: false, notes: ''},
-    ];
-    Store.reset();
-    Store.s.demo = true;
-    Store.s.user = {name: 'Demo User', email: 'demo · local only', created_at: Date.now()};
-    for (const d of D) {
-      const first = new Date(); first.setDate(first.getDate() + d.dayOff);
-      const fd = addMonths(first, d.off);
-      const e = EMI.normalize({...d, id: 'd' + Math.random().toString(36).slice(2, 8), firstDue: ymd(fd), createdAt: Date.now()});
-      e.paidDates = [];
-      for (let i = 0; i < e.paid; i++) { const pd = addMonths(parseYmd(e.firstDue), i); if (cmpYmd(ymd(pd), today()) < 0) e.paidDates.push(ymd(pd)); }
-      Store.s.emis[e.id] = e;
+/* ---------------- demo ---------------- */
+const App = {};
+App.demo = function() {
+  const D = [
+    {name: 'Phone EMI', lender: 'paytm', cat: 'consumer', amt: 612, n: 9, paid: 4, off: -4, d: 3},
+    {name: 'TV EMI', lender: 'phonepe', cat: 'consumer', amt: 1370, n: 12, paid: 7, off: -7, d: 14},
+    {name: 'Fridge EMI', lender: 'bajaj', cat: 'consumer', amt: 409, n: 10, paid: 3, off: -3, d: 20},
+    {name: 'Personal loan', lender: 'kreditbee', cat: 'personal', amt: 1250, n: 6, paid: 2, off: -2, d: 11},
+    {name: 'Laptop EMI', lender: 'navi', cat: 'consumer', amt: 1200, n: 18, paid: 9, off: -9, d: 3},
+    {name: 'BNPL order', lender: 'simpl', cat: 'bnpl', amt: 167, n: 3, paid: 1, off: -1, d: 26},
+  ];
+  Store.reset();
+  Store.s.demo = true; Store.s.onboarded = true;
+  Store.s.user = {name: 'Arvind Choudhary', email: 'arvind@example.com', created_at: Date.now()};
+  for (const x of D) {
+    const fd = addMonths(new Date(), x.off); fd.setDate(Math.min(x.d, 28));
+    const e = EMI.normalize({...x, id: 'd' + Math.random().toString(36).slice(2, 8), firstDue: ymd(fd), autopay: false, remind: 2, notes: '', createdAt: Date.now()});
+    e.paidDates = [];
+    for (let i = 0; i < e.paid; i++) {
+      const pd = addMonths(parseYmd(e.firstDue), i);
+      if (cmpYmd(ymd(pd), today()) < 0) e.paidDates.push(ymd(pd));
     }
-    Store.save();
-    $('#scr-onboard').classList.add('hidden');
-    this.enter();
-    toast('Demo loaded — look around!');
-  },
-  enter() {
-    const logged = !!Store.s.token || !!Store.s.demo;
-    $('#scr-onboard').classList.toggle('hidden', logged);
-    $('#app').classList.toggle('hidden', !logged);
-    if (logged) {
-      if (!Store.s.demo) $('#greet').textContent = 'Hi there';
-      Render.all(); Sync.statusUI('', 'syncing…'); Sync.full(); Remind.check();
-      
-    }
-  },
+    Store.s.emis[e.id] = e;
+  }
+  Store.save();
+  Auth.enterApp();
+  toast('Demo loaded — look around!');
 };
 
-/* ---------------- wire settings ---------------- */
-document.querySelectorAll('#segtheme button').forEach(b => b.onclick = () => { Sync.saveMeta({theme: b.dataset.v}).then(applyTheme); vib(6); });
-$('#swanim').onchange = (e) => { Sync.saveMeta({anim: e.target.checked}).then(applyTheme); };
+/* ---------------- boot ---------------- */
+document.getElementById('buildid').textContent = 'EMI Flow v' + APP_VERSION + ' · cloud-synced';
+applyTheme();
+
+function firstRoute() {
+  if (!Store.s.onboarded && !Store.s.token) { Route.to('onboard'); return; }
+  if (Store.s.token || Store.s.demo) { Route.cur = 'home'; Route.to('app'); Render.all(); Sync.statusUI('', 'demo — sample data'); Remind.check(); if (!Store.s.demo) Sync.full(); return; }
+  Route.to('login');
+}
+setTimeout(() => { $('#scr-splash').classList.add('hidden'); $('#scr-splash').style.display = 'none'; firstRoute(); }, 1500);
+if (new URLSearchParams(location.search).get('demo') === '1') { $('#scr-splash').style.display = 'none'; $('#scr-splash').classList.add('hidden'); firstRoute(); App.demo(); }
+
+/* reminders toggle */
 $('#swnotify').onchange = async (e) => {
   if (e.target.checked) {
     if (typeof Notification === 'undefined') { toast('Notifications not supported here', true); e.target.checked = false; return; }
     const p = await Notification.requestPermission();
     if (p !== 'granted') { toast('Permission denied', true); e.target.checked = false; return; }
-    toast('Reminders on — we\'ll nudge you before dues');
+    toast('Reminders on');
     Sync.saveMeta({notify: true}).then(() => Remind.check());
   } else Sync.saveMeta({notify: false});
 };
-window.addEventListener('resize', () => App.pill());
 
-/* ---------------- boot ---------------- */
-document.getElementById('buildid').textContent = 'build ' + APP_VERSION;
-applyTheme();
-if (new URLSearchParams(location.search).get('demo') === '1') App.demo();
-else App.enter();
+/* background sync */
 setInterval(() => { if (Store.s.token && !Store.s.demo) Sync.full(); }, 60000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden && Store.s.token && !Store.s.demo) Sync.full(); });
 window.addEventListener('online', () => { toast('Back online'); if (Store.s.token && !Store.s.demo) Sync.full(); });
-window.addEventListener('offline', () => { Sync.statusUI(' off', 'offline — changes queued'); });
+window.addEventListener('offline', () => { Sync.statusUI(' off', 'offline — queued'); });
+
+/* SW: network-first + auto reload */
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
   let refreshing = false;

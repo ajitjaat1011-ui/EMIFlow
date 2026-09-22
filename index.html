@@ -3,494 +3,650 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>EMIFlow — Plan Today, Peace Tomorrow</title>
-<meta name="description" content="EMIFlow — track every EMI across every lender. Cloud-synced, offline-first, private.">
-<meta name="theme-color" content="#f7f8fa">
+<title>EMI Flow — Small Payments. A Bigger Tomorrow.</title>
+<meta name="description" content="EMI Flow — track every EMI across every lender. Cloud-synced, offline-first, private.">
+<meta name="theme-color" content="#10121f">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <style>
-/* ==================================================================
-   EMIFlow v2.2 “Calm” — flat, quiet, one accent, room to breathe
-   ================================================================== */
+/* ================================================================
+   EMI Flow v3.0 — pixel build of the design system
+   light lavender · white cards · indigo→navy gradient pills
+   ================================================================ */
 :root{
-  --bg:#f7f8fa;
-  --card:#ffffff; --card2:#f1f2f6; --field:#f1f2f6;
-  --ink:#191c28; --ink2:#40465a; --mut:#8a8fa3;
-  --bd:#e7e9f0;
-  --acc:#4f5ce5; --acc-soft:#eef0fd;
-  --ok:#178a5e; --okbg:#e9f6f0;
-  --warn:#9a6205; --warnbg:#fdf3e2;
-  --danger:#cf3a31; --dangerbg:#fdeeed;
-  --hero:#1b1f33;
-  --sh:0 1px 2px rgba(25,28,40,.04);
-  --r:18px; --rs:12px;
-  --ease:cubic-bezier(.25,.8,.3,1);
+  --bg:#f3f4fb; --card:#ffffff; --field:#f3f4fa; --bd:#e9eaf4;
+  --ink:#181b2a; --ink2:#3f445c; --mut:#8a8fa6;
+  --acc:#565fe9; --acc2:#8b5cf6; --acc-soft:#eef0fe;
+  --ok:#1fa971; --okbg:#e7f7f0; --warn:#c07c10; --warnbg:#fdf3df;
+  --danger:#e05252; --dangerbg:#fdeeed;
+  --pill:linear-gradient(118deg,#6a63f0 0%,#4c53d8 45%,#23263c 120%);
+  --r:20px; --rs:14px; --ease:cubic-bezier(.25,.8,.3,1);
 }
 [data-theme="dark"]{
-  --bg:#0d0f17;
-  --card:#151827; --card2:#1b1f31; --field:#1b1f31;
-  --ink:#eceef6; --ink2:#c4c8d9; --mut:#7d8299;
-  --bd:#232739;
-  --acc:#7c88ff; --acc-soft:#1d2140;
-  --ok:#3fc78f; --okbg:#12271f;
-  --warn:#e5a83b; --warnbg:#2a2115;
-  --danger:#f0685f; --dangerbg:#2b1a1c;
-  --hero:#1c2033;
-  --sh:none;
+  --bg:#0e101c; --card:#161929; --field:#1d2135; --bd:#252a42;
+  --ink:#eef0fa; --ink2:#c6cad9; --mut:#7f849c;
+  --acc:#7d86ff; --acc2:#9d7bff; --acc-soft:#1e2240;
+  --ok:#3ec78f; --okbg:#122720; --warn:#e8ab48; --warnbg:#2a2115;
+  --danger:#f07171; --dangerbg:#2c1a1e;
+  --pill:linear-gradient(118deg,#6a63f0 0%,#4c53d8 60%,#181a2e 130%);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%}
 body{min-height:100dvh;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.5}
 body.noanim *{transition:none!important;animation:none!important}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-input,select,textarea{font:inherit;color:var(--ink);background:var(--field);border:1.5px solid transparent;border-radius:var(--rs);padding:12px 14px;width:100%;outline:none;transition:border-color .15s}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--field);border:1.5px solid var(--bd);border-radius:14px;padding:13px 15px;width:100%;outline:none;transition:border-color .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--acc)}
-label{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:15px 2px 6px}
-h1{font-size:21px;font-weight:700;letter-spacing:-.02em}
-h2{font-size:17px;font-weight:700;letter-spacing:-.015em}
-h3{font-size:15px;font-weight:650;letter-spacing:-.01em}
-a{color:var(--acc)}
+input::placeholder,textarea::placeholder{color:var(--mut)}
+label.fl{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:16px 2px 7px}
+h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
+h2{font-size:20px;font-weight:800;letter-spacing:-.02em}
+h3{font-size:16px;font-weight:700;letter-spacing:-.01em}
 .hidden{display:none!important}
 .mut{color:var(--mut)} .small{font-size:13px} .tiny{font-size:11.5px}
 .num{font-variant-numeric:tabular-nums}
 .row{display:flex;align-items:center;gap:10px} .grow{flex:1;min-width:0}
-.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--field);color:var(--mut);white-space:nowrap}
-.chip.ok{background:var(--okbg);color:var(--ok)} .chip.warn{background:var(--warnbg);color:var(--warn)}
-.chip.danger{background:var(--dangerbg);color:var(--danger)} .chip.acc{background:var(--acc-soft);color:var(--acc)}
 
 /* ---------- icons ---------- */
 .ic{width:21px;height:21px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ic.sm{width:18px;height:18px} .ic.xs{width:15px;height:15px} .ic.lg{width:24px;height:24px}
 
-/* ---------- buttons ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;border-radius:14px;padding:13px 20px;transition:transform .1s,opacity .15s;user-select:none}
-.btn:active{transform:scale(.97)}
-.btn.pri{background:var(--acc);color:#fff}
-.btn.ghost{background:var(--field);color:var(--ink)}
-.btn.line{border:1.5px solid var(--bd);color:var(--ink);background:var(--card)}
-.btn.danger{background:var(--dangerbg);color:var(--danger)}
-.btn.wide{width:100%} .btn.sm{padding:8px 14px;font-size:13px;border-radius:10px}
-.btn:disabled{opacity:.45;pointer-events:none}
+/* ---------- gradient pill buttons ---------- */
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:16px 22px;border-radius:99px;background:var(--pill);background-size:130% 130%;color:#fff;font-weight:700;font-size:15.5px;letter-spacing:-.01em;box-shadow:0 10px 26px rgba(86,95,233,.35);transition:transform .12s,box-shadow .2s}
+.pill:active{transform:scale(.97)}
+.pill:disabled{opacity:.5;pointer-events:none}
+.pill .ic{stroke-width:2}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:650;border-radius:99px;padding:11px 18px;font-size:14px;background:var(--field);color:var(--ink);transition:transform .1s}
+.btn2:active{transform:scale(.96)}
+.btn2.danger{background:var(--dangerbg);color:var(--danger)}
+.btn2.wfull{width:100%}
+.logout{width:100%;padding:16px;border-radius:18px;background:#e35d5d;color:#fff;font-weight:700;font-size:15.5px;box-shadow:0 10px 24px rgba(227,93,93,.3)}
+.logout:active{transform:scale(.97)}
 
-/* ================= ONBOARD ================= */
-#scr-onboard{min-height:100dvh;display:flex;flex-direction:column;padding:max(28px,env(safe-area-inset-top)) 26px 34px;max-width:520px;margin:0 auto}
-.ob-top{display:flex;justify-content:flex-end}
-.ob-hero{text-align:center;margin:7vh 0 38px}
-.ob-logo{width:76px;height:76px;border-radius:22px;margin-bottom:20px}
-.ob-brand{font-size:34px;font-weight:800;letter-spacing:-.03em;color:var(--ink)}
-.ob-brand em{font-style:normal;color:var(--acc)}
-.ob-tag{color:var(--mut);font-size:15.5px;margin-top:8px}
-.feats{display:flex;flex-direction:column;gap:6px}
-.feat{display:flex;gap:14px;align-items:center;padding:13px 6px;border-bottom:1px solid var(--bd)}
-.feat:last-child{border:0}
-.feat .fic{width:38px;height:38px;flex:none;border-radius:12px;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center}
-.feat b{display:block;font-size:14.5px;font-weight:650}
-.feat p{color:var(--mut);font-size:13px;margin-top:1px}
-.ob-cta{margin-top:auto;padding-top:30px;display:flex;flex-direction:column;gap:10px}
-.ob-terms{font-size:11.5px;color:var(--mut);text-align:center;margin-top:12px;line-height:1.6}
-.ob-demo{font-size:14px;font-weight:600;color:var(--acc);text-align:center;padding:10px}
+/* ================= SPLASH ================= */
+#scr-splash{position:fixed;inset:0;z-index:200;background:#0c0e1a;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;overflow:hidden}
+#scr-splash .aur{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+#scr-splash .aur.a{width:70vmax;height:70vmax;left:-25vmax;top:-30vmax;background:radial-gradient(circle,rgba(124,92,246,.55),transparent 62%)}
+#scr-splash .aur.b{width:60vmax;height:60vmax;right:-24vmax;bottom:-26vmax;background:radial-gradient(circle,rgba(86,95,233,.5),transparent 62%)}
+#scr-splash .wave{position:absolute;left:0;right:0;height:44%;bottom:0;opacity:.9}
+.spl-icon{width:92px;height:92px;border-radius:26px;background:linear-gradient(140deg,#8b7cff,#565fe9 60%,#3a3f8f);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 50px rgba(124,92,246,.5);position:relative;z-index:1;animation:splpop .8s var(--ease)}
+@keyframes splpop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.spl-name{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:26px;position:relative;z-index:1}
+.spl-tag{color:rgba(255,255,255,.65);font-size:15px;margin-top:4px;text-align:center;position:relative;z-index:1;line-height:1.45}
+.spl-foot{position:absolute;bottom:max(34px,env(safe-area-inset-bottom));text-align:center;color:rgba(255,255,255,.55);font-size:13.5px;line-height:1.6;z-index:1}
 
-/* ================= APP FRAME ================= */
-#app{max-width:520px;margin:0 auto;min-height:100dvh;padding:0 20px 120px}
-.top{display:flex;align-items:center;gap:12px;padding:max(18px,env(safe-area-inset-top)) 0 14px}
-.brandmark{width:34px;height:34px;border-radius:10px}
-.top h1{font-size:18px}
-.sync{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mut);margin-top:2px}
-.syncdot{width:7px;height:7px;border-radius:50%;background:#e0a23e;flex:none}
-.syncdot.on{background:var(--ok)} .syncdot.off{background:var(--mut)}
-.iconbtn{width:38px;height:38px;border-radius:11px;background:var(--field);display:flex;align-items:center;justify-content:center;color:var(--ink2);transition:transform .1s}
-.iconbtn:active{transform:scale(.92)}
+/* ================= ONBOARDING ================= */
+.ob-page{min-height:100dvh;display:flex;flex-direction:column;background:linear-gradient(180deg,#fbfbff 0%,var(--bg) 100%);padding:max(18px,env(safe-area-inset-top)) 24px calc(24px + env(safe-area-inset-bottom))}
+.ob-skip{align-self:flex-end;font-size:14.5px;font-weight:650;color:var(--mut);padding:10px 6px}
+.ob-stage{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.ob-slide{display:none;flex-direction:column;align-items:center;text-align:center}
+.ob-slide.on{display:flex;animation:obin .35s var(--ease)}
+@keyframes obin{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+.ob-art{height:250px;display:flex;align-items:center;justify-content:center;margin-bottom:26px;position:relative;width:100%}
+.ob-title{font-size:25px;font-weight:800;letter-spacing:-.025em;line-height:1.22}
+.ob-title b{color:var(--acc)}
+.ob-sub{color:var(--mut);font-size:14.5px;margin-top:10px;max-width:300px;line-height:1.55}
+.ob-dots{display:flex;gap:7px;justify-content:center;margin:26px 0}
+.ob-dots i{width:8px;height:8px;border-radius:99px;background:#d9dbef;transition:all .25s}
+.ob-dots i.on{width:22px;background:var(--acc)}
+/* slide art: floating tiles */
+.tiles3d{position:relative;width:230px;height:210px}
+.tiles3d .t{position:absolute;width:74px;height:74px;border-radius:20px;background:#fff;box-shadow:0 16px 34px rgba(60,64,120,.16),0 3px 8px rgba(60,64,120,.08);display:flex;align-items:center;justify-content:center;animation:bob 4.2s ease-in-out infinite}
+.tiles3d .t img{width:46px;height:46px;object-fit:contain}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(var(--rot))}50%{transform:translateY(-10px) rotate(var(--rot))}}
+/* slide art: calendar card + bell */
+.calbell{position:relative;width:250px;height:220px}
+.calbell .cal{position:absolute;left:10px;top:14px;width:180px;border-radius:22px;background:#fff;box-shadow:0 18px 40px rgba(60,64,120,.16);padding:16px;transform:rotate(-6deg)}
+.calbell .cal .ch{display:flex;justify-content:space-between;color:var(--mut);font-size:11px;font-weight:700;margin-bottom:10px}
+.calbell .cal .cg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.calbell .cal .cg i{height:16px;border-radius:6px;background:var(--field)}
+.calbell .cal .cg i.h{background:var(--acc-soft)}
+.calbell .due{position:absolute;right:0;bottom:44px;background:#fff;border-radius:16px;box-shadow:0 14px 30px rgba(60,64,120,.16);padding:11px 15px;display:flex;gap:10px;align-items:center;transform:rotate(3deg);z-index:2}
+.calbell .due .ic{color:var(--acc)}
+.calbell .due b{font-size:14px;display:block}
+.calbell .due span{font-size:11px;color:var(--mut);font-weight:600}
+.calbell .bellic{position:absolute;right:22px;top:6px;width:64px;height:64px;border-radius:50%;background:#fff;box-shadow:0 14px 30px rgba(60,64,120,.16);display:flex;align-items:center;justify-content:center;color:#8b5cf6;z-index:2;animation:bob2 3s ease-in-out infinite}
+@keyframes bob2{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+/* slide art: bar chart 3d-ish */
+.bars3d{display:flex;align-items:flex-end;gap:14px;height:190px}
+.bars3d .b{width:44px;border-radius:12px;background:linear-gradient(180deg,#a78bfa,#565fe9);box-shadow:0 14px 30px rgba(86,95,233,.3);position:relative;animation:grow 1s var(--ease) backwards}
+.bars3d .b:nth-child(2){height:52%;animation-delay:.1s;background:linear-gradient(180deg,#c4b5fd,#8b5cf6)}
+.bars3d .b:nth-child(1){height:34%;background:linear-gradient(180deg,#c4b5fd,#8b5cf6)}
+.bars3d .b:nth-child(3){height:86%;animation-delay:.2s}
+.bars3d .b:nth-child(4){height:64%;animation-delay:.3s;background:linear-gradient(180deg,#c4b5fd,#8b5cf6)}
+@keyframes grow{from{height:0}}
 
-main{position:relative}
-.screen{display:none} .screen.on{display:block;animation:screenin .22s var(--ease)}
-@keyframes screenin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.sect{display:flex;align-items:baseline;justify-content:space-between;margin:26px 2px 12px}
-.sect h2{font-size:16px}
-.sect .lnk{font-size:13.5px;font-weight:600;color:var(--acc)}
+/* ================= AUTH PAGES ================= */
+.au-page{min-height:100dvh;display:flex;flex-direction:column;padding:max(18px,env(safe-area-inset-top)) 26px calc(28px + env(safe-area-inset-bottom));max-width:480px;margin:0 auto;width:100%}
+.au-back{width:42px;height:42px;border-radius:14px;background:var(--card);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--ink);margin:6px 0 10px}
+.au-hero{margin:18px 0 8px}
+.au-hero h1{font-size:27px}
+.au-hero h1 .wave{display:inline-block}
+.au-hero p{color:var(--mut);font-size:14px;margin-top:6px;line-height:1.5}
+.frow{display:flex;align-items:center;gap:0;background:var(--field);border:1.5px solid var(--bd);border-radius:14px;overflow:hidden}
+.frow:focus-within{border-color:var(--acc)}
+.frow .fx{padding:13px 14px;font-weight:700;color:var(--ink2);border-right:1.5px solid var(--bd);font-size:14.5px;white-space:nowrap}
+.frow input{border:0;background:transparent;border-radius:0;flex:1}
+.frow input:focus{box-shadow:none}
+.ieye{padding:0 14px;color:var(--mut);display:flex}
+.aerr{font-size:13px;color:var(--danger);font-weight:600;margin-top:10px}
+.au-or{display:flex;align-items:center;gap:14px;color:var(--mut);font-size:12.5px;font-weight:600;margin:22px 0 14px}
+.au-or:before,.au-or:after{content:"";flex:1;height:1px;background:var(--bd)}
+.au-soc{display:flex;justify-content:center;gap:16px;margin-bottom:8px}
+.au-soc button{width:56px;height:56px;border-radius:50%;background:var(--card);border:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--ink);transition:transform .1s}
+.au-soc button:active{transform:scale(.92)}
+.au-foot{text-align:center;font-size:14px;color:var(--mut);margin-top:20px}
+.au-foot b{color:var(--acc);font-weight:700;cursor:pointer}
+.chk{display:flex;align-items:flex-start;gap:10px;margin-top:16px;font-size:13px;color:var(--ink2);line-height:1.5}
+.chk input{width:19px;height:19px;flex:none;accent-color:var(--acc);margin-top:1px}
+.au-links{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
+.au-links .lk{font-size:13.5px;font-weight:650;color:var(--acc)}
+/* success */
+.suc-top{align-self:flex-end;text-align:right;color:var(--ink2);font-size:13px;font-weight:700;line-height:1.35;margin-top:8px}
+.suc-art{position:relative;height:280px;display:flex;align-items:center;justify-content:center}
+.cone{width:120px;height:120px;border-radius:36px;background:linear-gradient(140deg,#a78bfa,#565fe9);transform:rotate(-14deg);box-shadow:0 24px 50px rgba(86,95,233,.35);display:flex;align-items:center;justify-content:center}
+.cone .ic{width:54px;height:54px;color:#fff;stroke-width:1.6}
+.conf{position:absolute;width:10px;height:14px;border-radius:3px;animation:conf 2.6s ease-in-out infinite}
+@keyframes conf{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-16px) rotate(40deg)}}
+.suc-title{text-align:center;font-size:28px;font-weight:800;letter-spacing:-.025em;margin-top:10px}
+.suc-sub{text-align:center;color:var(--mut);font-size:14.5px;margin:10px 0 30px;line-height:1.6}
 
-/* ================= HERO ================= */
-.hero{background:var(--hero);color:#fff;border-radius:22px;padding:22px;margin-top:4px}
-.hero .hlabel{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.55);font-weight:500}
-.hero .hamt{font-size:32px;font-weight:750;letter-spacing:-.03em;margin:8px 0 3px;font-variant-numeric:tabular-nums}
-.hero .hsub{font-size:13px;color:rgba(255,255,255,.55)}
-.hero .hsub b{color:#ffb98a;font-weight:600}
-.hero .hrow{display:flex;gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.09)}
-.hero .hcell{flex:1}
-.hero .hcell .k{font-size:12px;color:rgba(255,255,255,.5)}
-.hero .hcell .v{font-size:16px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums}
-.hero .hnext{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;background:rgba(255,255,255,.07);border-radius:14px;padding:12px 14px}
-.hero .hnext .t{font-size:12px;color:rgba(255,255,255,.5)}
-.hero .hnext .v{font-size:14px;font-weight:650;font-variant-numeric:tabular-nums;margin-top:1px}
-
-/* ================= CARDS / LISTS ================= */
+/* ================= APP ================= */
+#app{max-width:480px;margin:0 auto;min-height:100dvh;padding:0 20px 130px}
+.topbar{display:flex;align-items:flex-start;gap:12px;padding:max(20px,env(safe-area-inset-top)) 0 14px}
+.topbar .tb-title{font-size:14px;color:var(--mut);font-weight:600}
+.topbar h1{font-size:23px;margin-top:1px}
+.tb-ic{width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--ink2);position:relative;flex:none;transition:transform .1s}
+.tb-ic:active{transform:scale(.9)}
+.tb-ic .dot{position:absolute;top:10px;right:11px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid var(--card)}
+.app-scr{display:none}
+.app-scr.on{display:block;animation:scrin .22s var(--ease)}
+@keyframes scrin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pgtitle{display:flex;align-items:center;gap:12px;padding:max(20px,env(safe-area-inset-top)) 0 16px}
+.pgtitle h1{font-size:22px}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:12px}
-.card>h3{margin-bottom:14px;font-weight:650}
-.loans{display:flex;flex-direction:column;gap:10px}
-.loan{display:flex;gap:13px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:14px;cursor:pointer;transition:transform .1s}
-.loan:active{transform:scale(.985)}
-.loan .lic{width:44px;height:44px;flex:none;border-radius:12px;object-fit:contain;background:#fff;border:1px solid var(--bd);padding:5px}
-.loan .lic.ph{display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px}
-.loan .t{font-weight:600;font-size:14.5px;letter-spacing:-.01em}
-.loan .s{font-size:12.5px;color:var(--mut);margin-top:1px}
-.loan .right{text-align:right;flex:none}
-.loan .amt{font-weight:650;font-size:14.5px;font-variant-numeric:tabular-nums}
-.loan .st{font-size:12px;margin-top:3px;font-weight:500}
-.loan .st.due{color:var(--mut)} .loan .st.soon{color:var(--warn)} .loan .st.over{color:var(--danger);font-weight:600} .loan .st.done{color:var(--ok)}
-.pbar{height:4px;background:var(--field);border-radius:99px;margin-top:9px;overflow:hidden}
-.pbar>i{display:block;height:100%;border-radius:99px;background:var(--acc);transition:width .5s var(--ease)}
-.empty{text-align:center;padding:44px 20px;color:var(--mut)}
-.empty .eic{width:52px;height:52px;border-radius:16px;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
-.empty h3{color:var(--ink)} .empty p{font-size:13px;margin-top:4px}
 
-/* ================= STATS ================= */
-.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:15px 16px}
-.stat .k{font-size:12.5px;color:var(--mut)}
-.stat .v{font-size:19px;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.bars{display:flex;align-items:flex-end;gap:10px;height:120px;padding-top:10px}
-.bars .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
-.bars .b i{width:100%;max-width:32px;border-radius:7px;background:var(--acc);opacity:.9;min-height:4px;transition:height .5s var(--ease)}
-.bars .b.past i{opacity:.25}
-.bars .b .val{font-size:10.5px;color:var(--mut);font-variant-numeric:tabular-nums}
-.bars .b .l{font-size:11px;color:var(--mut)}
-.lrow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
-.lrow:last-child{border:0;padding-bottom:2px}
-.lrow .lic2{width:32px;height:32px;border-radius:9px;object-fit:contain;background:#fff;border:1px solid var(--bd);padding:3px;flex:none}
-.lrow .lic2.ph{display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;color:#fff}
-.lrow .rt{font-weight:600;font-size:13.5px;font-variant-numeric:tabular-nums;flex:none}
-.lrow .nm{font-size:13.5px;font-weight:550}
-.lrow .ct{font-size:11.5px;color:var(--mut)}
-.lbar{height:4px;background:var(--field);border-radius:99px;overflow:hidden;margin-top:6px}
-.lbar>i{display:block;height:100%;background:var(--acc);border-radius:99px;transition:width .5s var(--ease)}
-.emptyst{color:var(--mut);padding:6px 0;font-size:13px}
+/* ---------- home hero ---------- */
+.hero{background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:20px;margin-top:2px;position:relative;overflow:hidden}
+.hero .hl{font-size:13.5px;color:var(--mut);font-weight:600}
+.hero .hv{font-size:36px;font-weight:800;letter-spacing:-.03em;margin:5px 0 0;font-variant-numeric:tabular-nums}
+.hero .hv small{font-size:17px;color:var(--mut);font-weight:650}
+.hero .spark{display:block;width:100%;height:74px;margin-top:8px}
+.hero .vlink{display:inline-flex;align-items:center;gap:6px;color:var(--acc);font-weight:700;font-size:13.5px;margin-top:10px}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:14px}
+.htile{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:15px;position:relative;overflow:hidden}
+.htile .hic{width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.htile .hic.p{background:#ece9fe;color:#7c5cf0} .htile .hic.g{background:#e2f6ec;color:#1fa971}
+.htile .hic.b{background:#e4edfd;color:#2f6fd6} .htile .hic.o{background:#fdeeda;color:#d98a1f}
+.htile .k{font-size:12.5px;color:var(--mut);font-weight:600}
+.htile .v{font-size:19px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.htile .s{font-size:11.5px;color:var(--mut);margin-top:1px;font-weight:550}
+.motivate{display:flex;align-items:center;gap:11px;background:var(--acc-soft);border-radius:18px;padding:13px 16px;margin-top:13px;font-size:13px;color:var(--ink2);font-weight:600;line-height:1.45}
+.motivate.warn{background:var(--warnbg);color:var(--warn)}
+.motivate .ic{flex:none;color:var(--acc)}
+.motivate.warn .ic{color:var(--warn)}
 
-/* ================= CALENDAR ================= */
-.calhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.calhead b{font-size:15.5px;font-weight:650}
-.calnav{width:34px;height:34px;border-radius:10px;background:var(--field);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
-.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
-.calgrid .dow{font-size:11px;color:var(--mut);padding:6px 0;font-weight:500}
-.calgrid .day{aspect-ratio:1;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13.5px;font-weight:500;position:relative}
-.calgrid .day.today{box-shadow:inset 0 0 0 1.5px var(--acc);color:var(--acc);font-weight:600}
-.calgrid .day.sel{background:var(--acc);color:#fff}
-.calgrid .day .dots{display:flex;gap:2px;margin-top:2px;height:4px}
-.calgrid .day .dots i{width:4px;height:4px;border-radius:50%}
-.d-red{background:#e05a51} .d-amb{background:#e5a83b} .d-teal{background:#4aa893}
-.caldays{margin-top:6px}
+/* ---------- seg tabs ---------- */
+.seg2{display:flex;background:var(--field);border-radius:99px;padding:4px;gap:2px;margin:6px 0 14px}
+.seg2 button{flex:1;font-size:13px;font-weight:650;color:var(--mut);padding:9px 6px;border-radius:99px;white-space:nowrap}
+.seg2 button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(24,27,42,.1)}
 
-/* ================= NAV ================= */
+/* ---------- EMI rows ---------- */
+.emilist{display:flex;flex-direction:column;gap:10px}
+.emirow{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:14px;cursor:pointer;transition:transform .1s}
+.emirow:active{transform:scale(.985)}
+.emirow .logo{width:46px;height:46px;border-radius:14px;background:#fff;border:1px solid var(--bd);object-fit:contain;padding:5px;flex:none}
+.emirow .logo.ph{display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:15px}
+.emirow .t{font-weight:700;font-size:14.5px;letter-spacing:-.01em}
+.emirow .s{font-size:12px;color:var(--mut);margin-top:1px}
+.emirow .amt{font-weight:750;font-size:15px;font-variant-numeric:tabular-nums}
+.emirow .st{font-size:11.5px;margin-top:2px;font-weight:600;text-align:right}
+.emirow .st.ok{color:var(--ok)} .emirow .st.warn{color:var(--warn)} .emirow .st.bad{color:var(--danger)} .emirow .st.mut{color:var(--mut)}
+.fabpill{position:sticky;bottom:96px;display:flex;margin-top:16px;z-index:5}
+
+/* ---------- insights ---------- */
+.bigstat .k{font-size:13.5px;color:var(--mut);font-weight:600}
+.bigstat .vrow{display:flex;align-items:center;gap:10px;margin-top:4px}
+.bigstat .v{font-size:32px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.delta{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px}
+.delta.up{background:var(--okbg);color:var(--ok)} .delta.down{background:var(--dangerbg);color:var(--danger)}
+.chartbars{display:flex;align-items:flex-end;gap:10px;height:130px;margin-top:18px}
+.chartbars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.chartbars .b i{width:100%;max-width:30px;border-radius:9px;background:linear-gradient(180deg,#a78bfa,#565fe9);min-height:5px;transition:height .6s var(--ease)}
+.chartbars .b.past i{opacity:.3}
+.chartbars .b .l{font-size:10.5px;color:var(--mut);font-weight:600}
+.chartbars .b .val{font-size:10px;color:var(--mut);font-weight:650}
+.donutrow{display:flex;align-items:center;gap:20px;margin-top:6px}
+.donut{position:relative;width:132px;height:132px;flex:none}
+.donut svg{transform:rotate(-90deg)}
+.donut .dc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut .dc b{font-size:17px;font-weight:800}
+.donut .dc span{font-size:10.5px;color:var(--mut);font-weight:600}
+.dleg{flex:1;display:flex;flex-direction:column;gap:11px}
+.dleg .li{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600}
+.dleg .li i{width:10px;height:10px;border-radius:4px;flex:none}
+.dleg .li .pc{margin-left:auto;color:var(--mut);font-weight:650;font-variant-numeric:tabular-nums}
+.trendwrap{position:relative;margin-top:8px}
+.trendwrap svg{width:100%;height:110px;display:block}
+.oknote{display:flex;align-items:center;gap:11px;background:var(--okbg);color:var(--ok);border-radius:18px;padding:14px 16px;font-size:13.5px;font-weight:650;margin-top:14px}
+.oknote .ic{flex:none}
+
+/* ---------- calendar ---------- */
+.cal{background:var(--card);border:1px solid var(--bd);border-radius:22px;padding:16px 12px}
+.calhead{display:flex;align-items:center;justify-content:space-between;padding:0 6px;margin-bottom:10px}
+.calhead b{font-size:16px;font-weight:750}
+.calnav{width:36px;height:36px;border-radius:50%;background:var(--field);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;text-align:center}
+.calgrid .dow{font-size:11px;color:var(--mut);font-weight:600;padding:8px 0}
+.cday{aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative}
+.cday span{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600}
+.cday.today span{box-shadow:inset 0 0 0 1.5px var(--acc);color:var(--acc)}
+.cday.due span{background:var(--acc);color:#fff;box-shadow:0 5px 12px rgba(86,95,233,.4)}
+.cday.odata span{background:var(--danger);color:#fff;box-shadow:0 5px 12px rgba(224,82,82,.4)}
+.cday i.nd{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--acc)}
+.duelist{margin-top:12px}
+.duerow{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:12px;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:12px 15px;margin-bottom:8px;cursor:pointer}
+.duerow:active{transform:scale(.985)}
+.duerow .d{font-size:12.5px;color:var(--mut);font-weight:650}
+.duerow .n{font-weight:700;font-size:14px}
+.duerow .a{font-weight:750;font-variant-numeric:tabular-nums}
+
+/* ---------- add page ---------- */
+.cattiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:4px}
+.cattile{display:flex;flex-direction:column;align-items:center;gap:7px;padding:13px 4px;border-radius:16px;border:1.5px solid var(--bd);background:var(--card);cursor:pointer;transition:border-color .12s}
+.cattile .cic{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:#fff}
+.cattile span{font-size:11.5px;font-weight:650;color:var(--ink2)}
+.cattile.on{border-color:var(--acc);box-shadow:0 0 0 3px var(--acc-soft)}
+.selectrow{position:relative}
+.selectrow select{appearance:none;-webkit-appearance:none;padding-right:40px}
+.selectrow:after{content:"";position:absolute;right:16px;top:50%;width:8px;height:8px;border-right:2px solid var(--mut);border-bottom:2px solid var(--mut);transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.swrow{display:flex;align-items:center;justify-content:space-between;background:var(--field);border:1.5px solid var(--bd);border-radius:14px;padding:13px 15px;margin-top:16px}
+.swrow .t{font-weight:650;font-size:14.5px}
+.sw{position:relative;width:48px;height:28px;flex:none}
+.sw input{opacity:0;width:100%;height:100%;position:absolute;z-index:2;cursor:pointer}
+.sw i{position:absolute;inset:0;background:#d9dbef;border-radius:99px;transition:.2s}
+.sw i:before{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.sw input:checked+i{background:var(--acc)}
+.sw input:checked+i:before{transform:translateX(20px)}
+
+/* ---------- profile ---------- */
+.pcard{display:flex;align-items:center;gap:15px;background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:18px;margin-top:2px}
+.pava{width:62px;height:62px;border-radius:50%;background:var(--pill);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;flex:none}
+.pcard h2{font-size:19px}
+.pcard .em{font-size:13px;color:var(--mut);margin-top:1px}
+.editbtn{margin-top:8px;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--acc);background:var(--acc-soft);padding:6px 12px;border-radius:99px}
+.mlist{background:var(--card);border:1px solid var(--bd);border-radius:20px;overflow:hidden;margin-bottom:14px}
+.mrow{display:flex;align-items:center;gap:14px;width:100%;padding:15px 17px;border-bottom:1px solid var(--bd);text-align:left}
+.mrow:last-child{border:0}
+.mrow .mic{width:36px;height:36px;border-radius:12px;background:var(--field);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}
+.mrow .mt{font-weight:650;font-size:14.5px}
+.mrow .chev{margin-left:auto;color:var(--mut)}
+
+/* ---------- bottom nav ---------- */
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:40;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
-.navin{max-width:520px;margin:0 auto;display:flex;align-items:center;padding:6px 10px}
-.navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;color:var(--mut);padding:7px 0;font-weight:500}
-.navbtn.on{color:var(--acc);font-weight:600}
-.navadd{flex:0 0 auto;width:46px;height:46px;border-radius:13px;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 4px;transition:transform .12s}
-.navadd:active{transform:scale(.9)}
+.navin{max-width:480px;margin:0 auto;display:flex;align-items:center;padding:8px 8px}
+.navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--mut);font-weight:600;padding:5px 0}
+.navbtn.on{color:var(--acc)}
+.navplus{flex:0 0 auto;width:52px;height:52px;border-radius:18px;background:linear-gradient(140deg,#7d86ff,#565fe9);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 6px;box-shadow:0 10px 22px rgba(86,95,233,.45);transition:transform .15s}
+.navplus:active{transform:scale(.9)}
 
-/* ================= SHEETS ================= */
-.ov{position:fixed;inset:0;background:rgba(15,17,28,.45);z-index:60;display:none;align-items:flex-end;justify-content:center}
+/* ---------- sheets / toasts ---------- */
+.ov{position:fixed;inset:0;background:rgba(16,18,32,.45);z-index:60;display:none;align-items:flex-end;justify-content:center}
 .ov.on{display:flex;animation:ovin .18s ease}
 @keyframes ovin{from{opacity:0}to{opacity:1}}
-.sheet{background:var(--card);width:100%;max-width:520px;max-height:92dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:8px 22px calc(26px + env(safe-area-inset-bottom));animation:sheetup .28s var(--ease);overscroll-behavior:contain}
-@keyframes sheetup{from{transform:translateY(50px);opacity:.6}to{transform:none;opacity:1}}
-.grab{width:38px;height:4px;border-radius:99px;background:var(--bd);margin:8px auto 16px}
-.sheet h2{margin-bottom:2px}
-.sheet .sub{color:var(--mut);font-size:13px;margin-bottom:4px}
-.lgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:4px}
-.lpick{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 3px 8px;border-radius:13px;border:1.5px solid var(--bd);background:var(--card);cursor:pointer;transition:border-color .12s}
-.lpick img{width:30px;height:30px;object-fit:contain}
-.lpick span{font-size:10px;font-weight:550;color:var(--mut);text-align:center;line-height:1.2}
-.lpick.on{border-color:var(--acc)}
-.lpick.on span{color:var(--acc)}
-.cgrid{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px}
-.cpick{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:550;padding:8px 13px;border-radius:99px;background:var(--field);color:var(--ink2);border:1.5px solid transparent}
-.cpick.on{border-color:var(--acc);color:var(--acc);background:var(--acc-soft)}
-.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.switch{position:relative;width:46px;height:28px;flex:none}
-.switch input{opacity:0;width:100%;height:100%;position:absolute;z-index:2;cursor:pointer}
-.switch i{position:absolute;inset:0;background:var(--bd);border-radius:99px;transition:.2s}
-.switch i:before{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.switch input:checked+i{background:var(--acc)}
-.switch input:checked+i:before{transform:translateX(18px)}
-
-/* ================= ROWS / DETAIL ================= */
+.sheet{background:var(--card);width:100%;max-width:480px;max-height:88dvh;overflow-y:auto;border-radius:26px 26px 0 0;padding:8px 22px calc(26px + env(safe-area-inset-bottom));animation:sheetup .28s var(--ease)}
+@keyframes sheetup{from{transform:translateY(60px);opacity:.6}to{transform:none;opacity:1}}
+.grab{width:40px;height:4px;border-radius:99px;background:var(--bd);margin:8px auto 16px}
+.dsum{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--field);border-radius:16px;padding:14px 0;margin:14px 0}
+.dsum>div{padding:0 14px}
+.dsum .k{font-size:11.5px;color:var(--mut);font-weight:600}
+.dsum .v{font-size:16px;font-weight:750;margin-top:2px;font-variant-numeric:tabular-nums}
 .hrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--bd);font-size:14px}
 .hrow:last-child{border:0}
-.hrow .dd{width:42px;height:42px;flex:none;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:600;line-height:1.1}
+.hrow .dd{width:42px;height:42px;flex:none;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;line-height:1.1}
 .hrow .dd.ok{background:var(--okbg);color:var(--ok)} .hrow .dd.mut2{background:var(--field);color:var(--ink2)}
-.hrow .dd small{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-.dsumgrid{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--field);border-radius:14px;padding:13px 0;margin:12px 0}
-.dsumgrid>div{padding:0 14px}
-.dsumgrid .k{font-size:11.5px;color:var(--mut)}
-.dsumgrid .v{font-size:15.5px;font-weight:650;margin-top:2px;font-variant-numeric:tabular-nums}
-
-/* ================= PROFILE ================= */
-.pcard{display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-top:4px}
-.pavatar{width:54px;height:54px;border-radius:18px;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex:none}
-.pgroup{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.prow{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--bd)}
-.prow:last-child{border:0}
-.prow .pic{width:32px;height:32px;flex:none;border-radius:10px;background:var(--field);display:flex;align-items:center;justify-content:center;color:var(--ink2)}
-.prow .t{font-weight:550;font-size:14.5px}
-.prow .s{font-size:12.5px;color:var(--mut);margin-top:1px}
-.seg{display:flex;background:var(--field);border-radius:11px;padding:3px;gap:2px}
-.seg button{font-size:12.5px;font-weight:550;padding:7px 12px;border-radius:8px;color:var(--mut)}
-.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-
-/* ================= BANNER / TOASTS ================= */
-.banner{display:flex;gap:11px;align-items:center;background:var(--warnbg);color:var(--warn);border-radius:var(--r);padding:13px 16px;margin-bottom:12px;font-size:13.5px;font-weight:550}
-.banner .bpay{font-weight:650;color:var(--warn);flex:none}
+.hrow .dd small{font-size:9px;font-weight:700;text-transform:uppercase}
+.prog{height:5px;background:var(--field);border-radius:99px;overflow:hidden;margin:10px 0 4px}
+.prog>i{display:block;height:100%;background:linear-gradient(90deg,#8b7cff,#565fe9);border-radius:99px;transition:width .5s var(--ease)}
 #toasts{position:fixed;top:calc(14px + env(safe-area-inset-top));left:0;right:0;z-index:100;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
-.toast{background:var(--hero);color:#fff;font-size:13.5px;font-weight:550;padding:11px 18px;border-radius:99px;max-width:86%;animation:toastin .3s var(--ease)}
-[data-theme="dark"] .toast{background:#262b42}
+.toast{background:#1c1f33;color:#fff;font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:99px;max-width:86%;animation:toastin .3s var(--ease)}
+[data-theme="dark"] .toast{background:#2a2f4a}
 @keyframes toastin{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
-.toast.err{background:var(--danger)}
+.toast.err{background:#e05252}
 
-@media (max-width:400px){ .hero .hamt{font-size:28px} }
+@media (max-width:390px){ .hero .hv{font-size:31px} .navbtn{font-size:10px} }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.2 12 3.5l8.5 6.7V20a1.5 1.5 0 0 1-1.5 1.5h-4.6v-6.2h-4.8v6.2H5A1.5 1.5 0 0 1 3.5 20Z"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12"/><circle cx="4" cy="6.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="4" cy="17.5" r="1.4" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10.5M9.7 20V4M15.4 20v-9M21 20H3.2"/></symbol>
-<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M3.5 10h17M8 2.8V6.5M16 2.8V6.5M8 14.5h2.4M8 17.8h5.6"/></symbol>
 <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="4.2"/><path d="M4.5 20.8c1.3-3.4 4.1-5.1 7.5-5.1s6.2 1.7 7.5 5.1"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h11.5a1 1 0 0 1 1 1v2"/><path d="M3.5 7.5V17A2.5 2.5 0 0 0 6 19.5h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 19 8.5H6A2.5 2.5 0 0 1 3.5 6"/><circle cx="16.4" cy="14" r="1.15" fill="currentColor" stroke="none"/></symbol>
-<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7.5 18.5h9.8a3.7 3.7 0 0 0 .6-7.35 5.6 5.6 0 0 0-11-1.2A4.15 4.15 0 0 0 7.5 18.5Z"/><path d="m9.6 13.4 2 2 3.4-3.6"/></symbol>
-<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.8 5.8v6c0 4.6 3 7.7 7.2 9.2 4.2-1.5 7.2-4.6 7.2-9.2v-6Z"/><path d="m9 11.8 2.2 2.2 4-4.2"/></symbol>
-<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18.5 16.2H5.5c1.2-1.3 1.8-2.9 1.8-5.2a4.7 4.7 0 0 1 9.4 0c0 2.3.6 3.9 1.8 5.2Z"/><path d="M10.2 19.2a1.9 1.9 0 0 0 3.6 0"/><path d="M12 4v1.4"/></symbol>
-<symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.2 3 5.5 13.4h5l-1 7.6 8-10.6h-5Z"/></symbol>
-<symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 1 9-9c0 2.5-1.7 3.6-3.5 3.6h-2a2.2 2.2 0 0 0-1.6 3.7A1.8 1.8 0 0 1 12 21Z"/><circle cx="8" cy="10" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="16" cy="10" r="1.1" fill="currentColor" stroke="none"/></symbol>
-<symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v10.5M7.5 11l4.5 4.5 4.5-4.5"/><path d="M4.5 19.5h15"/></symbol>
-<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 6.5h15M9.5 6V4.5h5V6M6.5 6.5 7.3 20a1.5 1.5 0 0 0 1.5 1.4h6.4a1.5 1.5 0 0 0 1.5-1.4l.8-13.5"/><path d="M10 10.5v6M14 10.5v6"/></symbol>
-<symbol id="i-out" viewBox="0 0 24 24"><path d="M14.5 4h4a1.5 1.5 0 0 1 1.5 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-4"/><path d="M10 7.5 6 12l4 4.5M6 12h9"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13.5 6.5 20 12l-6.5 5.5"/></symbol>
 <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"/></symbol>
 <symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9.5 5.5 6.5 6.5-6.5 6.5"/></symbol>
+<symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9.5 6 6 6-6"/></symbol>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
 <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5 2.8 19.5h18.4Z"/><path d="M12 9.5v4.2M12 16.9v.4"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2.2"/></symbol>
-<symbol id="i-tag" viewBox="0 0 24 24"><path d="m3.5 12.5 8-8H20v8.5l-8 8Z"/><circle cx="15.8" cy="8.2" r="1.2" fill="currentColor" stroke="none"/></symbol>
-<symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.7 1.8-5.7 1.8L12 18.5l-1.8-5.9L4.5 10.8 10.2 9Z"/><path d="M19 16.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7Z"/></symbol>
-<symbol id="i-sync" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L20 9.2M19.5 12a7.5 7.5 0 0 1-12.8 5.3L4 14.8"/><path d="M20 4.5v4.7h-4.7M4 19.5v-4.7h4.7"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M3.5 10h17M8 2.8V6.5M16 2.8V6.5"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h11.5a1 1 0 0 1 1 1v2"/><path d="M3.5 7.5V17A2.5 2.5 0 0 0 6 19.5h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 19 8.5H6A2.5 2.5 0 0 1 3.5 6"/><circle cx="16.4" cy="14" r="1.15" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.4-4.4"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18.5 16.2H5.5c1.2-1.3 1.8-2.9 1.8-5.2a4.7 4.7 0 0 1 9.4 0c0 2.3.6 3.9 1.8 5.2Z"/><path d="M10.2 19.2a1.9 1.9 0 0 0 3.6 0"/><path d="M12 4v1.4"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+<symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M4 4l16 16"/><path d="M9.9 5.2A9.9 9.9 0 0 1 12 5c6 0 9.5 7 9.5 7a16.6 16.6 0 0 1-3 3.6M6.1 6.7A15.8 15.8 0 0 0 2.5 12S6 19 12 19a9.4 9.4 0 0 0 4-.9"/><path d="M9.9 9.9a2.8 2.8 0 0 0 4 4"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2.8" width="10" height="18.4" rx="2.6"/><path d="M10.8 18.2h2.4"/></symbol>
 <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12.5" rx="2.5"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 12.5h17"/></symbol>
-<symbol id="i-tv" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="12" rx="2.5"/><path d="M8.5 20.5h7M12 17.5v3"/></symbol>
-<symbol id="i-bike" viewBox="0 0 24 24"><circle cx="6" cy="16.5" r="3.2"/><circle cx="18" cy="16.5" r="3.2"/><path d="M6 16.5 9.2 9h4.1M12 16.5h6l-2.6-7.5h-2.2M9.5 9 8 6.5H5.8"/></symbol>
-<symbol id="i-car" viewBox="0 0 24 24"><path d="M4.5 13 6 8.2A2 2 0 0 1 7.9 6.8h8.2A2 2 0 0 1 18 8.2L19.5 13M4.5 13h15a1 1 0 0 1 1 1v3.6h-2.3M4.5 13a1 1 0 0 0-1 1v3.6h2.3M5.8 17.6h12.4"/><circle cx="7.6" cy="17.4" r="1.5"/><circle cx="16.4" cy="17.4" r="1.5"/></symbol>
-<symbol id="i-card2" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M6.5 14.5h4"/></symbol>
 <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5.5 8h13l-1 12h-11Z"/><path d="M8.8 10.5V6.8a3.2 3.2 0 0 1 6.4 0v3.7"/></symbol>
 <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h4.2l2 2.5H19a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 19.5H5A1.5 1.5 0 0 1 3.5 18Z"/></symbol>
-<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></symbol>
+<symbol id="i-sync" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3L20 9.2M19.5 12a7.5 7.5 0 0 1-12.8 5.3L4 14.8"/><path d="M20 4.5v4.7h-4.7M4 19.5v-4.7h4.7"/></symbol>
+<symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v10.5M7.5 11l4.5 4.5 4.5-4.5"/><path d="M4.5 19.5h15"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 6.5h15M9.5 6V4.5h5V6M6.5 6.5 7.3 20a1.5 1.5 0 0 0 1.5 1.4h6.4a1.5 1.5 0 0 0 1.5-1.4l.8-13.5"/><path d="M10 10.5v6M14 10.5v6"/></symbol>
+<symbol id="i-out" viewBox="0 0 24 24"><path d="M14.5 4h4a1.5 1.5 0 0 1 1.5 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-4"/><path d="M10 7.5 6 12l4 4.5M6 12h9"/></symbol>
+<symbol id="i-pen" viewBox="0 0 24 24"><path d="m14.5 5.5 4 4L8 20l-4.6 1L4.5 16Z"/><path d="m12.5 7.5 4 4"/></symbol>
+<symbol id="i-history" viewBox="0 0 24 24"><path d="M4 6.5v4h4"/><path d="M4.8 10.5a8 8 0 1 1-.6 4"/><path d="M12 8.5V12l2.6 1.8"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.2l1.2 2.3 2.6.4 1.9-1 1.4 1.4-1 1.9.4 2.6 2.3 1.2-2.3 1.2-.4 2.6 1 1.9-1.4 1.4-1.9-1-2.6.4L12 20.8l-1.2-2.3-2.6-.4-1.9 1-1.4-1.4 1-1.9-.4-2.6L3.2 12l2.3-1.2.4-2.6-1-1.9L6.3 4.9l1.9 1 2.6-.4Z"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.5 2-2.5 3.5"/><circle cx="12" cy="16.8" r=".4" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".4" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-party" viewBox="0 0 24 24"><path d="m5.2 14.4 4.4 4.4L20 8.5V4h-4.5Z"/><path d="M5.2 14.4 4 20l5.6-1.2"/><path d="m14.5 4.5.7 1.8M19 9l1.8.7M15.5 8.5 17 10M4 9.5l1.5.5M7 3.5l.8 1.6"/></symbol>
+<symbol id="i-kebab" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18.5" r="1.4" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.8 5.8v6c0 4.6 3 7.7 7.2 9.2 4.2-1.5 7.2-4.6 7.2-9.2v-6Z"/><path d="m9 11.8 2.2 2.2 4-4.2"/></symbol>
+<symbol id="i-g" viewBox="0 0 24 24"><path d="M21 12.2h-8.6V9h5.3a5.9 5.9 0 1 0-1.6 6.4l2.3 1.9A9 9 0 1 1 21 12.2Z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-apple" viewBox="0 0 24 24"><path d="M16.6 12.6c0-2.3 1.9-3.4 2-3.5a4.4 4.4 0 0 0-3.4-1.9c-1.4-.1-2.8.9-3.5.9s-1.9-.9-3-.8A4.6 4.6 0 0 0 4.8 9.6c-1.6 2.9-.4 7.1 1.2 9.4.8 1.1 1.7 2.4 3 2.3s1.7-.8 3.2-.8 1.9.8 3.2.8 2.2-1.1 3-2.3a10 10 0 0 0 1.4-2.8 4.3 4.3 0 0 1-2.7-4ZM14.3 5.6A4.3 4.3 0 0 0 15.3 2.5a4.4 4.4 0 0 0-2.9 1.5 4.1 4.1 0 0 0-1 3.1 3.7 3.7 0 0 0 2.9-1.5Z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-spark2" viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.7 1.8-5.7 1.8L12 18.5l-1.8-5.9L4.5 10.8 10.2 9Z"/></symbol>
 </defs></svg>
-<!-- ======================= ONBOARD ======================= -->
-<section id="scr-onboard" class="hidden">
-  <div class="ob-top"><span class="chip acc"><svg class="ic xs"><use href="#i-shield"/></svg>Private &amp; encrypted</span></div>
+<!-- ======================= SPLASH ======================= -->
+<section id="scr-splash">
+  <div class="aur a"></div><div class="aur b"></div>
+  <svg class="wave" viewBox="0 0 400 200" preserveAspectRatio="none"><path d="M0 120 C90 60 160 170 250 110 C310 72 360 90 400 60 L400 200 L0 200 Z" fill="rgba(124,92,246,.25)"/><path d="M0 150 C100 100 170 190 260 140 C320 108 370 120 400 96 L400 200 L0 200 Z" fill="rgba(86,95,233,.3)"/></svg>
+  <div class="spl-icon"><svg class="ic" style="width:44px;height:44px;color:#fff"><use href="#i-wallet"/></svg></div>
+  <div class="spl-name">EMI Flow</div>
+  <div class="spl-tag">Small Payments<br>A Bigger Tomorrow</div>
+  <div class="spl-foot">Control Today<br>Live Freely Tomorrow</div>
+</section>
 
-  <div class="ob-hero">
-    <img class="ob-logo" src="/icons/icon-192.png" alt="EMIFlow">
-    <div class="ob-brand">EMI<em>Flow</em></div>
-    <div class="ob-tag">Every EMI. Every lender. Zero surprises.</div>
+<!-- ======================= ONBOARDING ======================= -->
+<section id="scr-onboard" class="ob-page hidden">
+  <button class="ob-skip" onclick="OB.skip()">Skip</button>
+  <div class="ob-stage">
+    <div class="ob-slide on" data-s="0">
+      <div class="ob-art"><div class="tiles3d">
+        <div class="t" style="--rot:-10deg;left:6px;top:24px;animation-delay:0s"><img src="/icons/lenders/paytm.png" alt=""></div>
+        <div class="t" style="--rot:8deg;right:14px;top:0;animation-delay:.6s"><img src="/icons/lenders/phonepe.png" alt=""></div>
+        <div class="t" style="--rot:-6deg;right:34px;bottom:18px;animation-delay:1.2s"><img src="/icons/lenders/bajaj.png" alt=""></div>
+        <div class="t" style="--rot:12deg;left:30px;bottom:30px;animation-delay:1.8s"><img src="/icons/lenders/gpay.png" alt=""></div>
+      </div></div>
+      <div class="ob-title">Track All Your EMIs<br><b>In One Place</b></div>
+      <p class="ob-sub">Stay organized, never miss a payment and take control of your finances.</p>
+    </div>
+    <div class="ob-slide" data-s="1">
+      <div class="ob-art"><div class="calbell">
+        <div class="bellic"><svg class="ic lg"><use href="#i-bell"/></svg></div>
+        <div class="cal"><div class="ch"><span>October</span><span>2026</span></div>
+          <div class="cg"><i></i><i class="h"></i><i></i><i></i><i class="h"></i><i class="h"></i><i></i><i></i><i class="h"></i><i></i><i></i><i></i><i class="h"></i><i></i><i></i></div></div>
+        <div class="due"><svg class="ic sm"><use href="#i-wallet"/></svg><div><b>₹1,200</b><span>Due in 3 days</span></div></div>
+      </div></div>
+      <div class="ob-title">Smart Reminders<br><b>Never Miss a Payment</b></div>
+      <p class="ob-sub">Get smart alerts before your due dates so you stay stress free.</p>
+    </div>
+    <div class="ob-slide" data-s="2">
+      <div class="ob-art"><div class="bars3d"><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div></div></div>
+      <div class="ob-title">Better Insights<br><b>Stronger Decisions</b></div>
+      <p class="ob-sub">Understand your spending, track progress and plan ahead.</p>
+    </div>
   </div>
+  <div class="ob-dots" id="obdots"><i class="on"></i><i></i><i></i></div>
+  <button class="pill" id="obbtn" onclick="OB.next()">Get Started <svg class="ic sm"><use href="#i-arrow"/></svg></button>
+</section>
 
-  <div class="feats">
-    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-cloud"/></svg></div>
-      <div><b>Synced to your private cloud</b><p>Add on one device — it's there on every other.</p></div></div>
-    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-wallet"/></svg></div>
-      <div><b>15 real lenders, real icons</b><p>Bajaj, Paytm, PhonePe, GPay, CRED, banks &amp; BNPL apps.</p></div></div>
-    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-bell"/></svg></div>
-      <div><b>Never miss a due date</b><p>Overdue alerts, reminder windows, autopay flags.</p></div></div>
-    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-chart"/></svg></div>
-      <div><b>See your outflow coming</b><p>Six-month projections, lender-wise outstanding.</p></div></div>
+<!-- ======================= LOGIN ======================= -->
+<section id="scr-login" class="au-page hidden">
+  <button class="au-back" onclick="Route.to('splash')"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+  <div class="au-hero"><h1>Welcome Back <span class="wave">👋</span></h1><p>Login to continue your journey with EMI Flow.</p></div>
+  <label class="fl">Enter your mobile number or email</label>
+  <input id="li-user" inputmode="email" placeholder="98765 43210  ·  you@example.com" autocomplete="username">
+  <label class="fl">Password</label>
+  <div class="frow"><input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password" style="border:0;background:transparent">
+    <button class="ieye" onclick="UI.eye('li-pass',this)"><svg class="ic sm"><use href="#i-eye"/></svg></button></div>
+  <div class="au-links"><span></span><button class="lk" onclick="Auth.forgotView()">Forgot password?</button></div>
+  <div id="li-forgot" class="hidden">
+    <label class="fl">Email for reset code</label><input id="fg-email" type="email" placeholder="you@example.com">
+    <button class="btn2 wfull" style="margin-top:10px" onclick="Auth.forgotSend()">Get reset code</button>
+    <div id="fg-code-wrap" class="hidden">
+      <label class="fl">Reset code</label><input id="fg-code" inputmode="numeric" maxlength="6" placeholder="123456">
+      <label class="fl">New password</label><input id="fg-pass" type="password" placeholder="min 8 chars">
+      <button class="btn2 wfull" style="margin-top:10px" onclick="Auth.resetDo()">Set new password</button>
+    </div>
+    <div id="fg-msg" class="small mut" style="margin-top:10px"></div>
   </div>
+  <div id="li-err" class="aerr hidden"></div>
+  <div style="margin-top:auto;padding-top:24px">
+    <button class="pill" id="li-go" onclick="Auth.login()">Login <svg class="ic sm"><use href="#i-arrow"/></svg></button>
+    <div class="au-or">or continue with</div>
+    <div class="au-soc">
+      <button onclick="toast('Google sign-in coming soon')"><svg class="ic lg" style="color:#ea4335"><use href="#i-g"/></svg></button>
+      <button onclick="toast('Apple sign-in coming soon')"><svg class="ic lg"><use href="#i-apple"/></svg></button>
+      <button onclick="toast('More options coming soon')"><svg class="ic lg"><use href="#i-kebab"/></svg></button>
+    </div>
+    <div class="au-foot">Don't have an account? <b onclick="Route.to('register')">Sign Up</b></div>
+  </div>
+</section>
 
-  <div class="ob-cta">
-    <button class="btn pri wide" onclick="Auth.open('register')">Create free account</button>
-    <button class="btn line wide" onclick="Auth.open('login')">I already have an account</button>
-    <button class="ob-demo" onclick="App.demo()">Take a tour with sample data →</button>
-    <div class="ob-terms">By continuing you agree to the Terms &amp; Privacy Policy.<br>Passwords are PBKDF2-hashed · your data is never sold or shared.</div>
+<!-- ======================= REGISTER ======================= -->
+<section id="scr-register" class="au-page hidden">
+  <button class="au-back" onclick="Route.to('login')"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+  <div class="au-hero"><h1>Create Your Account</h1><p>Start managing your EMIs today.</p></div>
+  <label class="fl">Full Name</label><input id="rg-name" placeholder="Arvind Choudhary" autocomplete="name">
+  <label class="fl">Mobile Number</label>
+  <div class="frow"><span class="fx">+91</span><input id="rg-phone" inputmode="numeric" maxlength="10" placeholder="98765 43210"></div>
+  <label class="fl">Email <span class="mut">(optional)</span></label><input id="rg-email" type="email" placeholder="arvind@example.com" autocomplete="email">
+  <label class="fl">Create Password</label>
+  <div class="frow"><input id="rg-pass" type="password" placeholder="min 8 characters" autocomplete="new-password" style="border:0;background:transparent">
+    <button class="ieye" onclick="UI.eye('rg-pass',this)"><svg class="ic sm"><use href="#i-eye"/></svg></button></div>
+  <div class="chk"><input type="checkbox" id="rg-terms"><span>I agree to the Terms &amp; Privacy Policy. My data stays private — never sold, never shared.</span></div>
+  <div id="rg-err" class="aerr hidden"></div>
+  <div style="margin-top:auto;padding-top:22px">
+    <button class="pill" id="rg-go" onclick="Auth.register()">Create Account <svg class="ic sm"><use href="#i-arrow"/></svg></button>
+    <div class="au-foot">Already have an account? <b onclick="Route.to('login')">Login</b></div>
   </div>
+</section>
+
+<!-- ======================= SUCCESS ======================= -->
+<section id="scr-success" class="au-page hidden">
+  <div class="suc-top">Small Steps<br>Big Freedom</div>
+  <div class="suc-art">
+    <i class="conf" style="left:22%;top:18%;background:#f0a32f"></i><i class="conf" style="left:70%;top:12%;background:#565fe9;animation-delay:.4s"></i>
+    <i class="conf" style="left:80%;top:44%;background:#1fa971;animation-delay:.9s"></i><i class="conf" style="left:14%;top:48%;background:#8b5cf6;animation-delay:1.3s"></i>
+    <i class="conf" style="left:34%;top:8%;background:#e05252;animation-delay:1.7s"></i><i class="conf" style="left:58%;top:26%;background:#2f9fd6;animation-delay:.6s"></i>
+    <div class="cone"><svg class="ic"><use href="#i-party"/></svg></div>
+  </div>
+  <div class="suc-title">You're All Set! 🎉</div>
+  <p class="suc-sub">Welcome to EMI Flow.<br>Let's build a stress-free financial tomorrow, together.</p>
+  <div style="margin-top:auto"><button class="pill" onclick="Auth.finishRegister()">Go to Dashboard <svg class="ic sm"><use href="#i-arrow"/></svg></button></div>
 </section>
 
 <!-- ======================= APP ======================= -->
 <div id="app" class="hidden">
-  <header class="top">
-    <img class="brandmark" src="/icons/icon-192.png" alt="">
-    <div class="grow"><h1 id="greet">—</h1>
-      <div class="sync"><span class="syncdot" id="syncdot"></span><span id="synctext">syncing…</span></div></div>
-    <button class="iconbtn" onclick="App.go('profile')" aria-label="Profile"><svg class="ic sm"><use href="#i-user"/></svg></button>
-  </header>
 
-  <main>
-    <div id="duobanner"></div>
+  <!-- ============ HOME ============ -->
+  <section class="app-scr on" id="scr-home">
+    <header class="topbar">
+      <div class="grow"><div class="tb-title" id="hgreet">Good Morning,</div><h1 id="hname">—</h1>
+        <div class="sync" style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);margin-top:3px"><span class="syncdot" id="syncdot" style="width:7px;height:7px;border-radius:50%;background:#e0a23e"></span><span id="synctext">syncing…</span></div></div>
+      <button class="tb-ic" onclick="Route.go('emis')" aria-label="Search EMIs"><svg class="ic sm"><use href="#i-search"/></svg></button>
+      <button class="tb-ic" onclick="Route.go('calendar')" aria-label="Calendar"><svg class="ic sm"><use href="#i-bell"/></svg><span class="dot hidden" id="belldot"></span></button>
+    </header>
 
-    <!-- ============ HOME ============ -->
-    <section class="screen on" id="scr-home">
-      <div class="hero" id="herocard"></div>
-      <div class="sect"><h2>Your EMIs</h2><button class="lnk" onclick="Sheet.openAdd()">Add new</button></div>
-      <div id="loans" class="loans"></div>
-    </section>
+    <div class="hero">
+      <div class="hl">Total EMI Due</div>
+      <div class="hv" id="heroAmt">₹0</div>
+      <svg class="spark" id="heroSpark" viewBox="0 0 320 74" preserveAspectRatio="none"></svg>
+      <button class="vlink" onclick="Route.go('emis')">View Details <svg class="ic xs"><use href="#i-arrow"/></svg></button>
+    </div>
 
-    <!-- ============ STATS ============ -->
-    <section class="screen" id="scr-stats">
-      <div class="statgrid" id="statcards" style="margin-top:6px"></div>
-      <div class="sect"><h2>Outflow forecast</h2><span class="chip">6 months</span></div>
-      <div class="card"><div class="bars" id="projbars"></div></div>
-      <div class="card"><h3>Lender-wise outstanding</h3><div id="lenderrows"></div></div>
-      <div class="card"><h3>Category split</h3><div id="catrows"></div></div>
-    </section>
+    <div class="hgrid">
+      <div class="htile" onclick="Route.go('calendar')"><div class="hic p"><svg class="ic sm"><use href="#i-cal"/></svg></div>
+        <div class="k">Upcoming</div><div class="v" id="tUpcoming">₹0</div><div class="s" id="tUpcomingS">—</div></div>
+      <div class="htile" onclick="Route.go('insights')"><div class="hic g"><svg class="ic sm"><use href="#i-check"/></svg></div>
+        <div class="k">Paid</div><div class="v" id="tPaid">₹0</div><div class="s">this month</div></div>
+      <div class="htile" onclick="Route.go('emis')"><div class="hic b"><svg class="ic sm"><use href="#i-sync"/></svg></div>
+        <div class="k">Active EMIs</div><div class="v" id="tActive">0</div><div class="s" id="tActiveS">in progress</div></div>
+      <div class="htile" onclick="Route.go('insights')"><div class="hic o"><svg class="ic sm"><use href="#i-wallet"/></svg></div>
+        <div class="k">Remaining</div><div class="v" id="tRemain">₹0</div><div class="s">total outstanding</div></div>
+    </div>
 
-    <!-- ============ CALENDAR ============ -->
-    <section class="screen" id="scr-calendar">
-      <div class="card" style="margin-top:6px">
-        <div class="calhead">
-          <button class="calnav" onclick="Cal.nav(-1)" aria-label="Previous month"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
-          <b id="caltitle">—</b>
-          <button class="calnav" onclick="Cal.nav(1)" aria-label="Next month"><svg class="ic sm"><use href="#i-chev-r"/></svg></button>
-        </div>
-        <div class="calgrid" id="calgrid"></div>
+    <div class="motivate" id="motivate"></div>
+  </section>
+
+  <!-- ============ MY EMIs ============ -->
+  <section class="app-scr" id="scr-emis">
+    <header class="pgtitle">
+      <h1 class="grow">My EMIs</h1>
+      <button class="tb-ic" onclick="toast('Sorted by next due date')"><svg class="ic sm"><use href="#i-kebab"/></svg></button>
+    </header>
+    <div class="seg2" id="emitabs">
+      <button class="on" data-t="active" onclick="EMIs.switchTo('active')">Active</button>
+      <button data-t="upcoming" onclick="EMIs.switchTo('upcoming')">Upcoming</button>
+      <button data-t="done" onclick="EMIs.switchTo('done')">Completed</button>
+    </div>
+    <div class="emilist" id="emilist"></div>
+    <div class="fabpill"><button class="pill" onclick="Edit2.open()"><svg class="ic sm"><use href="#i-plus"/></svg> Add New EMI</button></div>
+  </section>
+
+  <!-- ============ INSIGHTS ============ -->
+  <section class="app-scr" id="scr-insights">
+    <header class="pgtitle"><h1 class="grow">Insights</h1><span class="chip" style="background:var(--card);border:1px solid var(--bd);color:var(--ink2);font-weight:650">This Month <svg class="ic xs" style="vertical-align:-2px"><use href="#i-chev-d"/></svg></span></header>
+
+    <div class="card bigstat">
+      <div class="k">Total EMI Payments</div>
+      <div class="vrow"><div class="v" id="insPaid">₹0</div><span class="delta up" id="insDelta">↑ 0%</span></div>
+      <div class="chartbars" id="insBars"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:8px">Category Wise</h3>
+      <div class="donutrow">
+        <div class="donut"><svg width="132" height="132" viewBox="0 0 132 132" id="donutSvg"></svg>
+          <div class="dc"><b id="donutTot">₹0</b><span>outstanding</span></div></div>
+        <div class="dleg" id="donutLeg"></div>
       </div>
-      <div class="card hidden caldays" id="calday"></div>
-      <div class="row small mut" style="justify-content:center;gap:16px;margin:2px 0 14px">
-        <span class="row" style="gap:6px"><i class="d-red" style="width:7px;height:7px;border-radius:50%"></i> overdue</span>
-        <span class="row" style="gap:6px"><i class="d-amb" style="width:7px;height:7px;border-radius:50%"></i> due</span>
-      </div>
-    </section>
+    </div>
 
-    <!-- ============ PROFILE ============ -->
-    <section class="screen" id="scr-profile">
-      <div class="pcard">
-        <div class="pavatar" id="pavatar">A</div>
-        <div class="grow"><h2 id="pname">—</h2><div class="small mut" id="pemail">—</div><div class="tiny mut" id="pmeta" style="margin-top:2px"></div></div>
-      </div>
+    <div class="card">
+      <h3 style="margin-bottom:2px">Expense Trend</h3>
+      <div class="small mut" style="font-weight:600">last 6 months</div>
+      <div class="trendwrap"><svg id="trendSvg" viewBox="0 0 320 110" preserveAspectRatio="none"></svg></div>
+    </div>
 
-      <div class="sect"><h2>Preferences</h2></div>
-      <div class="pgroup">
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-palette"/></svg></div>
-          <div class="grow"><div class="t">Theme</div></div>
-          <div class="seg" id="segtheme"><button data-v="system">Auto</button><button data-v="light">Light</button><button data-v="dark">Dark</button></div></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-bolt"/></svg></div>
-          <div class="grow"><div class="t">Animations</div></div>
-          <label class="switch"><input type="checkbox" id="swanim" checked><i></i></label></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-bell"/></svg></div>
-          <div class="grow"><div class="t">Due-date reminders</div></div>
-          <label class="switch"><input type="checkbox" id="swnotify"><i></i></label></div>
-      </div>
+    <div class="oknote" id="insNote"></div>
+  </section>
 
-      <div class="sect"><h2>Data</h2></div>
-      <div class="pgroup">
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-sync"/></svg></div>
-          <div class="grow"><div class="t">Sync status</div><div class="s" id="syncline2">—</div></div>
-          <button class="btn ghost sm" onclick="Sync.pull(true)">Sync now</button></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-dl"/></svg></div>
-          <div class="grow"><div class="t">Export data</div><div class="s">Full JSON backup</div></div>
-          <button class="btn ghost sm" onclick="Sync.exportCloud()">Export</button></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-out"/></svg></div>
-          <div class="grow"><div class="t">Log out everywhere</div></div>
-          <button class="btn ghost sm" onclick="Auth.logoutAll()">Log out</button></div>
+  <!-- ============ CALENDAR ============ -->
+  <section class="app-scr" id="scr-calendar">
+    <header class="pgtitle"><h1 class="grow">Calendar</h1>
+      <button class="tb-ic" onclick="Route.go('home')"><svg class="ic sm"><use href="#i-bell"/></svg></button></header>
+    <div class="cal">
+      <div class="calhead">
+        <button class="calnav" onclick="Cal.nav(-1)"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+        <b id="caltitle">—</b>
+        <button class="calnav" onclick="Cal.nav(1)"><svg class="ic sm"><use href="#i-chev-r"/></svg></button>
       </div>
+      <div class="calgrid" id="calgrid"></div>
+    </div>
+    <div class="duelist" id="duelist"></div>
+  </section>
 
-      <div class="sect"><h2>Danger zone</h2></div>
-      <div class="pgroup" style="border-color:rgba(207,58,49,.25)">
-        <div class="prow"><div class="pic" style="color:var(--danger)"><svg class="ic sm"><use href="#i-trash"/></svg></div>
-          <div class="grow"><div class="t" style="color:var(--danger)">Delete account</div><div class="s">Erases everything, permanently</div></div>
-          <button class="btn danger sm" onclick="Auth.deleteAccount()">Delete</button></div>
-      </div>
+  <!-- ============ ADD / EDIT EMI ============ -->
+  <section class="app-scr" id="scr-add">
+    <header class="pgtitle">
+      <button class="au-back" style="margin:0" onclick="Route.back()"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+      <h1 class="grow" id="addTitle">Add New EMI</h1>
+    </header>
 
-      <div class="card tiny mut" style="line-height:1.7;margin-top:16px">
-        <b style="color:var(--ink2)">EMIFlow</b> v2.2 “Calm” · <span id="buildid"></span><br>
-        Your data lives only in your account — never sold, never shared. Lender names &amp; logos are trademarks of their respective owners, used solely as visual tags. EMIFlow never touches your bank.
-      </div>
-    </section>
-  </main>
+    <label class="fl">Category</label>
+    <div class="cattiles" id="addCats"></div>
+    <label class="fl">Provider Name</label>
+    <div class="selectrow"><select id="addLender"></select></div>
+    <div class="row" style="gap:10px;align-items:flex-start">
+      <div class="grow"><label class="fl">EMI Amount</label><input id="addAmt" type="number" inputmode="decimal" min="1" placeholder="₹ 0"></div>
+      <div style="width:130px"><label class="fl">Tenure (months)</label>
+        <div class="selectrow"><select id="addN"><option>3</option><option>6</option><option selected>12</option><option>18</option><option>24</option><option>36</option><option>48</option><option>60</option></select></div></div>
+    </div>
+    <label class="fl">Start Date</label><input id="addDate" type="date">
+    <label class="fl">Repeat</label>
+    <div class="selectrow"><select id="addRepeat"><option>Monthly</option></select></div>
+    <div class="swrow"><div class="t">Set Reminder</div>
+      <label class="sw"><input type="checkbox" id="addRemind" checked><i></i></label></div>
+    <div id="addErr" class="aerr hidden"></div>
+    <div id="addEditWrap" class="hidden">
+      <button class="btn2 danger wfull" style="margin-top:16px" onclick="Edit2.remove()">Delete this EMI</button>
+    </div>
+    <button class="pill" style="margin-top:18px" id="addSave" onclick="Edit2.save()">Save EMI</button>
+  </section>
 
-  <nav class="nav"><div class="navin">
-    <button class="navbtn on" data-tab="home" onclick="App.go('home')"><svg class="ic"><use href="#i-home"/></svg>Home</button>
-    <button class="navbtn" data-tab="stats" onclick="App.go('stats')"><svg class="ic"><use href="#i-chart"/></svg>Reports</button>
-    <button class="navadd" onclick="Sheet.openAdd()" aria-label="Add EMI"><svg class="ic lg"><use href="#i-plus"/></svg></button>
-    <button class="navbtn" data-tab="calendar" onclick="App.go('calendar')"><svg class="ic"><use href="#i-cal"/></svg>Calendar</button>
-    <button class="navbtn" data-tab="profile" onclick="App.go('profile')"><svg class="ic"><use href="#i-user"/></svg></button>
-  </div></nav>
+  <!-- ============ PROFILE ============ -->
+  <section class="app-scr" id="scr-profile">
+    <header class="pgtitle"><h1 class="grow">Profile</h1></header>
+    <div class="pcard">
+      <div class="pava" id="pava">A</div>
+      <div class="grow"><h2 id="pname">—</h2><div class="em" id="pemail">—</div>
+        <button class="editbtn" onclick="toast('Edit profile coming soon')"><svg class="ic xs"><use href="#i-pen"/></svg> Edit Profile</button></div>
+    </div>
+
+    <div style="height:14px"></div>
+    <div class="mlist">
+      <button class="mrow" onclick="Profile.payHistory()"><span class="mic"><svg class="ic sm"><use href="#i-history"/></svg></span><span class="mt grow">Payment History</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="Profile.providers()"><span class="mic"><svg class="ic sm"><use href="#i-grid"/></svg></span><span class="mt grow">Manage Providers</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="Sync.exportCloud()"><span class="mic"><svg class="ic sm"><use href="#i-dl"/></svg></span><span class="mt grow">Export Report</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <div class="mrow"><span class="mic"><svg class="ic sm"><use href="#i-bell"/></svg></span><span class="mt grow">Reminders</span>
+        <label class="sw"><input type="checkbox" id="swnotify"><i></i></label></div>
+      <button class="mrow" onclick="Profile.settings()"><span class="mic"><svg class="ic sm"><use href="#i-gear"/></svg></span><span class="mt grow">App Settings</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="toast('Support: ajitjaat1011@gmail.com')"><span class="mic"><svg class="ic sm"><use href="#i-help"/></svg></span><span class="mt grow">Help &amp; Support</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="Profile.about()"><span class="mic"><svg class="ic sm"><use href="#i-info"/></svg></span><span class="mt grow">About EMI Flow</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+    </div>
+    <button class="logout" onclick="Auth.logout()">Log Out</button>
+    <div class="tiny mut" style="text-align:center;margin-top:14px" id="buildid"></div>
+  </section>
 </div>
 
-<!-- ======================= AUTH SHEET ======================= -->
-<div class="ov" id="ov-auth"><div class="sheet">
-  <div class="grab"></div>
-  <div class="row" style="margin-bottom:6px">
-    <button class="btn ghost sm" id="authtab-login" onclick="Auth.tab('login')">Sign in</button>
-    <button class="btn ghost sm" id="authtab-register" onclick="Auth.tab('register')">Create account</button>
-    <div class="grow"></div>
-    <button class="iconbtn" onclick="UI.closeOv('ov-auth')"><svg class="ic sm"><use href="#i-x"/></svg></button>
-  </div>
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="nav hidden" id="bnav"><div class="navin">
+  <button class="navbtn on" data-tab="home" onclick="Route.go('home')"><svg class="ic"><use href="#i-home"/></svg>Home</button>
+  <button class="navbtn" data-tab="emis" onclick="Route.go('emis')"><svg class="ic"><use href="#i-list"/></svg>EMIs</button>
+  <button class="navplus" onclick="Edit2.open()" aria-label="Add EMI"><svg class="ic lg"><use href="#i-plus"/></svg></button>
+  <button class="navbtn" data-tab="insights" onclick="Route.go('insights')"><svg class="ic"><use href="#i-chart"/></svg>Insights</button>
+  <button class="navbtn" data-tab="profile" onclick="Route.go('profile')"><svg class="ic"><use href="#i-user"/></svg>Profile</button>
+</div></nav>
 
-  <div id="auth-main">
-    <label>Your name</label><input id="au-name" placeholder="Ajit Sharma" autocomplete="name">
-    <label>Email</label><input id="au-email" type="email" placeholder="you@example.com" autocomplete="email">
-    <label>Password <span class="mut">(min 8 chars)</span></label>
-    <input id="au-pass" type="password" placeholder="••••••••" autocomplete="current-password">
-    <div id="au-err" class="small hidden" style="color:var(--danger);margin-top:10px;font-weight:550"></div>
-    <button class="btn pri wide" id="au-go" style="margin-top:18px" onclick="Auth.submit()">Create account</button>
-    <button class="ob-demo" onclick="Auth.forgotView()">Forgot password?</button>
-  </div>
-
-  <div id="auth-forgot" class="hidden">
-    <p class="sub">We'll issue a 6-digit reset code for your email.</p>
-    <label>Email</label><input id="fg-email" type="email">
-    <button class="btn pri wide" style="margin-top:14px" onclick="Auth.forgotSend()">Get reset code</button>
-    <div id="fg-code-wrap" class="hidden">
-      <label>Reset code</label><input id="fg-code" inputmode="numeric" maxlength="6" placeholder="123456">
-      <label>New password</label><input id="fg-pass" type="password" placeholder="min 8 chars">
-      <button class="btn pri wide" style="margin-top:14px" onclick="Auth.resetDo()">Set new password</button>
-    </div>
-    <div id="fg-msg" class="small" style="margin-top:12px;color:var(--mut)"></div>
-    <button class="ob-demo" onclick="Auth.forgotView(false)">← Back to sign in</button>
-  </div>
-</div></div>
-
-<!-- ======================= ADD / EDIT SHEET ======================= -->
-<div class="ov" id="ov-edit"><div class="sheet">
-  <div class="grab"></div>
-  <div class="row"><h2 class="grow" id="ed-title">Add EMI</h2>
-    <button class="iconbtn" onclick="UI.closeOv('ov-edit')"><svg class="ic sm"><use href="#i-x"/></svg></button></div>
-
-  <label>EMI name</label><input id="ed-name" placeholder="e.g. Bajaj Finserv TV" maxlength="60">
-  <label>Lender / pay through</label><div class="lgrid" id="ed-lenders"></div>
-  <label>Category</label><div class="cgrid" id="ed-cats"></div>
-  <div class="split">
-    <div><label>EMI amount (₹)</label><input id="ed-amt" type="number" inputmode="decimal" min="1" placeholder="4999"></div>
-    <div><label>Installments</label><input id="ed-n" type="number" inputmode="numeric" min="1" max="480" placeholder="12"></div>
-  </div>
-  <div class="split">
-    <div><label>First due date</label><input id="ed-first" type="date"></div>
-    <div><label>Already paid</label><input id="ed-paid" type="number" inputmode="numeric" min="0" placeholder="0"></div>
-  </div>
-  <div class="prow" style="padding:14px 2px;border-bottom:0">
-    <div class="pic"><svg class="ic sm"><use href="#i-bolt"/></svg></div>
-    <div class="grow"><div class="t">Autopay</div><div class="s">Auto-debited each month</div></div>
-    <label class="switch"><input type="checkbox" id="ed-autopay"><i></i></label></div>
-  <label>Remind me</label>
-  <select id="ed-remind"><option value="0">On due day only</option><option value="1">1 day before</option><option value="2" selected>2 days before</option><option value="4">4 days before</option><option value="7">1 week before</option></select>
-  <label>Notes (optional)</label><textarea id="ed-notes" rows="2" maxlength="240" placeholder="Loan account no., amount variation…"></textarea>
-  <div id="ed-err" class="small hidden" style="color:var(--danger);margin-top:10px;font-weight:550"></div>
-  <button class="btn pri wide" style="margin-top:18px" id="ed-save" onclick="Edit.save()">Save EMI</button>
-</div></div>
-
-<!-- ======================= DETAIL SHEET ======================= -->
+<!-- ============ DETAIL SHEET ============ -->
 <div class="ov" id="ov-detail"><div class="sheet">
   <div class="grab"></div>
   <div class="row"><h2 class="grow" id="dt-title">EMI</h2>
-    <button class="iconbtn" onclick="UI.closeOv('ov-detail')"><svg class="ic sm"><use href="#i-x"/></svg></button></div>
+    <button class="tb-ic" onclick="UI.closeOv('ov-detail')"><svg class="ic sm"><use href="#i-x"/></svg></button></div>
   <div id="dt-body"></div>
 </div></div>
 
-<!-- ======================= CONFIRM ======================= -->
+<!-- ============ GENERIC SHEET ============ -->
+<div class="ov" id="ov-gen"><div class="sheet">
+  <div class="grab"></div>
+  <div class="row"><h2 class="grow" id="gen-title">—</h2>
+    <button class="tb-ic" onclick="UI.closeOv('ov-gen')"><svg class="ic sm"><use href="#i-x"/></svg></button></div>
+  <div id="gen-body"></div>
+</div></div>
+
+<!-- ============ CONFIRM ============ -->
 <div class="ov" id="ov-confirm" style="align-items:center"><div class="sheet" style="max-width:380px;border-radius:24px;margin-bottom:18dvh">
   <h2 id="cf-title">Are you sure?</h2>
   <p class="mut small" id="cf-text" style="margin-top:6px"></p>
   <div class="row" style="margin-top:18px;gap:10px">
-    <button class="btn ghost grow" onclick="UI.closeOv('ov-confirm')">Cancel</button>
-    <button class="btn danger grow" id="cf-ok">Confirm</button>
+    <button class="btn2 grow" onclick="UI.closeOv('ov-confirm')">Cancel</button>
+    <button class="btn2 danger grow" id="cf-ok">Confirm</button>
   </div>
 </div></div>
 
@@ -502,11 +658,12 @@ main{position:relative}
 'use strict';
 
 const CATS = [
-  {id:'personal', n:'Personal', ic:'briefcase'}, {id:'consumer', n:'Consumer', ic:'tv'},
-  {id:'bike', n:'Bike', ic:'bike'}, {id:'car', n:'Car', ic:'car'},
-  {id:'home', n:'Home', ic:'home'}, {id:'card', n:'Card bill', ic:'card2'},
-  {id:'bnpl', n:'BNPL', ic:'bag'}, {id:'other', n:'Other', ic:'folder'},
+  {id:'personal', n:'Loan',     ic:'briefcase', c:'#565fe9'},
+  {id:'consumer', n:'Phone',    ic:'phone',     c:'#8b5cf6'},
+  {id:'bnpl',     n:'Shopping', ic:'bag',       c:'#f0a32f'},
+  {id:'other',    n:'Other',    ic:'folder',    c:'#64748b'},
 ];
+const CAT_ALIAS = {bike:'personal', car:'personal', home:'personal', card:'other', shopping:'bnpl', phone:'consumer'};
 const LENDERS = [
   {id:'bajaj',    n:'Bajaj Finserv', c:'#2563eb'},
   {id:'paytm',    n:'Paytm',         c:'#002972'},
@@ -527,7 +684,7 @@ const LENDERS = [
 ];
 const LMAP = Object.fromEntries(LENDERS.map(l => [l.id, l]));
 const CMAP = Object.fromEntries(CATS.map(c => [c.id, c]));
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '3.0.0';
 
 /* ---------------- tiny utils ---------------- */
 const $ = (s) => document.querySelector(s);
@@ -573,7 +730,7 @@ function confirmBox(title, text, onOk) {
 /* ---------------- persistent store ---------------- */
 const Store = {
   ls: 'emiflow.v2',
-  s: { token: null, user: null, emis: {}, cursor: 0, meta: {theme:'system', anim:true, notify:false}, lastSync: 0, outbox: [], notifiedOn: '' },
+  s: { token: null, user: null, emis: {}, cursor: 0, meta: {theme:'system', anim:true, notify:false}, lastSync: 0, outbox: [], notifiedOn: '', onboarded: false },
   load() { try { const d = JSON.parse(localStorage.getItem(this.ls)); if (d && typeof d === 'object') Object.assign(this.s, d); } catch {} },
   save() { try { localStorage.setItem(this.ls, JSON.stringify(this.s)); } catch {} },
   reset() { try { localStorage.removeItem(this.ls); } catch {} this.s = { token: null, user: null, emis: {}, cursor: 0, meta: {theme:'system', anim:true, notify:false}, lastSync: 0, outbox: [], notifiedOn: '' }; },
@@ -598,7 +755,7 @@ const EMI = {
     return {
       v: 1, id: d.id, name: String(d.name || 'Untitled EMI').slice(0, 60),
       lender: LMAP[d.lender] ? d.lender : 'other',
-      cat: CMAP[d.cat] ? d.cat : 'other',
+      cat: CMAP[d.cat] ? d.cat : (CAT_ALIAS[d.cat] || 'other'),
       amt: Math.max(0, Number(d.amt) || 0),
       n: Math.max(1, Math.min(480, Math.round(Number(d.n) || 1))),
       paid: Math.max(0, Math.min(Math.round(Number(d.paid) || 0), Math.round(Number(d.n) || 1))),
@@ -643,6 +800,23 @@ const EMI = {
     return out;
   },
   monthOutflow(ymStr) { return this.duesInMonth(ymStr).reduce((s, d) => s + d.emi.amt, 0); },
+  paidInMonth(ymStr) {
+    let sum = 0;
+    for (const e of Object.values(Store.s.emis)) {
+      if (e.deleted) continue;
+      for (const d of (e.paidDates || [])) if (d.startsWith(ymStr)) sum += e.amt;
+    }
+    return sum;
+  },
+  upcomingSoon() { // next installment within 3 days
+    const out = [];
+    for (const e of Object.values(Store.s.emis)) {
+      if (e.deleted || !EMI.active(e)) continue;
+      const nd = this.nextDue(e);
+      if (nd) { const diff = Math.round((parseYmd(nd.date) - parseYmd(today())) / 86400000); if (diff <= 3) out.push({emi: e, date: nd.date, in: diff, amt: e.amt}); }
+    }
+    return out.sort((a, b) => a.date < b.date ? -1 : 1);
+  },
   summary() {
     const all = Object.values(Store.s.emis).filter(e => !e.deleted);
     const act = all.filter(e => this.active(e));
@@ -791,14 +965,20 @@ const Remind = {
   },
 };
 /* ============================================================
-   EMIFlow v2.1 “Aurora” UI — render · auth · sheets · calendar
+   EMI Flow v3.0 — pages: splash · onboarding · auth · dashboard
    ============================================================ */
 'use strict';
 
-/* ---------------- ui helpers ---------------- */
+/* ---------------- shared UI ---------------- */
 const UI = {
   openOv(id) { $('#' + id).classList.add('on'); document.body.style.overflow = 'hidden'; },
   closeOv(id) { $('#' + id).classList.remove('on'); document.body.style.overflow = ''; },
+  eye(inputId, btn) {
+    const i = $('#' + inputId);
+    const show = i.type === 'password';
+    i.type = show ? 'text' : 'password';
+    btn.innerHTML = ic(show ? 'eyeoff' : 'eye', 'ic sm');
+  },
 };
 document.querySelectorAll('.ov').forEach(ov => ov.addEventListener('click', (e) => { if (e.target === ov) UI.closeOv(ov.id); }));
 
@@ -808,63 +988,138 @@ function lenderTile(id, cls) {
   if (icn) return `<img class="${cls}" src="${icn}" alt="${esc(L.n)}" loading="lazy">`;
   return `<div class="${cls} ph" style="background:${L.c}">${esc(L.n.slice(0, 2).toUpperCase())}</div>`;
 }
-const licBig = (id) => lenderTile(id, 'lic');
-const licSm = (id) => lenderTile(id, 'lic2');
 
-function loanStatus(e) {
-  const nd = EMI.nextDue(e);
-  if (!nd) return {cls: 'done', txt: 'done'};
-  const od = EMI.overdueCount(e);
-  if (od) return {cls: 'over', txt: od + ' overdue'};
-  const diff = Math.round((parseYmd(nd.date) - parseYmd(today())) / 86400000);
-  if (diff === 0) return {cls: 'soon', txt: 'due today'};
-  if (diff === 1) return {cls: 'soon', txt: 'due tomorrow'};
-  if (diff <= 7) return {cls: 'due', txt: 'in ' + diff + ' days'};
-  return {cls: 'due', txt: 'due ' + prettyDay(nd.date)};
+function toast(msg, err) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg;
+  $('#toasts').appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 420); }, 2400);
 }
+function confirmBox(title, text, onOk) {
+  $('#cf-title').textContent = title; $('#cf-text').textContent = text;
+  $('#cf-ok').onclick = () => { UI.closeOv('ov-confirm'); onOk(); };
+  UI.openOv('ov-confirm');
+}
+
+/* ---------------- router ---------------- */
+const Route = {
+  cur: 'home',
+  to(name) { // top-level: splash onboard login register success app
+    ['scr-splash','scr-onboard','scr-login','scr-register','scr-success'].forEach(id => $('#' + id).classList.add('hidden'));
+    $('#app').classList.add('hidden'); $('#bnav').classList.add('hidden');
+    if (name === 'app') {
+      $('#app').classList.remove('hidden'); $('#bnav').classList.remove('hidden');
+      this.go(this.cur === 'add' ? 'home' : this.cur);
+      return;
+    }
+    const el = $('#scr-' + name);
+    if (el) el.classList.remove('hidden');
+    window.scrollTo(0, 0);
+  },
+  go(tab, hideNav) {
+    this.cur = tab;
+
+    document.querySelectorAll('.app-scr').forEach(s => s.classList.remove('on'));
+    const scr = $('#scr-' + tab); if (scr) scr.classList.add('on');
+    document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+    $('#bnav').classList.toggle('hidden', !!hideNav);
+    if (tab === 'home') Render.home();
+    if (tab === 'emis') EMIs.render();
+    if (tab === 'insights') Render.insights();
+    if (tab === 'calendar') Cal.render();
+    if (tab === 'profile') Render.profile();
+    window.scrollTo(0, 0);
+  },
+  back() { this.go('emis'); },
+};
+
+/* ---------------- onboarding ---------------- */
+const OB = {
+  i: 0,
+  show(n) {
+    this.i = n;
+    document.querySelectorAll('.ob-slide').forEach(s => s.classList.toggle('on', +s.dataset.s === n));
+    document.querySelectorAll('#obdots i').forEach((d, j) => d.classList.toggle('on', j === n));
+    $('#obbtn').innerHTML = (n === 2 ? "Let's Go " : (n === 0 ? 'Get Started ' : 'Next ')) + ic('arrow', 'ic sm');
+  },
+  next() { this.i >= 2 ? this.done() : this.show(this.i + 1); },
+  skip() { this.done(); },
+  done() {
+    Store.s.onboarded = true; Store.save();
+    Route.to(Store.s.token || Store.s.demo ? 'app' : 'login');
+  },
+};
 
 /* ---------------- auth ---------------- */
 const Auth = {
-  mode: 'login',
-  open(mode) { this.tab(mode || 'login'); $('#au-err').classList.add('hidden'); UI.openOv('ov-auth'); },
-  tab(mode) {
-    this.mode = mode;
-    $('#authtab-login').classList.toggle('on', mode === 'login');
-    $('#authtab-register').classList.toggle('on', mode === 'register');
-    $('#authtab-login').style.cssText = mode === 'login' ? 'background:var(--acc);color:#fff' : '';
-    $('#authtab-register').style.cssText = mode === 'register' ? 'background:var(--acc);color:#fff' : '';
-    $('#au-name').parentElement.querySelector('label').style.display = mode === 'register' ? '' : 'none';
-    $('#au-name').style.display = mode === 'register' ? '' : 'none';
-    $('#au-go').textContent = mode === 'register' ? 'Create account' : 'Sign in';
-    $('#au-err').classList.add('hidden');
-  },
-  err(msg) { const e = $('#au-err'); e.textContent = msg; e.classList.remove('hidden'); },
-  async submit() {
-    if (Store.s.demo) { Store.s.demo = false; Store.save(); }
-    const email = $('#au-email').value.trim().toLowerCase();
-    const pass = $('#au-pass').value;
-    const name = $('#au-name').value.trim();
-    if (this.mode === 'register' && name.length < 2) return this.err('Please enter your name.');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return this.err('That email doesn\'t look right.');
-    if (pass.length < 8) return this.err('Password must be at least 8 characters.');
-    const btn = $('#au-go'); btn.disabled = true; btn.textContent = 'Please wait…';
-    const r = await api('/auth/' + (this.mode === 'register' ? 'register' : 'login'), {method: 'POST', body: JSON.stringify({email, password: pass, name})});
-    btn.disabled = false; btn.textContent = this.mode === 'register' ? 'Create account' : 'Sign in';
+  pendingUser: null,
+  err(id, msg) { const e = $('#' + id); e.textContent = msg; e.classList.toggle('hidden', !msg); },
+  async login() {
+    const ident = $('#li-user').value.trim().toLowerCase();
+    const pass = $('#li-pass').value;
+    this.err('li-err', '');
+    if (/^\d{10}$/.test(ident.replace(/\D/g, '')) && !ident.includes('@')) {
+      const p = ident.replace(/\D/g, '');
+      if (p.length !== 10) return this.err('li-err', 'Enter a valid 10-digit mobile number.');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(ident)) {
+      return this.err('li-err', 'Enter a valid mobile number or email.');
+    }
+    if (pass.length < 8) return this.err('li-err', 'Password must be at least 8 characters.');
+    const btn = $('#li-go'); btn.disabled = true; btn.textContent = 'Please wait…';
+    const r = await api('/auth/login', {method: 'POST', body: JSON.stringify({email: ident, password: pass})});
+    btn.disabled = false; btn.innerHTML = 'Login ' + ic('arrow', 'ic sm');
     if (!r.ok) {
-      const M = {email_taken: 'That email is already registered — sign in instead.', bad_credentials: 'Wrong email or password.', rate_limited: 'Too many attempts — wait a few minutes.', bad_email: 'Invalid email.', bad_name: 'Name too short.', bad_password: 'Password must be 8+ characters.', network: 'You appear offline.'};
-      return this.err(M[r.error] || ('Failed (' + (r.error || r._status) + ')'));
+      const M = {bad_credentials: 'Wrong mobile/email or password.', rate_limited: 'Too many attempts — wait a few minutes.', network: 'You appear offline.'};
+      return this.err('li-err', M[r.error] || ('Login failed (' + (r.error || r._status) + ')'));
     }
     Store.s.demo = false;
     Store.s.token = r.token; Store.s.user = r.user; Store.s.emis = {}; Store.s.cursor = 0; Store.save();
-    UI.closeOv('ov-auth');
-    toast('Welcome, ' + (r.user.name.split(' ')[0]) + '!');
-    App.enter();
+    toast('Welcome back, ' + r.user.name.split(' ')[0] + '!');
+    this.enterApp();
     Sync.full();
-    try { fetch('/api/analytics', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({e: 'auth', s: this.mode})}); } catch {}
+  },
+  async register() {
+    const name = $('#rg-name').value.trim();
+    const phone = $('#rg-phone').value.replace(/\D/g, '');
+    const email = $('#rg-email').value.trim().toLowerCase();
+    const pass = $('#rg-pass').value;
+    const terms = $('#rg-terms').checked;
+    this.err('rg-err', '');
+    if (name.length < 2) return this.err('rg-err', 'Please enter your full name.');
+    if (phone.length !== 10) return this.err('rg-err', 'Enter a valid 10-digit mobile number.');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return this.err('rg-err', 'That email doesn\'t look right.');
+    if (pass.length < 8) return this.err('rg-err', 'Password must be at least 8 characters.');
+    if (!terms) return this.err('rg-err', 'Please agree to the Terms & Privacy Policy.');
+    const btn = $('#rg-go'); btn.disabled = true; btn.textContent = 'Creating…';
+    const finalEmail = email || ('user' + phone + '@emiflow.local');
+    const r = await api('/auth/register', {method: 'POST', body: JSON.stringify({name, email: finalEmail, phone, password: pass})});
+    btn.disabled = false; btn.innerHTML = 'Create Account ' + ic('arrow', 'ic sm');
+    if (!r.ok) {
+      const M = {email_taken: 'Account already exists with this mobile/email — Login instead.', bad_phone: 'Invalid mobile number.', rate_limited: 'Too many attempts — wait a bit.', network: 'You appear offline.'};
+      return this.err('rg-err', M[r.error] || ('Could not create account (' + (r.error || r._status) + ')'));
+    }
+    Store.s.demo = false;
+    Store.s.token = r.token; Store.s.user = r.user; Store.s.emis = {}; Store.s.cursor = 0; Store.save();
+    this.pendingUser = r.user;
+    Route.to('success');
+    try { fetch('/api/analytics', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({e: 'auth', s: 'register'})}); } catch {}
+  },
+  finishRegister() {
+    this.enterApp();
+    toast('Start by adding your first EMI');
+    Sync.full();
+  },
+  enterApp() {
+    Route.cur = 'home';
+    Route.to('app');
+    Render.all();
+    Sync.statusUI('', 'syncing…');
+    if (!Store.s.demo) Sync.full();
+    Remind.check();
   },
   forgotView(show = true) {
-    $('#auth-main').classList.toggle('hidden', show);
-    $('#auth-forgot').classList.toggle('hidden', !show);
+    $('#li-forgot').classList.toggle('hidden', !show);
+    if (show) $('#li-forgot').scrollIntoView({behavior: 'smooth', block: 'nearest'});
   },
   async forgotSend() {
     const email = $('#fg-email').value.trim().toLowerCase();
@@ -879,100 +1134,78 @@ const Auth = {
   },
   async resetDo() {
     const email = $('#fg-email').value.trim().toLowerCase();
-    const code = $('#fg-code').value.trim(); const pass = $('#fg-pass').value;
+    const code = $('#fg-code').value.trim(), pass = $('#fg-pass').value;
     if (code.length !== 6) return $('#fg-msg').textContent = 'Enter the 6-digit code.';
     if (pass.length < 8) return $('#fg-msg').textContent = 'New password must be 8+ characters.';
     const r = await api('/auth/reset-password', {method: 'POST', body: JSON.stringify({email, code, password: pass})});
-    if (r.ok) { $('#fg-msg').textContent = 'Password set! Sign in with it now.'; setTimeout(() => { this.forgotView(false); this.tab('login'); }, 900); }
+    if (r.ok) { $('#fg-msg').textContent = 'Password set! Login with it now.'; setTimeout(() => this.forgotView(false), 1000); }
     else $('#fg-msg').textContent = 'Invalid or expired code.';
   },
   sessionExpired() {
     if (!Store.s.token || Store.s.demo) return;
     Store.s.token = null; Store.save();
-    toast('Session expired — sign in again', true);
-    App.enter();
+    toast('Session expired — login again', true);
+    Route.to('login');
   },
-  async logout() {
-    if (Store.s.demo) { Store.reset(); App.enter(); return; }
-    await api('/auth/logout', {method: 'POST'});
-    Store.s.token = null; Store.save(); App.enter(); toast('Logged out');
-  },
-  async logoutAll() {
-    if (Store.s.demo) return confirmBox('Leave demo?', 'Sample data will be cleared.', () => { Store.reset(); App.enter(); });
-    confirmBox('Log out everywhere?', 'All sessions on all devices will end. You\'ll sign in again here.', async () => {
-      await api('/auth/logout-all', {method: 'POST'});
-      Store.s.token = null; Store.save(); App.enter(); toast('Logged out of all devices');
-    });
-  },
-  deleteAccount() {
-    if (Store.s.demo) return toast('Nothing to delete in demo', true);
-    confirmBox('Delete account permanently?', 'Every EMI, payment record and your account will be erased. This cannot be undone.', async () => {
-      const pass = prompt('Confirm your password to delete:');
-      if (pass == null) return;
-      const r = await api('/account/delete', {method: 'POST', body: JSON.stringify({password: pass})});
-      if (r.ok) { Store.reset(); App.enter(); toast('Account deleted. Take care!'); }
-      else toast(r.error === 'bad_credentials' ? 'Wrong password.' : 'Delete failed.', true);
-    });
+  logout() {
+    const doIt = async () => {
+      if (!Store.s.demo) await api('/auth/logout', {method: 'POST'});
+      Store.s.token = null; Store.s.demo = false; Store.save();
+      Route.to('login'); toast('Logged out');
+    };
+    confirmBox('Log out?', 'You can login back anytime.', doIt);
   },
 };
 
-/* ---------------- add / edit sheet ---------------- */
-const Sheet = { openAdd() { if (Store.s.demo) toast('Demo — sign up to add your own', true); else Edit.open(null); } };
-const Edit = {
-  current: null, lender: 'other', cat: 'personal',
-  open(id) {
-    this.current = id;
-    const e = id ? Store.s.emis[id] : null;
-    $('#ed-title').textContent = id ? 'Edit EMI' : 'Add EMI';
-    const d = e || {};
-    $('#ed-name').value = d.name || '';
-    this.lender = d.lender || 'other';
-    this.cat = d.cat || 'personal';
-    $('#ed-amt').value = d.amt || '';
-    $('#ed-n').value = d.n || '';
-    $('#ed-first').value = d.firstDue || ymd(addMonths(new Date(), 1));
-    $('#ed-paid').value = d.paid ?? 0;
-    $('#ed-autopay').checked = !!d.autopay;
-    $('#ed-remind').value = String(d.remind ?? 2);
-    $('#ed-notes').value = d.notes || '';
-    $('#ed-err').classList.add('hidden');
-    $('#ed-save').textContent = id ? 'Save changes' : 'Save EMI';
-    this.renderPickers();
-    UI.openOv('ov-edit');
+/* ---------------- my EMIs (tabs) ---------------- */
+const EMIs = {
+  tab: 'active',
+  switchTo(t) {
+    this.tab = t;
+    document.querySelectorAll('#emitabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t));
+    this.render();
   },
-  renderPickers() {
-    $('#ed-lenders').innerHTML = LENDERS.map(l =>
-      `<div class="lpick ${l.id === this.lender ? 'on' : ''}" data-id="${l.id}" onclick="Edit.pickLender('${l.id}')">${LENDER_ICONS[l.id] ? `<img src="${LENDER_ICONS[l.id]}" alt="">` : `<div style="width:34px;height:34px;border-radius:10px;background:${l.c};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px">${esc(l.n.slice(0, 2).toUpperCase())}</div>`}<span>${esc(l.n)}</span></div>`).join('');
-    $('#ed-cats').innerHTML = CATS.map(c =>
-      `<button class="cpick ${c.id === this.cat ? 'on' : ''}" onclick="Edit.pickCat('${c.id}')">${ic(c.ic, 'ic xs')} ${esc(c.n)}</button>`).join('');
-  },
-  pickLender(id) { this.lender = id; this.renderPickers(); vib(8); },
-  pickCat(id) { this.cat = id; this.renderPickers(); vib(8); },
-  save() {
-    const name = $('#ed-name').value.trim();
-    const amt = Number($('#ed-amt').value), n = Math.round(Number($('#ed-n').value));
-    const first = $('#ed-first').value, paid = Math.max(0, Math.round(Number($('#ed-paid').value) || 0));
-    const err = (m) => { const e = $('#ed-err'); e.textContent = m; e.classList.remove('hidden'); };
-    if (name.length < 2) return err('Give this EMI a name.');
-    if (!(amt > 0)) return err('Enter the EMI amount.');
-    if (!(n >= 1 && n <= 480)) return err('Installments must be 1–480.');
-    if (!first) return err('Pick the first due date.');
-    if (paid > n) return err('Already-paid can\'t exceed total installments.');
-    const prev = this.current ? Store.s.emis[this.current] : null;
-    const doc = EMI.normalize({
-      ...(prev || {}), id: this.current || ('e' + Math.random().toString(36).slice(2, 10)),
-      name, lender: this.lender, cat: this.cat, amt, n, paid, firstDue: first,
-      autopay: $('#ed-autopay').checked, remind: Number($('#ed-remind').value),
-      notes: $('#ed-notes').value.trim(), createdAt: prev ? prev.createdAt : Date.now(),
-      paidDates: prev && prev.paid !== paid ? prev.paidDates.slice(0, paid) : (prev ? prev.paidDates : []),
-    });
-    Sync.queueLocal(doc);
-    UI.closeOv('ov-edit');
-    toast(this.current ? 'EMI updated' : 'EMI added');
-    vib(10);
-    Remind.banner(); Render.all(); Sync.full();
+  render() {
+  const t = today();
+  const all = Object.values(Store.s.emis).filter(e => !e.deleted);
+  const started = (e) => e.paid > 0 || cmpYmd(e.firstDue, t) <= 0;
+  const groups = {
+    active: all.filter(e => started(e) && EMI.active(e)),
+    upcoming: all.filter(e => !started(e)),
+    done: all.filter(e => !EMI.active(e)),
+  };
+  document.querySelector('#emitabs [data-t=active]').textContent = `Active (${groups.active.length})`;
+  document.querySelector('#emitabs [data-t=upcoming]').textContent = `Upcoming (${groups.upcoming.length})`;
+  document.querySelector('#emitabs [data-t=done]').textContent = `Completed (${groups.done.length})`;
+  const list = groups[this.tab].sort((a, b) => {
+    const da = (EMI.nextDue(a) || {date: a.firstDue}).date, db2 = (EMI.nextDue(b) || {date: b.firstDue}).date;
+    return da < db2 ? -1 : 1;
+  });
+  $('#emilist').innerHTML = list.length ? list.map(e => {
+    const nd = EMI.nextDue(e);
+    const od = EMI.overdueCount(e);
+    let st, cls;
+    if (!EMI.active(e)) { st = 'Completed'; cls = 'ok'; }
+    else if (od) { st = od + ' overdue'; cls = 'bad'; }
+    else if (nd) {
+      const diff = Math.round((parseYmd(nd.date) - parseYmd(t)) / 86400000);
+      st = diff === 0 ? 'Due today' : diff <= 3 ? 'Due in ' + diff + 'd' : 'Next: ' + prettyDay(nd.date);
+      cls = diff <= 3 ? 'warn' : 'mut';
+    } else { st = '—'; cls = 'mut'; }
+    return `<div class="emirow" onclick="Detail.open('${e.id}')">
+      ${lenderTile(e.lender, 'logo')}
+      <div class="grow"><div class="t">${esc(e.name)}</div><div class="s">${esc((LMAP[e.lender] || LMAP.other).n)} · ${e.paid}/${e.n} paid</div></div>
+      <div style="text-align:right"><div class="amt">${fmtINR(e.amt)}</div><div class="st ${cls}">${st}</div></div>
+    </div>`;
+  }).join('') : `<div class="card" style="text-align:center;padding:36px 20px">
+    <div style="width:56px;height:56px;border-radius:18px;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;margin:0 auto 12px">${ic('wallet', 'ic lg')}</div>
+    <h3>Nothing here yet</h3><p class="small mut" style="margin-top:4px">Add an EMI and it will show up in this list.</p></div>`;
   },
 };
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#emitabs button');
+  if (b) EMIs.switchTo(b.dataset.t);
+});
 
 /* ---------------- detail sheet ---------------- */
 const Detail = {
@@ -982,33 +1215,31 @@ const Detail = {
     this.id = id;
     const L = LMAP[e.lender] || LMAP.other, C = CMAP[e.cat] || CMAP.other;
     const nd = EMI.nextDue(e), od = EMI.overdueCount(e), prog = EMI.progress(e);
-    const upcoming = EMI.statusOf(e).filter(r => r.state !== 'paid').slice(0, 4);
-    const hist = (e.paidDates || []).slice(-5).reverse().map((d) =>
+    const upcoming = EMI.statusOf(e).filter(r => r.state !== 'paid').slice(0, 3);
+    const hist = (e.paidDates || []).slice(-4).reverse().map((d) =>
       `<div class="hrow"><div class="dd ok"><small>${parseYmd(d).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(d).getDate()}</div>
-       <div class="grow"><b>${fmtINR(e.amt)}</b> <span class="mut small" style="font-weight:600">paid</span></div>
-       <span class="chip ok">paid</span></div>`).join('');
+       <div class="grow"><b>${fmtINR(e.amt)}</b> <span class="mut small">paid</span></div><span class="chip ok">paid</span></div>`).join('');
     $('#dt-title').textContent = e.name;
     $('#dt-body').innerHTML = `
-      <div class="row" style="margin:6px 0 2px">
-        ${licSm(e.lender)}
-        <div class="grow" style="min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(L.n)}</b></div>
-        <span class="chip acc">${ic(C.ic, 'ic xs')} ${esc(C.n)}</span> ${e.autopay ? `<span class="chip">${ic('bolt', 'ic xs')}autopay</span>` : ''}
-      </div>
-      <div class="dsumgrid">
+      <div class="row" style="margin:4px 0 2px">${lenderTile(e.lender, 'logo')}
+        <div class="grow" style="min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(L.n)}</b>
+        <span class="tiny mut" style="font-weight:600">${C.n}${e.autopay ? ' · autopay' : ''}</span></div>
+        <span class="chip acc">${e.paid}/${e.n}</span></div>
+      <div class="dsum">
         <div><div class="k">EMI</div><div class="v">${fmtINR(e.amt)}</div></div>
-        <div><div class="k">Paid</div><div class="v">${e.paid}<span class="mut" style="font-size:12px">/${e.n}</span></div></div>
-        <div><div class="k">Left</div><div class="v">${fmtINR(EMI.outstanding(e))}</div></div>
+        <div><div class="k">Remaining</div><div class="v">${fmtINR(EMI.outstanding(e))}</div></div>
+        <div><div class="k">Progress</div><div class="v">${prog}%</div></div>
       </div>
-      <div class="pbar" style="margin:2px 0 6px"><i style="width:${prog}%"></i></div>
-      <div class="small mut" style="text-align:center;font-weight:600">${prog}% done · started ${prettyDate(e.firstDue)}${e.notes ? '<br><span class=mut>note:</span> ' + esc(e.notes) : ''}</div>
-      ${od ? `<div class="banner">${ic('alert', 'ic sm')}<span class="grow">${od} installment${od > 1 ? 's' : ''} overdue</span></div>` : ''}
-      ${nd ? `<button class="btn pri wide" style="margin-top:14px" onclick="Detail.pay()">${od ? 'Clear overdue' : 'Mark paid'} · ${fmtINR(e.amt)}</button>`
-           : `<div class="chip ok" style="margin-top:14px;width:100%;justify-content:center;padding:11px">${ic('spark', 'ic xs')} Loan completed — well done!</div>`}
-      ${upcoming.length ? `<label>Upcoming</label>${upcoming.map(r => `<div class="hrow"><div class="dd mut2"><small>${parseYmd(r.date).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(r.date).getDate()}</div><div class="grow">${fmtINR(e.amt)} <span class="mut small">· #${r.i + 1}</span></div><span class="chip ${r.state === 'overdue' ? 'danger' : ''}">${r.state}</span></div>`).join('')}` : ''}
-      ${hist ? `<label>Recent payments</label>${hist}` : ''}
-      <div class="row" style="gap:10px;margin-top:20px">
-        <button class="btn ghost grow" onclick="UI.closeOv('ov-detail');Edit.open('${e.id}')">Edit</button>
-        <button class="btn danger grow" onclick="Detail.remove()">Delete</button>
+      <div class="prog"><i style="width:${prog}%"></i></div>
+      <div class="tiny mut" style="text-align:center;margin-bottom:6px">started ${prettyDate(e.firstDue)}${e.notes ? ' · ' + esc(e.notes) : ''}</div>
+      ${od ? `<div class="oknote" style="background:var(--dangerbg);color:var(--danger)">${ic('alert', 'ic sm')} ${od} installment${od > 1 ? 's' : ''} overdue</div>` : ''}
+      ${nd ? `<button class="pill" style="margin-top:14px" onclick="Detail.pay()">${od ? 'Clear overdue' : 'Mark paid'} · ${fmtINR(e.amt)} <svg class="ic sm"><use href="#i-arrow"/></svg></button>`
+           : `<div class="oknote" style="margin-top:14px">${ic('check', 'ic sm')} Loan completed — well done!</div>`}
+      ${upcoming.length ? `<label class="fl">Upcoming</label>${upcoming.map(r => `<div class="hrow"><div class="dd mut2"><small>${parseYmd(r.date).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(r.date).getDate()}</div><div class="grow">${fmtINR(e.amt)} <span class="mut small">· #${r.i + 1}</span></div><span class="chip">${r.state}</span></div>`).join('')}` : ''}
+      ${hist ? `<label class="fl">Recent payments</label>${hist}` : ''}
+      <div class="row" style="gap:10px;margin-top:18px">
+        <button class="btn2 grow" onclick="UI.closeOv('ov-detail');Edit2.open('${e.id}')">Edit</button>
+        <button class="btn2 danger grow" onclick="Detail.remove()">Delete</button>
       </div>`;
     UI.openOv('ov-detail');
   },
@@ -1021,9 +1252,8 @@ const Detail = {
     Sync.queueLocal({...e});
     toast(`Paid ${fmtINR(e.amt)} — ${e.name}`);
     if (!Store.s.demo) { try { fetch('/api/payments', {method: 'POST', headers: {'content-type': 'application/json', authorization: 'Bearer ' + Store.s.token}, body: JSON.stringify({emiId: e.id, amt: e.amt})}); } catch {} }
-    Remind.banner(); Render.all();
     UI.closeOv('ov-detail');
-    Sync.full();
+    Render.all(); Sync.full();
   },
   remove() {
     const e = Store.s.emis[this.id]; if (!e) return;
@@ -1032,125 +1262,319 @@ const Detail = {
       Sync.queueLocal({...e, deleted: true, updatedAt: Date.now()});
       delete Store.s.emis[e.id];
       UI.closeOv('ov-detail');
-      toast('EMI deleted'); Remind.banner(); Render.all(); Sync.full();
+      toast('EMI deleted'); Render.all(); Sync.full();
     });
+  },
+};
+
+/* ---------------- add / edit page ---------------- */
+const Edit2 = {
+  cat: 'personal', editId: null,
+  open(id) {
+    this.editId = id || null;
+    const e = id ? Store.s.emis[id] : null;
+    $('#addTitle').textContent = id ? 'Edit EMI' : 'Add New EMI';
+    this.cat = e ? (CMAP[e.cat] ? e.cat : 'other') : 'personal';
+    this.lender = e ? e.lender : 'other';
+    $('#addLender').innerHTML = '<option value="" disabled ' + (e ? '' : 'selected') + '>Select provider</option>' +
+      LENDERS.map(l => `<option value="${l.id}" ${e && e.lender === l.id ? 'selected' : ''}>${esc(l.n)}</option>`).join('');
+    $('#addLender').onchange = (ev) => { this.lender = ev.target.value || 'other'; };
+    $('#addAmt').value = e ? e.amt : '';
+    $('#addN').value = e ? String(e.n) : '12';
+    $('#addDate').value = e ? e.firstDue : ymd(addMonths(new Date(), 1));
+    $('#addRemind').checked = e ? e.remind > 0 : true;
+    $('#addErr').classList.add('hidden');
+    $('#addEditWrap').classList.toggle('hidden', !id);
+    this.renderCats();
+    Route.go('add', true);
+  },
+  renderCats() {
+    $('#addCats').innerHTML = CATS.map(c =>
+      `<div class="cattile ${c.id === this.cat ? 'on' : ''}" onclick="Edit2.cat='${c.id}';Edit2.renderCats()">
+        <span class="cic" style="background:${c.c}">${ic(c.ic, 'ic sm')}</span><span>${c.n}</span></div>`).join('');
+  },
+  save() {
+    const amt = Number($('#addAmt').value), n = Math.round(Number($('#addN').value));
+    const first = $('#addDate').value;
+    const err = (m) => { const el = $('#addErr'); el.textContent = m; el.classList.remove('hidden'); };
+    if (!this.lender) this.lender = 'other';
+    const L = this.lenderName();
+    const defName = L === 'Other' ? (CATS.find(c => c.id === this.cat) || {}).n + ' EMI' : L;
+    if (!(amt > 0)) return err('Enter the EMI amount.');
+    if (!(n >= 1 && n <= 480)) return err('Pick a valid tenure.');
+    if (!first) return err('Pick a start date.');
+    const prev = this.editId ? Store.s.emis[this.editId] : null;
+    const remind = $('#addRemind').checked ? 2 : 0;
+    const doc = EMI.normalize({
+      ...(prev || {}), id: this.editId || ('e' + Math.random().toString(36).slice(2, 10)),
+      name: prev ? prev.name : defName + ' · ' + fmtINR(amt),
+      lender: this.lender, cat: this.cat, amt, n,
+      paid: prev ? prev.paid : 0, firstDue: first,
+      autopay: prev ? prev.autopay : false, remind,
+      notes: prev ? prev.notes : '', createdAt: prev ? prev.createdAt : Date.now(),
+      paidDates: prev ? prev.paidDates : [],
+    });
+    Sync.queueLocal(doc);
+    toast(this.editId ? 'EMI updated' : 'EMI added');
+    vib(10);
+    Route.go('emis');
+    Render.all(); Sync.full();
+  },
+  lender: 'other',
+  lenderName() { return (LMAP[this.lender] || LMAP.other).n; },
+  remove() {
+    if (!this.editId) return;
+    Detail.id = this.editId;
+    Detail.remove();
+    Route.go('emis');
   },
 };
 
 /* ---------------- calendar ---------------- */
 const Cal = {
-  off: 0, sel: null,
-  nav(d) { this.off += d; this.sel = null; $('#calday').classList.add('hidden'); this.render(); },
+  off: 0,
+  nav(d) { this.off += d; this.render(); },
   render() {
     const g = $('#calgrid'); if (!g) return;
     const base = new Date(); const m = new Date(base.getFullYear(), base.getMonth() + this.off, 1);
     $('#caltitle').textContent = m.toLocaleDateString('en-IN', {month: 'long', year: 'numeric'});
     const ymStr = ymd(m).slice(0, 7);
-    const firstDow = (m.getDay() + 6) % 7;
+    const firstDow = m.getDay(); // Sun-first (mock)
     const dim = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
     const dues = EMI.duesInMonth(ymStr);
     const byDay = {};
     for (const d of dues) (byDay[d.date] = byDay[d.date] || []).push(d);
-    const t = today(); const sel = this.sel;
-    let html = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(d => `<div class="dow">${d}</div>`).join('');
+    const t = today();
+    let html = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => `<div class="dow">${d}</div>`).join('');
     for (let i = 0; i < firstDow; i++) html += '<div></div>';
     for (let day = 1; day <= dim; day++) {
       const ds = ymStr + '-' + pad(day);
       const list = byDay[ds] || [];
-      const dots = list.slice(0, 3).map(x => `<i class="${x.state === 'overdue' ? 'd-red' : 'd-amb'}"></i>`).join('');
-      const cls = ['day', ds === t ? 'today' : '', ds === sel ? 'sel' : ''].join(' ');
-      html += `<div class="${cls}" onclick="Cal.selDay('${ds}')">${day}<div class="dots">${dots}</div></div>`;
+      const over = list.some(x => x.state === 'overdue');
+      const cls = ['cday', list.length ? (over ? 'odata' : 'due') : '', ds === t ? 'today' : ''].join(' ');
+      html += `<div class="${cls}" onclick="Cal.day('${ds}')"><span>${day}</span></div>`;
     }
     g.innerHTML = html;
+    this.list(ymStr);
   },
-  selDay(ds) {
-    this.sel = ds; this.render();
+  list(ymStr) {
+    const dues = EMI.duesInMonth(ymStr).sort((a, b) => a.date < b.date ? -1 : 1);
+    const el = $('#duelist');
+    el.innerHTML = dues.length ? dues.map(x => `
+      <div class="duerow" onclick="Detail.open('${x.emi.id}')">
+        <div class="d">${parseYmd(x.date).getDate()} ${parseYmd(x.date).toLocaleDateString('en-IN', {month: 'short'})}</div>
+        <div class="n">${esc(x.emi.name)}${x.state === 'overdue' ? ' <span class="tiny" style="color:var(--danger);font-weight:700">overdue</span>' : ''}</div>
+        <div class="a">${fmtINR(x.emi.amt)}</div>
+      </div>`).join('')
+    : `<div class="card" style="text-align:center;color:var(--mut);font-weight:600;font-size:13.5px;padding:22px">No due dates this month 🎉</div>`;
+  },
+  day(ds) {
     const list = EMI.duesInMonth(ds.slice(0, 7)).filter(x => x.date === ds);
-    const el = $('#calday');
-    if (!list.length) { el.classList.add('hidden'); return; }
-    el.classList.remove('hidden');
-    el.innerHTML = `<h3 style="margin-bottom:4px">${prettyDate(ds)}</h3>` + list.map(x => `
-      <div class="hrow" style="cursor:pointer" onclick="Detail.open('${x.emi.id}')">
-        ${licSm(x.emi.lender)}
-        <div class="grow"><b>${esc(x.emi.name)}</b><div class="small mut" style="font-weight:600">${fmtINR(x.emi.amt)}${x.emi.autopay ? ' · autopay' : ''}</div></div>
-        <span class="chip ${x.state === 'overdue' ? 'danger' : 'warn'}">${x.state}</span>
-      </div>`).join('');
+    if (list.length === 1) Detail.open(list[0].emi.id);
+    else if (list.length) Detail.open(list[0].emi.id);
+  },
+};
+
+/* ---------------- charts ---------------- */
+const Charts = {
+  spark(el, values) {
+    const W = 320, H = 74, max = Math.max(...values, 1), min = Math.min(...values, 0);
+    const pts = values.map((v, i) => [i * (W / (values.length - 1)), H - 8 - ((v - min) / (max - min || 1)) * (H - 22)]);
+    let d = `M${pts[0][0]},${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+      const mx = (x0 + x1) / 2;
+      d += ` C${mx},${y0} ${mx},${y1} ${x1},${y1}`;
+    }
+    el.innerHTML = `<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7d86ff" stop-opacity=".38"/><stop offset="1" stop-color="#7d86ff" stop-opacity="0"/></linearGradient></defs>
+      <path d="${d} L${W},${H} L0,${H} Z" fill="url(#sg)"/>
+      <path d="${d}" fill="none" stroke="#565fe9" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="4" fill="#565fe9"/>`;
+  },
+  bars(el, data) { // [{label, val, past}]
+    const max = Math.max(...data.map(d => d.val), 1);
+    el.innerHTML = data.map(d =>
+      `<div class="b ${d.past ? 'past' : ''}"><span class="val">${d.val ? (d.val >= 1000 ? (d.val / 1000).toFixed(d.val >= 10000 ? 0 : 1) + 'k' : d.val) : ''}</span>
+       <i style="height:${Math.max(4, Math.round(d.val / max * 100))}%"></i><span class="l">${d.label}</span></div>`).join('');
+  },
+  donut(svgEl, parts, total) { // [{label, val, color}]
+    const R = 56, C = 2 * Math.PI * R;
+    let off = 0, segs = '', leg = '';
+    for (const p of parts) {
+      const frac = p.val / (total || 1);
+      const len = frac * C;
+      segs += `<circle cx="66" cy="66" r="${R}" fill="none" stroke="${p.color}" stroke-width="14" stroke-dasharray="${Math.max(len - 3, 0)} ${C - Math.max(len - 3, 0)}" stroke-dashoffset="${-off}" stroke-linecap="round"/>`;
+      off += len;
+      leg += `<div class="li"><i style="background:${p.color}"></i>${p.label}<span class="pc">${Math.round(frac * 100)}%</span></div>`;
+    }
+    if (!parts.length) segs = `<circle cx="66" cy="66" r="${R}" fill="none" stroke="var(--field)" stroke-width="14"/>`;
+    svgEl.innerHTML = segs;
+    $('#donutLeg').innerHTML = leg || '<div class="li mut">No data yet</div>';
+    $('#donutTot').textContent = fmtINR(total);
+  },
+  trend(el, data) { // [{label, val}]
+    const W = 320, H = 110, max = Math.max(...data.map(d => d.val), 1);
+    const pts = data.map((d, i) => [18 + i * ((W - 36) / (data.length - 1)), H - 22 - (d.val / max) * (H - 48)]);
+    let d2 = `M${pts[0][0]},${pts[0][1]}`;
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; const mx = (x0 + x1) / 2;
+      d2 += ` C${mx},${y0} ${mx},${y1} ${x1},${y1}`;
+    }
+    el.innerHTML = `<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8b7cff" stop-opacity=".3"/><stop offset="1" stop-color="#8b7cff" stop-opacity="0"/></linearGradient></defs>
+      <path d="${d2} L${pts[pts.length - 1][0]},${H - 14} L${pts[0][0]},${H - 14} Z" fill="url(#tg)"/>
+      <path d="${d2}" fill="none" stroke="#7c5cf0" stroke-width="2.5" stroke-linecap="round"/>
+      ${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="#7c5cf0"/>`).join('')}
+      ${data.map((d, i) => `<text x="${pts[i][0]}" y="${H - 2}" font-size="9.5" fill="var(--mut)" text-anchor="middle" font-weight="600">${d.label}</text>`).join('')}
+      <text x="${pts[pts.length - 1][0] - 4}" y="${pts[pts.length - 1][1] - 9}" font-size="10" fill="#7c5cf0" text-anchor="end" font-weight="700">${fmtINR(data[data.length - 1].val)}</text>`;
   },
 };
 
 /* ---------------- render ---------------- */
 const Render = {
-  all() { this.home(); this.stats(); Cal.render(); this.profile(); Remind.banner(); },
+  all() { this.home(); EMIs.render(); this.insights(); Cal.render(); this.profile(); this.banner(); },
   home() {
     const s = EMI.summary();
-    const hr = $('#herocard'); if (!hr) return;
-    const hour = new Date().getHours();
-    $('#greet').textContent = (hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening') + ', ' + ((Store.s.user?.name || Store.s.demo ? 'Demo' : 'there')).split(' ')[0];
-    $('#greet').textContent = (hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening') + (Store.s.demo ? '' : ', ' + (Store.s.user?.name || 'there').split(' ')[0]);
-    hr.innerHTML = `
-      <div class="hlabel">${ic('wallet', 'ic sm')} Total outstanding</div>
-      <div class="hamt">${fmtINR(s.outstanding)}</div>
-      <div class="hsub">across ${s.count} active EMI${s.count === 1 ? '' : 's'}${s.overdue ? ` · <b>${fmtINR(s.overdue)} overdue</b>` : ''}</div>
-      <div class="hrow">
-        <div class="hcell"><div class="k">Due this month</div><div class="v">${fmtINR(s.dueThisMonth)}</div></div>
-        <div class="hcell"><div class="k">Paid this month</div><div class="v">${fmtINR(s.paidThisMonth)}</div></div>
-      </div>
-      ${s.next ? `<div class="hnext"><div><div class="t">Next due · ${prettyDay(s.next.date)}</div><div class="v">${fmtINR(s.next.amt)} — ${esc(s.next.emi.name)}</div></div></div>` : ''}`;
-    const list = Object.values(Store.s.emis).filter(e => !e.deleted)
-      .sort((a, b) => (EMI.active(b) - EMI.active(a)) || (((EMI.nextDue(a) || {date: '9'}).date < (EMI.nextDue(b) || {date: '9'}).date) ? -1 : 1));
-    const host = $('#loans');
-    host.innerHTML = list.length ? list.map((e) => {
-      const st = loanStatus(e), prog = EMI.progress(e);
-      const L = LMAP[e.lender] || LMAP.other;
-      return `<div class="loan" onclick="Detail.open('${e.id}')">
-        ${licBig(e.lender)}
-        <div class="grow">
-          <div class="t">${esc(e.name)}${e.autopay ? ` <span class="mut tiny">· autopay</span>` : ''}</div>
-          <div class="s">${esc(L.n)} · ${e.paid}/${e.n} paid</div>
-          <div class="pbar"><i style="width:${prog}%"></i></div>
-        </div>
-        <div class="right">
-          <div class="amt">${fmtINR(e.amt)}</div>
-          <div class="st ${st.cls}">${st.txt}</div>
-        </div>
-      </div>`;
-    }).join('') : `<div class="empty">
-      <div class="eic">${ic('wallet', 'ic lg')}</div>
-      <h3>No EMIs yet</h3><p>Tap + to add your first — pick a lender,<br>amount and due date.</p>
-      <button class="btn pri" style="margin-top:16px" onclick="Sheet.openAdd()">Add your first EMI</button></div>`;
+    const h = new Date().getHours();
+    $('#hgreet').textContent = h < 12 ? 'Good Morning,' : h < 17 ? 'Good Afternoon,' : 'Good Evening,';
+    $('#hname').textContent = (Store.s.user?.name || 'Arvind').split(' ')[0] + ' 👋';
+    const heroTotal = s.dueThisMonth + s.overdue;
+    $('#heroAmt').innerHTML = fmtINR(heroTotal) + (s.overdue ? ` <small>overdue</small>` : '');
+    Charts.spark($('#heroSpark'), EMI.projection(6).map(p => p.amt));
+    $('#tUpcoming').textContent = s.next ? fmtINR(s.next.amt) : '₹0';
+    $('#tUpcomingS').textContent = s.next ? prettyDay(s.next.date) : 'nothing due';
+    $('#tPaid').textContent = fmtINR(s.paidThisMonth);
+    $('#tActive').textContent = s.count;
+    $('#tActiveS').textContent = 'in progress';
+    $('#tRemain').textContent = fmtINR(s.outstanding);
+    $('#belldot').classList.toggle('hidden', !EMI.upcomingSoon().length);
+    this.banner();
   },
-  stats() {
+  banner() {
+    const m = $('#motivate'); if (!m) return;
     const s = EMI.summary();
-    const tiles = [
-      ['Active EMIs', s.count],
-      ['Due this month', fmtINR(s.dueThisMonth)],
-      ['Overdue', s.overdue ? fmtINR(s.overdue) : '₹0'],
-      ['Paid this month', fmtINR(s.paidThisMonth)],
-    ];
-    $('#statcards').innerHTML = tiles.map(([k, v]) =>
-      `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
-    const proj = EMI.projection(6); const max = Math.max(...proj.map(p => p.amt), 1);
-    $('#projbars').innerHTML = proj.map((p, i) =>
-      `<div class="b ${i === 0 ? '' : 'past'}"><span class="val">${p.amt ? (p.amt >= 100000 ? Math.round(p.amt / 1000) + 'k' : (p.amt / 1000).toFixed(1) + 'k') : '·'}</span><i style="height:${Math.max(4, Math.round(p.amt / max * 100))}%"></i><span class="l">${p.label}</span></div>`).join('');
-    const lr = EMI.byLender(); const lmax = Math.max(...lr.map(x => x.amt), 1);
-    $('#lenderrows').innerHTML = lr.length ? lr.slice(0, 8).map(x =>
-      `<div class="lrow">${licSm(x.lender.id)}<div class="grow"><div class="row" style="justify-content:space-between"><span class="nm">${esc(x.lender.n)}</span><span class="rt">${fmtINR(x.amt)}</span></div><div class="lbar"><i style="width:${Math.round(x.amt / lmax * 100)}%"></i></div><div class="ct">${x.count} EMI${x.count > 1 ? 's' : ''} outstanding</div></div></div>`).join('')
-      : '<div class="emptyst">Lender-wise outstanding shows up once you add EMIs.</div>';
-    const cr = EMI.byCat(); const cmax = Math.max(...cr.map(x => x.amt), 1);
-    $('#catrows').innerHTML = cr.length ? cr.map(x =>
-      `<div class="lrow"><div class="lic2 ph" style="background:var(--field);color:var(--ink)">${ic(x.cat.ic, 'ic sm')}</div><div class="grow"><div class="row" style="justify-content:space-between"><span class="nm">${esc(x.cat.n)}</span><span class="rt">${fmtINR(x.amt)}</span></div><div class="lbar"><i style="width:${Math.round(x.amt / cmax * 100)}%"></i></div></div></div>`).join('')
-      : '<div class="emptyst">Category split appears once you add EMIs.</div>';
+    if (s.overdue) {
+      m.className = 'motivate warn';
+      m.innerHTML = `${ic('alert', 'ic sm')} <span class="grow">${fmtINR(s.overdue)} overdue — clear them to stay on track.</span>`;
+    } else {
+      m.className = 'motivate';
+      m.innerHTML = `${ic('spark2', 'ic sm')} <span class="grow"><b>Keep going!</b> You're one step closer to your goals.</span>`;
+    }
+  },
+  insights() {
+    const t = today();
+    const ym = t.slice(0, 7);
+    const paidThis = EMI.paidInMonth(ym);
+    const prev = new Date(); prev.setMonth(prev.getMonth() - 1);
+    const paidPrev = EMI.paidInMonth(ymd(prev).slice(0, 7));
+    $('#insPaid').textContent = fmtINR(paidThis);
+    const dPct = paidPrev ? Math.round((paidThis - paidPrev) / paidPrev * 100) : (paidThis ? 100 : 0);
+    const dEl = $('#insDelta');
+    dEl.className = 'delta ' + (dPct >= 0 ? 'up' : 'down');
+    dEl.textContent = (dPct >= 0 ? '↑ ' : '↓ ') + Math.abs(dPct) + '%';
+    // bars: paid last 3 + forecast next 3 (incl current)
+    const months = [];
+    const now = new Date();
+    for (let i = -3; i <= 2; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const ymS = ymd(d).slice(0, 7);
+      const label = d.toLocaleDateString('en-IN', {month: 'short'});
+      if (i < 0) months.push({label, val: EMI.paidInMonth(ymS), past: true});
+      else if (i === 0) months.push({label, val: EMI.paidInMonth(ymS) || EMI.monthOutflow(ymS), past: false});
+      else months.push({label, val: EMI.monthOutflow(ymS), past: true});
+    }
+    Charts.bars($('#insBars'), months);
+    // donut
+    const colors = {personal: '#565fe9', consumer: '#8b5cf6', bnpl: '#f0a32f', other: '#94a3b8'};
+    const byCat = {};
+    let tot = 0;
+    for (const e of Object.values(Store.s.emis)) {
+      if (e.deleted || !EMI.active(e)) continue;
+      byCat[e.cat] = (byCat[e.cat] || 0) + EMI.outstanding(e);
+      tot += EMI.outstanding(e);
+    }
+    Charts.donut($('#donutSvg'), Object.entries(byCat).map(([id, val]) => ({label: (CMAP[id] || CMAP.other).n, val, color: colors[id] || '#94a3b8'})).sort((a, b) => b.val - a.val), tot);
+    // trend: paid last 6 months
+    const tr = [];
+    for (let i = -5; i <= 0; i++) {
+      const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      tr.push({label: d.toLocaleDateString('en-IN', {month: 'short'}), val: EMI.paidInMonth(ymd(d).slice(0, 7))});
+    }
+    Charts.trend($('#trendSvg'), tr);
+    const s = EMI.summary();
+    const note = $('#insNote');
+    if (s.overdue) { note.style.background = 'var(--warnbg)'; note.style.color = 'var(--warn)';
+      note.innerHTML = `${ic('alert', 'ic sm')} ${fmtINR(s.overdue)} is overdue — clear it to keep your streak.`; }
+    else { note.style.background = ''; note.style.color = '';
+      note.innerHTML = `${ic('check', 'ic sm')} You're doing great! On track with your payments.`; }
   },
   profile() {
-    const u = Store.s.user || {name: 'Demo User', email: 'demo · local only', created_at: Date.now()};
-    $('#pavatar').textContent = (u.name || 'A')[0].toUpperCase();
+    const u = Store.s.user || {name: 'Arvind Choudhary', email: 'arvind@example.com'};
+    $('#pava').textContent = (u.name || 'A')[0].toUpperCase();
     $('#pname').textContent = u.name;
-    $('#pemail').textContent = u.email;
-    const n = Object.values(Store.s.emis).filter(e => !e.deleted).length;
-    $('#pmeta').textContent = (Store.s.demo ? 'Sample data · not synced' : `Member since ${new Date(u.created_at).toLocaleDateString('en-IN', {month: 'short', year: 'numeric'})}`) + ` · ${n} EMI${n === 1 ? '' : 's'}`;
-    document.querySelectorAll('#segtheme button').forEach(b => b.classList.toggle('on', b.dataset.v === (Store.s.meta.theme || 'system')));
-    $('#swanim').checked = Store.s.meta.anim !== false;
+    $('#pemail').textContent = Store.s.demo ? 'demo · local only' : u.email;
     $('#swnotify').checked = !!Store.s.meta.notify;
+  },
+};
+
+/* ---------------- profile extras ---------------- */
+const Profile = {
+  payHistory() {
+    const rows = [];
+    for (const e of Object.values(Store.s.emis)) {
+      if (e.deleted) continue;
+      for (const d of (e.paidDates || [])) rows.push({d, e});
+    }
+    rows.sort((a, b) => a.d < b.d ? 1 : -1);
+    $('#gen-title').textContent = 'Payment History';
+    $('#gen-body').innerHTML = rows.length ? rows.slice(0, 30).map(r => `
+      <div class="hrow">${lenderTile(r.e.lender, 'logo')}<div class="grow"><b>${esc(r.e.name)}</b>
+      <div class="tiny mut" style="font-weight:600">${prettyDate(r.d)}</div></div>
+      <b class="num">${fmtINR(r.e.amt)}</b></div>`).join('')
+    : '<p class="mut small" style="padding:10px 0">No payments recorded yet. Mark an EMI as paid to see it here.</p>';
+    UI.openOv('ov-gen');
+  },
+  providers() {
+    const used = new Set(Object.values(Store.s.emis).filter(e => !e.deleted).map(e => e.lender));
+    $('#gen-title').textContent = 'Manage Providers';
+    $('#gen-body').innerHTML = LENDERS.filter(l => l.id !== 'other').map(l => `
+      <div class="hrow">${lenderTile(l.id, 'logo')}<div class="grow"><b>${esc(l.n)}</b></div>
+      ${used.has(l.id) ? '<span class="chip acc">in use</span>' : '<span class="chip">available</span>'}</div>`).join('');
+    UI.openOv('ov-gen');
+  },
+  settings() {
+    $('#gen-title').textContent = 'App Settings';
+    $('#gen-body').innerHTML = `
+      <label class="fl">Theme</label>
+      <div class="seg2" id="segtheme" style="margin:0">
+        <button data-v="system">Auto</button><button data-v="light">Light</button><button data-v="dark">Dark</button>
+      </div>
+      <div class="swrow" style="margin-top:16px"><div class="t">Animations</div>
+        <label class="sw"><input type="checkbox" id="swanim" checked><i></i></label></div>
+      <button class="btn2 danger wfull" style="margin-top:20px" onclick="Auth.deleteAccount()">Delete account</button>`;
+    document.querySelectorAll('#segtheme button').forEach(b => {
+      b.classList.toggle('on', b.dataset.v === (Store.s.meta.theme || 'system'));
+      b.onclick = () => { Sync.saveMeta({theme: b.dataset.v}).then(() => { applyTheme(); Profile.settings(); }); };
+    });
+    $('#swanim').checked = Store.s.meta.anim !== false;
+    $('#swanim').onchange = (e) => Sync.saveMeta({anim: e.target.checked}).then(applyTheme);
+    UI.openOv('ov-gen');
+  },
+  about() {
+    $('#gen-title').textContent = 'About EMI Flow';
+    $('#gen-body').innerHTML = `
+      <div style="text-align:center;padding:8px 0 4px">
+        <img src="/icons/icon-192.png" style="width:64px;height:64px;border-radius:18px" alt="">
+        <div style="font-weight:800;font-size:17px;margin-top:8px">EMI Flow</div>
+        <div class="tiny mut">PLAN · TRACK · PAY · GROW</div>
+        <p class="small mut" style="margin-top:10px;line-height:1.6">“Financial peace isn't a dream. It's a habit.”</p>
+      </div>
+      <div class="dsum"><div><div class="k">Version</div><div class="v">v${APP_VERSION}</div></div>
+        <div><div class="k">Sync</div><div class="v">${Store.s.demo ? 'demo' : 'cloud'}</div></div>
+        <div><div class="k">EMIs</div><div class="v">${Object.values(Store.s.emis).filter(e => !e.deleted).length}</div></div></div>
+      <p class="tiny mut" style="line-height:1.6">Your data lives only in your account — encrypted passwords, revocable sessions, never sold or shared. Lender names &amp; logos are trademarks of their respective owners, used as visual tags only.</p>`;
+    UI.openOv('ov-gen');
   },
 };
 
@@ -1160,82 +1584,69 @@ function applyTheme() {
   const dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   document.body.classList.toggle('noanim', Store.s.meta.anim === false);
-  document.querySelector('meta[name=theme-color]').content = dark ? '#070b14' : '#eef1f8';
+  document.querySelector('meta[name=theme-color]').content = dark ? '#0e101c' : '#f3f4fb';
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
 
-/* ---------------- app shell ---------------- */
-const App = {
-  go(tab) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
-    $('#scr-' + tab).classList.add('on');
-    document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-    this.pill();
-    if (tab === 'calendar') Cal.render();
-    if (tab === 'stats') Render.stats();
-    vib(6);
-  },
-  pill() {},
-  demo() {
-    const D = [
-      {name: 'Smart TV 55″', lender: 'bajaj', cat: 'consumer', amt: 5499, n: 12, paid: 4, off: -4, dayOff: 0, autopay: true, notes: 'Smart TV 55″ 4K'},
-      {name: 'Card bill', lender: 'phonepe', cat: 'card', amt: 2400, n: 6, paid: 2, off: -3, dayOff: 6, autopay: false, notes: ''},
-      {name: 'Personal loan', lender: 'navi', cat: 'personal', amt: 8250, n: 36, paid: 9, off: -10, dayOff: 0, autopay: false, notes: ''},
-      {name: 'Headphones', lender: 'simpl', cat: 'bnpl', amt: 1299, n: 3, paid: 0, off: 1, dayOff: 0, autopay: false, notes: 'Headphones'},
-      {name: 'Car loan', lender: 'hdfc', cat: 'car', amt: 14750, n: 60, paid: 22, off: -22, dayOff: 0, autopay: true, notes: ''},
-      {name: 'Closed loan', lender: 'kreditbee', cat: 'personal', amt: 3200, n: 6, paid: 6, off: -6, dayOff: 0, autopay: false, notes: ''},
-    ];
-    Store.reset();
-    Store.s.demo = true;
-    Store.s.user = {name: 'Demo User', email: 'demo · local only', created_at: Date.now()};
-    for (const d of D) {
-      const first = new Date(); first.setDate(first.getDate() + d.dayOff);
-      const fd = addMonths(first, d.off);
-      const e = EMI.normalize({...d, id: 'd' + Math.random().toString(36).slice(2, 8), firstDue: ymd(fd), createdAt: Date.now()});
-      e.paidDates = [];
-      for (let i = 0; i < e.paid; i++) { const pd = addMonths(parseYmd(e.firstDue), i); if (cmpYmd(ymd(pd), today()) < 0) e.paidDates.push(ymd(pd)); }
-      Store.s.emis[e.id] = e;
+/* ---------------- demo ---------------- */
+const App = {};
+App.demo = function() {
+  const D = [
+    {name: 'Phone EMI', lender: 'paytm', cat: 'consumer', amt: 612, n: 9, paid: 4, off: -4, d: 3},
+    {name: 'TV EMI', lender: 'phonepe', cat: 'consumer', amt: 1370, n: 12, paid: 7, off: -7, d: 14},
+    {name: 'Fridge EMI', lender: 'bajaj', cat: 'consumer', amt: 409, n: 10, paid: 3, off: -3, d: 20},
+    {name: 'Personal loan', lender: 'kreditbee', cat: 'personal', amt: 1250, n: 6, paid: 2, off: -2, d: 11},
+    {name: 'Laptop EMI', lender: 'navi', cat: 'consumer', amt: 1200, n: 18, paid: 9, off: -9, d: 3},
+    {name: 'BNPL order', lender: 'simpl', cat: 'bnpl', amt: 167, n: 3, paid: 1, off: -1, d: 26},
+  ];
+  Store.reset();
+  Store.s.demo = true; Store.s.onboarded = true;
+  Store.s.user = {name: 'Arvind Choudhary', email: 'arvind@example.com', created_at: Date.now()};
+  for (const x of D) {
+    const fd = addMonths(new Date(), x.off); fd.setDate(Math.min(x.d, 28));
+    const e = EMI.normalize({...x, id: 'd' + Math.random().toString(36).slice(2, 8), firstDue: ymd(fd), autopay: false, remind: 2, notes: '', createdAt: Date.now()});
+    e.paidDates = [];
+    for (let i = 0; i < e.paid; i++) {
+      const pd = addMonths(parseYmd(e.firstDue), i);
+      if (cmpYmd(ymd(pd), today()) < 0) e.paidDates.push(ymd(pd));
     }
-    Store.save();
-    $('#scr-onboard').classList.add('hidden');
-    this.enter();
-    toast('Demo loaded — look around!');
-  },
-  enter() {
-    const logged = !!Store.s.token || !!Store.s.demo;
-    $('#scr-onboard').classList.toggle('hidden', logged);
-    $('#app').classList.toggle('hidden', !logged);
-    if (logged) {
-      if (!Store.s.demo) $('#greet').textContent = 'Hi there';
-      Render.all(); Sync.statusUI('', 'syncing…'); Sync.full(); Remind.check();
-      
-    }
-  },
+    Store.s.emis[e.id] = e;
+  }
+  Store.save();
+  Auth.enterApp();
+  toast('Demo loaded — look around!');
 };
 
-/* ---------------- wire settings ---------------- */
-document.querySelectorAll('#segtheme button').forEach(b => b.onclick = () => { Sync.saveMeta({theme: b.dataset.v}).then(applyTheme); vib(6); });
-$('#swanim').onchange = (e) => { Sync.saveMeta({anim: e.target.checked}).then(applyTheme); };
+/* ---------------- boot ---------------- */
+document.getElementById('buildid').textContent = 'EMI Flow v' + APP_VERSION + ' · cloud-synced';
+applyTheme();
+
+function firstRoute() {
+  if (!Store.s.onboarded && !Store.s.token) { Route.to('onboard'); return; }
+  if (Store.s.token || Store.s.demo) { Route.cur = 'home'; Route.to('app'); Render.all(); Sync.statusUI('', 'demo — sample data'); Remind.check(); if (!Store.s.demo) Sync.full(); return; }
+  Route.to('login');
+}
+setTimeout(() => { $('#scr-splash').classList.add('hidden'); $('#scr-splash').style.display = 'none'; firstRoute(); }, 1500);
+if (new URLSearchParams(location.search).get('demo') === '1') { $('#scr-splash').style.display = 'none'; $('#scr-splash').classList.add('hidden'); firstRoute(); App.demo(); }
+
+/* reminders toggle */
 $('#swnotify').onchange = async (e) => {
   if (e.target.checked) {
     if (typeof Notification === 'undefined') { toast('Notifications not supported here', true); e.target.checked = false; return; }
     const p = await Notification.requestPermission();
     if (p !== 'granted') { toast('Permission denied', true); e.target.checked = false; return; }
-    toast('Reminders on — we\'ll nudge you before dues');
+    toast('Reminders on');
     Sync.saveMeta({notify: true}).then(() => Remind.check());
   } else Sync.saveMeta({notify: false});
 };
-window.addEventListener('resize', () => App.pill());
 
-/* ---------------- boot ---------------- */
-document.getElementById('buildid').textContent = 'build ' + APP_VERSION;
-applyTheme();
-if (new URLSearchParams(location.search).get('demo') === '1') App.demo();
-else App.enter();
+/* background sync */
 setInterval(() => { if (Store.s.token && !Store.s.demo) Sync.full(); }, 60000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden && Store.s.token && !Store.s.demo) Sync.full(); });
 window.addEventListener('online', () => { toast('Back online'); if (Store.s.token && !Store.s.demo) Sync.full(); });
-window.addEventListener('offline', () => { Sync.statusUI(' off', 'offline — changes queued'); });
+window.addEventListener('offline', () => { Sync.statusUI(' off', 'offline — queued'); });
+
+/* SW: network-first + auto reload */
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   navigator.serviceWorker.register('/sw.js').catch(() => {});
   let refreshing = false;

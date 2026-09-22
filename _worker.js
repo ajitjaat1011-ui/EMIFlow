@@ -95,7 +95,8 @@ function initSchema(env) {
     [`CREATE TABLE IF NOT EXISTS analytics (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, e TEXT, s TEXT, x TEXT)`],
     [`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`],
     [`CREATE INDEX IF NOT EXISTS idx_login_attempts ON login_attempts(ip, ts)`],
-  ]).catch(e => { _init = null; throw e; });
+  ]).then(() => pipeline(env, [[`ALTER TABLE users ADD COLUMN phone TEXT`]]).catch(() => {}))
+    .catch(e => { _init = null; throw e; });
   return _init;
 }
 
@@ -151,17 +152,19 @@ async function api(request, env, url) {
     const email = String(b.email || '').trim().toLowerCase();
     const name = String(b.name || '').trim();
     const pw = String(b.password || '');
+    const phone = String(b.phone || '').replace(/\D/g, '').slice(-10);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return json({ ok: false, error: 'bad_email' }, 400);
     if (name.length < 2 || name.length > 40) return json({ ok: false, error: 'bad_name' }, 400);
     if (pw.length < 8 || pw.length > 200) return json({ ok: false, error: 'bad_password' }, 400);
+    if (phone.length !== 10) return json({ ok: false, error: 'bad_phone' }, 400);
     if (await failCount(env, ip, email) >= 8) return json({ ok: false, error: 'rate_limited' }, 429);
-    const dup = await db(env, `SELECT id FROM users WHERE email = ?`, [email]);
+    const dup = await db(env, `SELECT id FROM users WHERE email = ? OR (phone IS NOT NULL AND phone = ?)`, [email, phone]);
     if (dup.length) return json({ ok: false, error: 'email_taken' }, 409);
     const id = crypto.randomUUID(), salt = randHex(16), now = Date.now();
     const ph = await hashPassword(pw, salt);
     const token = randHex(32);
     await pipeline(env, [
-      [`INSERT INTO users (id, email, name, salt, pass_hash, created_at, terms_version, email_verified) VALUES (?,?,?,?,?,?,1,0)`, [id, email, name, salt, ph, now]],
+      [`INSERT INTO users (id, email, name, salt, pass_hash, created_at, terms_version, email_verified, phone) VALUES (?,?,?,?,?,?,1,0,?)`, [id, email, name, salt, ph, now, phone]],
       [`INSERT INTO sessions (token, user_id, created_at, expires_at, last_seen) VALUES (?,?,?,?,?)`, [token, id, now, sessionExpiry(), now]],
       [`INSERT INTO login_attempts (ip, email, ok, ts) VALUES (?,?,1,?)`, [ip, email, now]],
     ]);
@@ -171,20 +174,23 @@ async function api(request, env, url) {
   if (route === '/auth/login' && m === 'POST') {
     await initSchema(env);
     const b = await readBody(request);
-    const email = String(b.email || '').trim().toLowerCase();
+    const ident = String(b.email || '').trim().toLowerCase();
     const pw = String(b.password || '');
-    if (await failCount(env, ip, email) >= 8) return json({ ok: false, error: 'rate_limited' }, 429);
-    const rows = await db(env, `SELECT id, email, name, salt, pass_hash, created_at, email_verified FROM users WHERE email = ?`, [email]);
+    const phone = ident.replace(/\D/g, '').slice(-10);
+    const isPhone = /^\d{10}$/.test(phone) && !ident.includes('@');
+    const q = isPhone ? phone : ident;
+    if (await failCount(env, ip, q) >= 8) return json({ ok: false, error: 'rate_limited' }, 429);
+    const rows = await db(env, `SELECT id, email, name, salt, pass_hash, created_at, email_verified FROM users WHERE ${isPhone ? 'phone = ?' : 'email = ?'}`, [q]);
     const ok = rows.length === 1 && (await hashPassword(pw, rows[0][3])) === rows[0][4];
     const token = randHex(32), now = Date.now();
     if (!ok) {
-      await db(env, `INSERT INTO login_attempts (ip, email, ok, ts) VALUES (?,?,0,?)`, [ip, email, now]);
+      await db(env, `INSERT INTO login_attempts (ip, email, ok, ts) VALUES (?,?,0,?)`, [ip, q, now]);
       return json({ ok: false, error: 'bad_credentials' }, 401);
     }
     const [id, em2, nm, , , created_at, email_verified] = rows[0];
     await pipeline(env, [
       [`INSERT INTO sessions (token, user_id, created_at, expires_at, last_seen) VALUES (?,?,?,?,?)`, [token, id, now, sessionExpiry(), now]],
-      [`INSERT INTO login_attempts (ip, email, ok, ts) VALUES (?,?,1,?)`, [ip, email, now]],
+      [`INSERT INTO login_attempts (ip, email, ok, ts) VALUES (?,?,1,?)`, [ip, q, now]],
     ]);
     return json({ ok: true, token, user: { id, email: em2, name: nm, created_at, email_verified } });
   }

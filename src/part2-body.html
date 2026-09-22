@@ -1,210 +1,289 @@
-<!-- ======================= ONBOARD ======================= -->
-<section id="scr-onboard" class="hidden">
-  <div class="ob-top"><span class="chip acc"><svg class="ic xs"><use href="#i-shield"/></svg>Private &amp; encrypted</span></div>
+<!-- ======================= SPLASH ======================= -->
+<section id="scr-splash">
+  <div class="aur a"></div><div class="aur b"></div>
+  <svg class="wave" viewBox="0 0 400 200" preserveAspectRatio="none"><path d="M0 120 C90 60 160 170 250 110 C310 72 360 90 400 60 L400 200 L0 200 Z" fill="rgba(124,92,246,.25)"/><path d="M0 150 C100 100 170 190 260 140 C320 108 370 120 400 96 L400 200 L0 200 Z" fill="rgba(86,95,233,.3)"/></svg>
+  <div class="spl-icon"><svg class="ic" style="width:44px;height:44px;color:#fff"><use href="#i-wallet"/></svg></div>
+  <div class="spl-name">EMI Flow</div>
+  <div class="spl-tag">Small Payments<br>A Bigger Tomorrow</div>
+  <div class="spl-foot">Control Today<br>Live Freely Tomorrow</div>
+</section>
 
-  <div class="ob-hero">
-    <img class="ob-logo" src="/icons/icon-192.png" alt="EMIFlow">
-    <div class="ob-brand">EMI<em>Flow</em></div>
-    <div class="ob-tag">Every EMI. Every lender. Zero surprises.</div>
+<!-- ======================= ONBOARDING ======================= -->
+<section id="scr-onboard" class="ob-page hidden">
+  <button class="ob-skip" onclick="OB.skip()">Skip</button>
+  <div class="ob-stage">
+    <div class="ob-slide on" data-s="0">
+      <div class="ob-art"><div class="tiles3d">
+        <div class="t" style="--rot:-10deg;left:6px;top:24px;animation-delay:0s"><img src="/icons/lenders/paytm.png" alt=""></div>
+        <div class="t" style="--rot:8deg;right:14px;top:0;animation-delay:.6s"><img src="/icons/lenders/phonepe.png" alt=""></div>
+        <div class="t" style="--rot:-6deg;right:34px;bottom:18px;animation-delay:1.2s"><img src="/icons/lenders/bajaj.png" alt=""></div>
+        <div class="t" style="--rot:12deg;left:30px;bottom:30px;animation-delay:1.8s"><img src="/icons/lenders/gpay.png" alt=""></div>
+      </div></div>
+      <div class="ob-title">Track All Your EMIs<br><b>In One Place</b></div>
+      <p class="ob-sub">Stay organized, never miss a payment and take control of your finances.</p>
+    </div>
+    <div class="ob-slide" data-s="1">
+      <div class="ob-art"><div class="calbell">
+        <div class="bellic"><svg class="ic lg"><use href="#i-bell"/></svg></div>
+        <div class="cal"><div class="ch"><span>October</span><span>2026</span></div>
+          <div class="cg"><i></i><i class="h"></i><i></i><i></i><i class="h"></i><i class="h"></i><i></i><i></i><i class="h"></i><i></i><i></i><i></i><i class="h"></i><i></i><i></i></div></div>
+        <div class="due"><svg class="ic sm"><use href="#i-wallet"/></svg><div><b>₹1,200</b><span>Due in 3 days</span></div></div>
+      </div></div>
+      <div class="ob-title">Smart Reminders<br><b>Never Miss a Payment</b></div>
+      <p class="ob-sub">Get smart alerts before your due dates so you stay stress free.</p>
+    </div>
+    <div class="ob-slide" data-s="2">
+      <div class="ob-art"><div class="bars3d"><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div></div></div>
+      <div class="ob-title">Better Insights<br><b>Stronger Decisions</b></div>
+      <p class="ob-sub">Understand your spending, track progress and plan ahead.</p>
+    </div>
   </div>
+  <div class="ob-dots" id="obdots"><i class="on"></i><i></i><i></i></div>
+  <button class="pill" id="obbtn" onclick="OB.next()">Get Started <svg class="ic sm"><use href="#i-arrow"/></svg></button>
+</section>
 
-  <div class="feats">
-    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-cloud"/></svg></div>
-      <div><b>Synced to your private cloud</b><p>Add on one device — it's there on every other.</p></div></div>
-    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-wallet"/></svg></div>
-      <div><b>15 real lenders, real icons</b><p>Bajaj, Paytm, PhonePe, GPay, CRED, banks &amp; BNPL apps.</p></div></div>
-    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-bell"/></svg></div>
-      <div><b>Never miss a due date</b><p>Overdue alerts, reminder windows, autopay flags.</p></div></div>
-    <div class="feat"><div class="fic"><svg class="ic sm"><use href="#i-chart"/></svg></div>
-      <div><b>See your outflow coming</b><p>Six-month projections, lender-wise outstanding.</p></div></div>
+<!-- ======================= LOGIN ======================= -->
+<section id="scr-login" class="au-page hidden">
+  <button class="au-back" onclick="Route.to('splash')"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+  <div class="au-hero"><h1>Welcome Back <span class="wave">👋</span></h1><p>Login to continue your journey with EMI Flow.</p></div>
+  <label class="fl">Enter your mobile number or email</label>
+  <input id="li-user" inputmode="email" placeholder="98765 43210  ·  you@example.com" autocomplete="username">
+  <label class="fl">Password</label>
+  <div class="frow"><input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password" style="border:0;background:transparent">
+    <button class="ieye" onclick="UI.eye('li-pass',this)"><svg class="ic sm"><use href="#i-eye"/></svg></button></div>
+  <div class="au-links"><span></span><button class="lk" onclick="Auth.forgotView()">Forgot password?</button></div>
+  <div id="li-forgot" class="hidden">
+    <label class="fl">Email for reset code</label><input id="fg-email" type="email" placeholder="you@example.com">
+    <button class="btn2 wfull" style="margin-top:10px" onclick="Auth.forgotSend()">Get reset code</button>
+    <div id="fg-code-wrap" class="hidden">
+      <label class="fl">Reset code</label><input id="fg-code" inputmode="numeric" maxlength="6" placeholder="123456">
+      <label class="fl">New password</label><input id="fg-pass" type="password" placeholder="min 8 chars">
+      <button class="btn2 wfull" style="margin-top:10px" onclick="Auth.resetDo()">Set new password</button>
+    </div>
+    <div id="fg-msg" class="small mut" style="margin-top:10px"></div>
   </div>
+  <div id="li-err" class="aerr hidden"></div>
+  <div style="margin-top:auto;padding-top:24px">
+    <button class="pill" id="li-go" onclick="Auth.login()">Login <svg class="ic sm"><use href="#i-arrow"/></svg></button>
+    <div class="au-or">or continue with</div>
+    <div class="au-soc">
+      <button onclick="toast('Google sign-in coming soon')"><svg class="ic lg" style="color:#ea4335"><use href="#i-g"/></svg></button>
+      <button onclick="toast('Apple sign-in coming soon')"><svg class="ic lg"><use href="#i-apple"/></svg></button>
+      <button onclick="toast('More options coming soon')"><svg class="ic lg"><use href="#i-kebab"/></svg></button>
+    </div>
+    <div class="au-foot">Don't have an account? <b onclick="Route.to('register')">Sign Up</b></div>
+  </div>
+</section>
 
-  <div class="ob-cta">
-    <button class="btn pri wide" onclick="Auth.open('register')">Create free account</button>
-    <button class="btn line wide" onclick="Auth.open('login')">I already have an account</button>
-    <button class="ob-demo" onclick="App.demo()">Take a tour with sample data →</button>
-    <div class="ob-terms">By continuing you agree to the Terms &amp; Privacy Policy.<br>Passwords are PBKDF2-hashed · your data is never sold or shared.</div>
+<!-- ======================= REGISTER ======================= -->
+<section id="scr-register" class="au-page hidden">
+  <button class="au-back" onclick="Route.to('login')"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+  <div class="au-hero"><h1>Create Your Account</h1><p>Start managing your EMIs today.</p></div>
+  <label class="fl">Full Name</label><input id="rg-name" placeholder="Arvind Choudhary" autocomplete="name">
+  <label class="fl">Mobile Number</label>
+  <div class="frow"><span class="fx">+91</span><input id="rg-phone" inputmode="numeric" maxlength="10" placeholder="98765 43210"></div>
+  <label class="fl">Email <span class="mut">(optional)</span></label><input id="rg-email" type="email" placeholder="arvind@example.com" autocomplete="email">
+  <label class="fl">Create Password</label>
+  <div class="frow"><input id="rg-pass" type="password" placeholder="min 8 characters" autocomplete="new-password" style="border:0;background:transparent">
+    <button class="ieye" onclick="UI.eye('rg-pass',this)"><svg class="ic sm"><use href="#i-eye"/></svg></button></div>
+  <div class="chk"><input type="checkbox" id="rg-terms"><span>I agree to the Terms &amp; Privacy Policy. My data stays private — never sold, never shared.</span></div>
+  <div id="rg-err" class="aerr hidden"></div>
+  <div style="margin-top:auto;padding-top:22px">
+    <button class="pill" id="rg-go" onclick="Auth.register()">Create Account <svg class="ic sm"><use href="#i-arrow"/></svg></button>
+    <div class="au-foot">Already have an account? <b onclick="Route.to('login')">Login</b></div>
   </div>
+</section>
+
+<!-- ======================= SUCCESS ======================= -->
+<section id="scr-success" class="au-page hidden">
+  <div class="suc-top">Small Steps<br>Big Freedom</div>
+  <div class="suc-art">
+    <i class="conf" style="left:22%;top:18%;background:#f0a32f"></i><i class="conf" style="left:70%;top:12%;background:#565fe9;animation-delay:.4s"></i>
+    <i class="conf" style="left:80%;top:44%;background:#1fa971;animation-delay:.9s"></i><i class="conf" style="left:14%;top:48%;background:#8b5cf6;animation-delay:1.3s"></i>
+    <i class="conf" style="left:34%;top:8%;background:#e05252;animation-delay:1.7s"></i><i class="conf" style="left:58%;top:26%;background:#2f9fd6;animation-delay:.6s"></i>
+    <div class="cone"><svg class="ic"><use href="#i-party"/></svg></div>
+  </div>
+  <div class="suc-title">You're All Set! 🎉</div>
+  <p class="suc-sub">Welcome to EMI Flow.<br>Let's build a stress-free financial tomorrow, together.</p>
+  <div style="margin-top:auto"><button class="pill" onclick="Auth.finishRegister()">Go to Dashboard <svg class="ic sm"><use href="#i-arrow"/></svg></button></div>
 </section>
 
 <!-- ======================= APP ======================= -->
 <div id="app" class="hidden">
-  <header class="top">
-    <img class="brandmark" src="/icons/icon-192.png" alt="">
-    <div class="grow"><h1 id="greet">—</h1>
-      <div class="sync"><span class="syncdot" id="syncdot"></span><span id="synctext">syncing…</span></div></div>
-    <button class="iconbtn" onclick="App.go('profile')" aria-label="Profile"><svg class="ic sm"><use href="#i-user"/></svg></button>
-  </header>
 
-  <main>
-    <div id="duobanner"></div>
+  <!-- ============ HOME ============ -->
+  <section class="app-scr on" id="scr-home">
+    <header class="topbar">
+      <div class="grow"><div class="tb-title" id="hgreet">Good Morning,</div><h1 id="hname">—</h1>
+        <div class="sync" style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);margin-top:3px"><span class="syncdot" id="syncdot" style="width:7px;height:7px;border-radius:50%;background:#e0a23e"></span><span id="synctext">syncing…</span></div></div>
+      <button class="tb-ic" onclick="Route.go('emis')" aria-label="Search EMIs"><svg class="ic sm"><use href="#i-search"/></svg></button>
+      <button class="tb-ic" onclick="Route.go('calendar')" aria-label="Calendar"><svg class="ic sm"><use href="#i-bell"/></svg><span class="dot hidden" id="belldot"></span></button>
+    </header>
 
-    <!-- ============ HOME ============ -->
-    <section class="screen on" id="scr-home">
-      <div class="hero" id="herocard"></div>
-      <div class="sect"><h2>Your EMIs</h2><button class="lnk" onclick="Sheet.openAdd()">Add new</button></div>
-      <div id="loans" class="loans"></div>
-    </section>
+    <div class="hero">
+      <div class="hl">Total EMI Due</div>
+      <div class="hv" id="heroAmt">₹0</div>
+      <svg class="spark" id="heroSpark" viewBox="0 0 320 74" preserveAspectRatio="none"></svg>
+      <button class="vlink" onclick="Route.go('emis')">View Details <svg class="ic xs"><use href="#i-arrow"/></svg></button>
+    </div>
 
-    <!-- ============ STATS ============ -->
-    <section class="screen" id="scr-stats">
-      <div class="statgrid" id="statcards" style="margin-top:6px"></div>
-      <div class="sect"><h2>Outflow forecast</h2><span class="chip">6 months</span></div>
-      <div class="card"><div class="bars" id="projbars"></div></div>
-      <div class="card"><h3>Lender-wise outstanding</h3><div id="lenderrows"></div></div>
-      <div class="card"><h3>Category split</h3><div id="catrows"></div></div>
-    </section>
+    <div class="hgrid">
+      <div class="htile" onclick="Route.go('calendar')"><div class="hic p"><svg class="ic sm"><use href="#i-cal"/></svg></div>
+        <div class="k">Upcoming</div><div class="v" id="tUpcoming">₹0</div><div class="s" id="tUpcomingS">—</div></div>
+      <div class="htile" onclick="Route.go('insights')"><div class="hic g"><svg class="ic sm"><use href="#i-check"/></svg></div>
+        <div class="k">Paid</div><div class="v" id="tPaid">₹0</div><div class="s">this month</div></div>
+      <div class="htile" onclick="Route.go('emis')"><div class="hic b"><svg class="ic sm"><use href="#i-sync"/></svg></div>
+        <div class="k">Active EMIs</div><div class="v" id="tActive">0</div><div class="s" id="tActiveS">in progress</div></div>
+      <div class="htile" onclick="Route.go('insights')"><div class="hic o"><svg class="ic sm"><use href="#i-wallet"/></svg></div>
+        <div class="k">Remaining</div><div class="v" id="tRemain">₹0</div><div class="s">total outstanding</div></div>
+    </div>
 
-    <!-- ============ CALENDAR ============ -->
-    <section class="screen" id="scr-calendar">
-      <div class="card" style="margin-top:6px">
-        <div class="calhead">
-          <button class="calnav" onclick="Cal.nav(-1)" aria-label="Previous month"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
-          <b id="caltitle">—</b>
-          <button class="calnav" onclick="Cal.nav(1)" aria-label="Next month"><svg class="ic sm"><use href="#i-chev-r"/></svg></button>
-        </div>
-        <div class="calgrid" id="calgrid"></div>
+    <div class="motivate" id="motivate"></div>
+  </section>
+
+  <!-- ============ MY EMIs ============ -->
+  <section class="app-scr" id="scr-emis">
+    <header class="pgtitle">
+      <h1 class="grow">My EMIs</h1>
+      <button class="tb-ic" onclick="toast('Sorted by next due date')"><svg class="ic sm"><use href="#i-kebab"/></svg></button>
+    </header>
+    <div class="seg2" id="emitabs">
+      <button class="on" data-t="active" onclick="EMIs.switchTo('active')">Active</button>
+      <button data-t="upcoming" onclick="EMIs.switchTo('upcoming')">Upcoming</button>
+      <button data-t="done" onclick="EMIs.switchTo('done')">Completed</button>
+    </div>
+    <div class="emilist" id="emilist"></div>
+    <div class="fabpill"><button class="pill" onclick="Edit2.open()"><svg class="ic sm"><use href="#i-plus"/></svg> Add New EMI</button></div>
+  </section>
+
+  <!-- ============ INSIGHTS ============ -->
+  <section class="app-scr" id="scr-insights">
+    <header class="pgtitle"><h1 class="grow">Insights</h1><span class="chip" style="background:var(--card);border:1px solid var(--bd);color:var(--ink2);font-weight:650">This Month <svg class="ic xs" style="vertical-align:-2px"><use href="#i-chev-d"/></svg></span></header>
+
+    <div class="card bigstat">
+      <div class="k">Total EMI Payments</div>
+      <div class="vrow"><div class="v" id="insPaid">₹0</div><span class="delta up" id="insDelta">↑ 0%</span></div>
+      <div class="chartbars" id="insBars"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:8px">Category Wise</h3>
+      <div class="donutrow">
+        <div class="donut"><svg width="132" height="132" viewBox="0 0 132 132" id="donutSvg"></svg>
+          <div class="dc"><b id="donutTot">₹0</b><span>outstanding</span></div></div>
+        <div class="dleg" id="donutLeg"></div>
       </div>
-      <div class="card hidden caldays" id="calday"></div>
-      <div class="row small mut" style="justify-content:center;gap:16px;margin:2px 0 14px">
-        <span class="row" style="gap:6px"><i class="d-red" style="width:7px;height:7px;border-radius:50%"></i> overdue</span>
-        <span class="row" style="gap:6px"><i class="d-amb" style="width:7px;height:7px;border-radius:50%"></i> due</span>
-      </div>
-    </section>
+    </div>
 
-    <!-- ============ PROFILE ============ -->
-    <section class="screen" id="scr-profile">
-      <div class="pcard">
-        <div class="pavatar" id="pavatar">A</div>
-        <div class="grow"><h2 id="pname">—</h2><div class="small mut" id="pemail">—</div><div class="tiny mut" id="pmeta" style="margin-top:2px"></div></div>
-      </div>
+    <div class="card">
+      <h3 style="margin-bottom:2px">Expense Trend</h3>
+      <div class="small mut" style="font-weight:600">last 6 months</div>
+      <div class="trendwrap"><svg id="trendSvg" viewBox="0 0 320 110" preserveAspectRatio="none"></svg></div>
+    </div>
 
-      <div class="sect"><h2>Preferences</h2></div>
-      <div class="pgroup">
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-palette"/></svg></div>
-          <div class="grow"><div class="t">Theme</div></div>
-          <div class="seg" id="segtheme"><button data-v="system">Auto</button><button data-v="light">Light</button><button data-v="dark">Dark</button></div></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-bolt"/></svg></div>
-          <div class="grow"><div class="t">Animations</div></div>
-          <label class="switch"><input type="checkbox" id="swanim" checked><i></i></label></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-bell"/></svg></div>
-          <div class="grow"><div class="t">Due-date reminders</div></div>
-          <label class="switch"><input type="checkbox" id="swnotify"><i></i></label></div>
-      </div>
+    <div class="oknote" id="insNote"></div>
+  </section>
 
-      <div class="sect"><h2>Data</h2></div>
-      <div class="pgroup">
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-sync"/></svg></div>
-          <div class="grow"><div class="t">Sync status</div><div class="s" id="syncline2">—</div></div>
-          <button class="btn ghost sm" onclick="Sync.pull(true)">Sync now</button></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-dl"/></svg></div>
-          <div class="grow"><div class="t">Export data</div><div class="s">Full JSON backup</div></div>
-          <button class="btn ghost sm" onclick="Sync.exportCloud()">Export</button></div>
-        <div class="prow"><div class="pic"><svg class="ic sm"><use href="#i-out"/></svg></div>
-          <div class="grow"><div class="t">Log out everywhere</div></div>
-          <button class="btn ghost sm" onclick="Auth.logoutAll()">Log out</button></div>
+  <!-- ============ CALENDAR ============ -->
+  <section class="app-scr" id="scr-calendar">
+    <header class="pgtitle"><h1 class="grow">Calendar</h1>
+      <button class="tb-ic" onclick="Route.go('home')"><svg class="ic sm"><use href="#i-bell"/></svg></button></header>
+    <div class="cal">
+      <div class="calhead">
+        <button class="calnav" onclick="Cal.nav(-1)"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+        <b id="caltitle">—</b>
+        <button class="calnav" onclick="Cal.nav(1)"><svg class="ic sm"><use href="#i-chev-r"/></svg></button>
       </div>
+      <div class="calgrid" id="calgrid"></div>
+    </div>
+    <div class="duelist" id="duelist"></div>
+  </section>
 
-      <div class="sect"><h2>Danger zone</h2></div>
-      <div class="pgroup" style="border-color:rgba(207,58,49,.25)">
-        <div class="prow"><div class="pic" style="color:var(--danger)"><svg class="ic sm"><use href="#i-trash"/></svg></div>
-          <div class="grow"><div class="t" style="color:var(--danger)">Delete account</div><div class="s">Erases everything, permanently</div></div>
-          <button class="btn danger sm" onclick="Auth.deleteAccount()">Delete</button></div>
-      </div>
+  <!-- ============ ADD / EDIT EMI ============ -->
+  <section class="app-scr" id="scr-add">
+    <header class="pgtitle">
+      <button class="au-back" style="margin:0" onclick="Route.back()"><svg class="ic sm"><use href="#i-chev-l"/></svg></button>
+      <h1 class="grow" id="addTitle">Add New EMI</h1>
+    </header>
 
-      <div class="card tiny mut" style="line-height:1.7;margin-top:16px">
-        <b style="color:var(--ink2)">EMIFlow</b> v2.2 “Calm” · <span id="buildid"></span><br>
-        Your data lives only in your account — never sold, never shared. Lender names &amp; logos are trademarks of their respective owners, used solely as visual tags. EMIFlow never touches your bank.
-      </div>
-    </section>
-  </main>
+    <label class="fl">Category</label>
+    <div class="cattiles" id="addCats"></div>
+    <label class="fl">Provider Name</label>
+    <div class="selectrow"><select id="addLender"></select></div>
+    <div class="row" style="gap:10px;align-items:flex-start">
+      <div class="grow"><label class="fl">EMI Amount</label><input id="addAmt" type="number" inputmode="decimal" min="1" placeholder="₹ 0"></div>
+      <div style="width:130px"><label class="fl">Tenure (months)</label>
+        <div class="selectrow"><select id="addN"><option>3</option><option>6</option><option selected>12</option><option>18</option><option>24</option><option>36</option><option>48</option><option>60</option></select></div></div>
+    </div>
+    <label class="fl">Start Date</label><input id="addDate" type="date">
+    <label class="fl">Repeat</label>
+    <div class="selectrow"><select id="addRepeat"><option>Monthly</option></select></div>
+    <div class="swrow"><div class="t">Set Reminder</div>
+      <label class="sw"><input type="checkbox" id="addRemind" checked><i></i></label></div>
+    <div id="addErr" class="aerr hidden"></div>
+    <div id="addEditWrap" class="hidden">
+      <button class="btn2 danger wfull" style="margin-top:16px" onclick="Edit2.remove()">Delete this EMI</button>
+    </div>
+    <button class="pill" style="margin-top:18px" id="addSave" onclick="Edit2.save()">Save EMI</button>
+  </section>
 
-  <nav class="nav"><div class="navin">
-    <button class="navbtn on" data-tab="home" onclick="App.go('home')"><svg class="ic"><use href="#i-home"/></svg>Home</button>
-    <button class="navbtn" data-tab="stats" onclick="App.go('stats')"><svg class="ic"><use href="#i-chart"/></svg>Reports</button>
-    <button class="navadd" onclick="Sheet.openAdd()" aria-label="Add EMI"><svg class="ic lg"><use href="#i-plus"/></svg></button>
-    <button class="navbtn" data-tab="calendar" onclick="App.go('calendar')"><svg class="ic"><use href="#i-cal"/></svg>Calendar</button>
-    <button class="navbtn" data-tab="profile" onclick="App.go('profile')"><svg class="ic"><use href="#i-user"/></svg></button>
-  </div></nav>
+  <!-- ============ PROFILE ============ -->
+  <section class="app-scr" id="scr-profile">
+    <header class="pgtitle"><h1 class="grow">Profile</h1></header>
+    <div class="pcard">
+      <div class="pava" id="pava">A</div>
+      <div class="grow"><h2 id="pname">—</h2><div class="em" id="pemail">—</div>
+        <button class="editbtn" onclick="toast('Edit profile coming soon')"><svg class="ic xs"><use href="#i-pen"/></svg> Edit Profile</button></div>
+    </div>
+
+    <div style="height:14px"></div>
+    <div class="mlist">
+      <button class="mrow" onclick="Profile.payHistory()"><span class="mic"><svg class="ic sm"><use href="#i-history"/></svg></span><span class="mt grow">Payment History</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="Profile.providers()"><span class="mic"><svg class="ic sm"><use href="#i-grid"/></svg></span><span class="mt grow">Manage Providers</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="Sync.exportCloud()"><span class="mic"><svg class="ic sm"><use href="#i-dl"/></svg></span><span class="mt grow">Export Report</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <div class="mrow"><span class="mic"><svg class="ic sm"><use href="#i-bell"/></svg></span><span class="mt grow">Reminders</span>
+        <label class="sw"><input type="checkbox" id="swnotify"><i></i></label></div>
+      <button class="mrow" onclick="Profile.settings()"><span class="mic"><svg class="ic sm"><use href="#i-gear"/></svg></span><span class="mt grow">App Settings</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="toast('Support: ajitjaat1011@gmail.com')"><span class="mic"><svg class="ic sm"><use href="#i-help"/></svg></span><span class="mt grow">Help &amp; Support</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="Profile.about()"><span class="mic"><svg class="ic sm"><use href="#i-info"/></svg></span><span class="mt grow">About EMI Flow</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+    </div>
+    <button class="logout" onclick="Auth.logout()">Log Out</button>
+    <div class="tiny mut" style="text-align:center;margin-top:14px" id="buildid"></div>
+  </section>
 </div>
 
-<!-- ======================= AUTH SHEET ======================= -->
-<div class="ov" id="ov-auth"><div class="sheet">
-  <div class="grab"></div>
-  <div class="row" style="margin-bottom:6px">
-    <button class="btn ghost sm" id="authtab-login" onclick="Auth.tab('login')">Sign in</button>
-    <button class="btn ghost sm" id="authtab-register" onclick="Auth.tab('register')">Create account</button>
-    <div class="grow"></div>
-    <button class="iconbtn" onclick="UI.closeOv('ov-auth')"><svg class="ic sm"><use href="#i-x"/></svg></button>
-  </div>
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="nav hidden" id="bnav"><div class="navin">
+  <button class="navbtn on" data-tab="home" onclick="Route.go('home')"><svg class="ic"><use href="#i-home"/></svg>Home</button>
+  <button class="navbtn" data-tab="emis" onclick="Route.go('emis')"><svg class="ic"><use href="#i-list"/></svg>EMIs</button>
+  <button class="navplus" onclick="Edit2.open()" aria-label="Add EMI"><svg class="ic lg"><use href="#i-plus"/></svg></button>
+  <button class="navbtn" data-tab="insights" onclick="Route.go('insights')"><svg class="ic"><use href="#i-chart"/></svg>Insights</button>
+  <button class="navbtn" data-tab="profile" onclick="Route.go('profile')"><svg class="ic"><use href="#i-user"/></svg>Profile</button>
+</div></nav>
 
-  <div id="auth-main">
-    <label>Your name</label><input id="au-name" placeholder="Ajit Sharma" autocomplete="name">
-    <label>Email</label><input id="au-email" type="email" placeholder="you@example.com" autocomplete="email">
-    <label>Password <span class="mut">(min 8 chars)</span></label>
-    <input id="au-pass" type="password" placeholder="••••••••" autocomplete="current-password">
-    <div id="au-err" class="small hidden" style="color:var(--danger);margin-top:10px;font-weight:550"></div>
-    <button class="btn pri wide" id="au-go" style="margin-top:18px" onclick="Auth.submit()">Create account</button>
-    <button class="ob-demo" onclick="Auth.forgotView()">Forgot password?</button>
-  </div>
-
-  <div id="auth-forgot" class="hidden">
-    <p class="sub">We'll issue a 6-digit reset code for your email.</p>
-    <label>Email</label><input id="fg-email" type="email">
-    <button class="btn pri wide" style="margin-top:14px" onclick="Auth.forgotSend()">Get reset code</button>
-    <div id="fg-code-wrap" class="hidden">
-      <label>Reset code</label><input id="fg-code" inputmode="numeric" maxlength="6" placeholder="123456">
-      <label>New password</label><input id="fg-pass" type="password" placeholder="min 8 chars">
-      <button class="btn pri wide" style="margin-top:14px" onclick="Auth.resetDo()">Set new password</button>
-    </div>
-    <div id="fg-msg" class="small" style="margin-top:12px;color:var(--mut)"></div>
-    <button class="ob-demo" onclick="Auth.forgotView(false)">← Back to sign in</button>
-  </div>
-</div></div>
-
-<!-- ======================= ADD / EDIT SHEET ======================= -->
-<div class="ov" id="ov-edit"><div class="sheet">
-  <div class="grab"></div>
-  <div class="row"><h2 class="grow" id="ed-title">Add EMI</h2>
-    <button class="iconbtn" onclick="UI.closeOv('ov-edit')"><svg class="ic sm"><use href="#i-x"/></svg></button></div>
-
-  <label>EMI name</label><input id="ed-name" placeholder="e.g. Bajaj Finserv TV" maxlength="60">
-  <label>Lender / pay through</label><div class="lgrid" id="ed-lenders"></div>
-  <label>Category</label><div class="cgrid" id="ed-cats"></div>
-  <div class="split">
-    <div><label>EMI amount (₹)</label><input id="ed-amt" type="number" inputmode="decimal" min="1" placeholder="4999"></div>
-    <div><label>Installments</label><input id="ed-n" type="number" inputmode="numeric" min="1" max="480" placeholder="12"></div>
-  </div>
-  <div class="split">
-    <div><label>First due date</label><input id="ed-first" type="date"></div>
-    <div><label>Already paid</label><input id="ed-paid" type="number" inputmode="numeric" min="0" placeholder="0"></div>
-  </div>
-  <div class="prow" style="padding:14px 2px;border-bottom:0">
-    <div class="pic"><svg class="ic sm"><use href="#i-bolt"/></svg></div>
-    <div class="grow"><div class="t">Autopay</div><div class="s">Auto-debited each month</div></div>
-    <label class="switch"><input type="checkbox" id="ed-autopay"><i></i></label></div>
-  <label>Remind me</label>
-  <select id="ed-remind"><option value="0">On due day only</option><option value="1">1 day before</option><option value="2" selected>2 days before</option><option value="4">4 days before</option><option value="7">1 week before</option></select>
-  <label>Notes (optional)</label><textarea id="ed-notes" rows="2" maxlength="240" placeholder="Loan account no., amount variation…"></textarea>
-  <div id="ed-err" class="small hidden" style="color:var(--danger);margin-top:10px;font-weight:550"></div>
-  <button class="btn pri wide" style="margin-top:18px" id="ed-save" onclick="Edit.save()">Save EMI</button>
-</div></div>
-
-<!-- ======================= DETAIL SHEET ======================= -->
+<!-- ============ DETAIL SHEET ============ -->
 <div class="ov" id="ov-detail"><div class="sheet">
   <div class="grab"></div>
   <div class="row"><h2 class="grow" id="dt-title">EMI</h2>
-    <button class="iconbtn" onclick="UI.closeOv('ov-detail')"><svg class="ic sm"><use href="#i-x"/></svg></button></div>
+    <button class="tb-ic" onclick="UI.closeOv('ov-detail')"><svg class="ic sm"><use href="#i-x"/></svg></button></div>
   <div id="dt-body"></div>
 </div></div>
 
-<!-- ======================= CONFIRM ======================= -->
+<!-- ============ GENERIC SHEET ============ -->
+<div class="ov" id="ov-gen"><div class="sheet">
+  <div class="grab"></div>
+  <div class="row"><h2 class="grow" id="gen-title">—</h2>
+    <button class="tb-ic" onclick="UI.closeOv('ov-gen')"><svg class="ic sm"><use href="#i-x"/></svg></button></div>
+  <div id="gen-body"></div>
+</div></div>
+
+<!-- ============ CONFIRM ============ -->
 <div class="ov" id="ov-confirm" style="align-items:center"><div class="sheet" style="max-width:380px;border-radius:24px;margin-bottom:18dvh">
   <h2 id="cf-title">Are you sure?</h2>
   <p class="mut small" id="cf-text" style="margin-top:6px"></p>
   <div class="row" style="margin-top:18px;gap:10px">
-    <button class="btn ghost grow" onclick="UI.closeOv('ov-confirm')">Cancel</button>
-    <button class="btn danger grow" id="cf-ok">Confirm</button>
+    <button class="btn2 grow" onclick="UI.closeOv('ov-confirm')">Cancel</button>
+    <button class="btn2 danger grow" id="cf-ok">Confirm</button>
   </div>
 </div></div>
 
