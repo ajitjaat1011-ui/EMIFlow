@@ -120,7 +120,7 @@
       <button class="tb-ic" onclick="Route.go('calendar')" aria-label="Calendar"><svg class="ic sm"><use href="#i-bell"/></svg><span class="dot hidden" id="belldot"></span></button>
     </header>
 
-    <div class="hero">
+    <div class="hero grad">
       <div class="hl">Total EMI Due</div>
       <div class="hv" id="heroAmt">₹0</div>
       <svg class="spark" id="heroSpark" viewBox="0 0 320 74" preserveAspectRatio="none"></svg>
@@ -255,11 +255,11 @@
 
 <!-- ============ BOTTOM NAV ============ -->
 <nav class="nav hidden" id="bnav"><div class="navin">
-  <button class="navbtn on" data-tab="home" onclick="Route.go('home')"><svg class="ic"><use href="#i-home"/></svg>Home</button>
-  <button class="navbtn" data-tab="emis" onclick="Route.go('emis')"><svg class="ic"><use href="#i-list"/></svg>EMIs</button>
+  <button class="navbtn on" data-tab="home" onclick="Route.go('home')"><span class="nic"><svg class="ic"><use href="#i-home"/></span>Home</button>
+  <button class="navbtn" data-tab="emis" onclick="Route.go('emis')"><span class="nic"><svg class="ic"><use href="#i-list"/></span>EMIs</button>
   <button class="navplus" onclick="Edit2.open()" aria-label="Add EMI"><svg class="ic lg"><use href="#i-plus"/></svg></button>
-  <button class="navbtn" data-tab="insights" onclick="Route.go('insights')"><svg class="ic"><use href="#i-chart"/></svg>Insights</button>
-  <button class="navbtn" data-tab="profile" onclick="Route.go('profile')"><svg class="ic"><use href="#i-user"/></svg>Profile</button>
+  <button class="navbtn" data-tab="insights" onclick="Route.go('insights')"><span class="nic"><svg class="ic"><use href="#i-chart"/></span>Insights</button>
+  <button class="navbtn" data-tab="profile" onclick="Route.go('profile')"><span class="nic"><svg class="ic"><use href="#i-user"/></span>Profile</button>
 </div></nav>
 
 <!-- ============ DETAIL SHEET ============ -->

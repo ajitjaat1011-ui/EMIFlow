@@ -420,11 +420,13 @@ const Charts = {
       const mx = (x0 + x1) / 2;
       d += ` C${mx},${y0} ${mx},${y1} ${x1},${y1}`;
     }
+    const grad = !!el.closest('.grad');
+    const line = grad ? '#ffffff' : '#2f6bf7';
     el.innerHTML = `<defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#7d86ff" stop-opacity=".38"/><stop offset="1" stop-color="#7d86ff" stop-opacity="0"/></linearGradient></defs>
+      <stop offset="0" stop-color="${line}" stop-opacity="${grad ? '.45' : '.30'}"/><stop offset="1" stop-color="${line}" stop-opacity="0"/></linearGradient></defs>
       <path d="${d} L${W},${H} L0,${H} Z" fill="url(#sg)"/>
-      <path d="${d}" fill="none" stroke="#565fe9" stroke-width="2.5" stroke-linecap="round"/>
-      <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="4" fill="#565fe9"/>`;
+      <path d="${d}" fill="none" stroke="${line}" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="4" fill="${line}"/>`;
   },
   bars(el, data) { // [{label, val, past}]
     const max = Math.max(...data.map(d => d.val), 1);
