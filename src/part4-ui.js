@@ -1,5 +1,5 @@
 /* ============================================================
-   EMIFlow v2.0 UI — render · auth · sheets · calendar · boot
+   EMIFlow v2.1 “Aurora” UI — render · auth · sheets · calendar
    ============================================================ */
 'use strict';
 
@@ -10,17 +10,25 @@ const UI = {
 };
 document.querySelectorAll('.ov').forEach(ov => ov.addEventListener('click', (e) => { if (e.target === ov) UI.closeOv(ov.id); }));
 
-function lenderIcon(id, size) {
+function lenderTile(id, cls) {
   const L = LMAP[id] || LMAP.other;
-  const ic = LENDER_ICONS[id];
-  if (ic) return `<img class="lic ${size || ''}" src="${ic}" alt="${esc(L.n)}" loading="lazy">`;
-  return `<div class="lic ph" style="background:${L.c}">${esc(L.n.slice(0, 2).toUpperCase())}</div>`;
+  const icn = LENDER_ICONS[id];
+  if (icn) return `<img class="${cls}" src="${icn}" alt="${esc(L.n)}" loading="lazy">`;
+  return `<div class="${cls} ph" style="background:${L.c}">${esc(L.n.slice(0, 2).toUpperCase())}</div>`;
 }
-function lenderIconSm(id) {
-  const L = LMAP[id] || LMAP.other;
-  const ic = LENDER_ICONS[id];
-  if (ic) return `<img src="${ic}" alt="" style="width:30px;height:30px;border-radius:8px;object-fit:contain;background:var(--card2);border:1px solid var(--bd);padding:2px">`;
-  return `<div class="ph" style="width:30px;height:30px;border-radius:8px;background:${L.c};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px">${esc(L.n.slice(0, 2).toUpperCase())}</div>`;
+const licBig = (id) => lenderTile(id, 'lic');
+const licSm = (id) => lenderTile(id, 'lic2');
+
+function statusChip(e) {
+  const nd = EMI.nextDue(e);
+  if (!nd) return `<span class="statechip done">${ic('check', 'ic xs')} done</span>`;
+  const od = EMI.overdueCount(e);
+  if (od) return `<span class="statechip over">${od} overdue</span>`;
+  const diff = Math.round((parseYmd(nd.date) - parseYmd(today())) / 86400000);
+  if (diff === 0) return `<span class="statechip soon">due today</span>`;
+  if (diff === 1) return `<span class="statechip soon">tomorrow</span>`;
+  if (diff <= 7) return `<span class="statechip due">in ${diff}d</span>`;
+  return `<span class="statechip due">${prettyDay(nd.date)}</span>`;
 }
 
 /* ---------------- auth ---------------- */
@@ -29,6 +37,8 @@ const Auth = {
   open(mode) { this.tab(mode || 'login'); $('#au-err').classList.add('hidden'); UI.openOv('ov-auth'); },
   tab(mode) {
     this.mode = mode;
+    $('#authtab-login').classList.toggle('on', mode === 'login');
+    $('#authtab-register').classList.toggle('on', mode === 'register');
     $('#authtab-login').style.cssText = mode === 'login' ? 'background:var(--acc);color:#fff' : '';
     $('#authtab-register').style.cssText = mode === 'register' ? 'background:var(--acc);color:#fff' : '';
     $('#au-name').parentElement.querySelector('label').style.display = mode === 'register' ? '' : 'none';
@@ -38,6 +48,7 @@ const Auth = {
   },
   err(msg) { const e = $('#au-err'); e.textContent = msg; e.classList.remove('hidden'); },
   async submit() {
+    if (Store.s.demo) { Store.s.demo = false; Store.save(); }
     const email = $('#au-email').value.trim().toLowerCase();
     const pass = $('#au-pass').value;
     const name = $('#au-name').value.trim();
@@ -51,6 +62,7 @@ const Auth = {
       const M = {email_taken: 'That email is already registered — sign in instead.', bad_credentials: 'Wrong email or password.', rate_limited: 'Too many attempts — wait a few minutes.', bad_email: 'Invalid email.', bad_name: 'Name too short.', bad_password: 'Password must be 8+ characters.', network: 'You appear offline.'};
       return this.err(M[r.error] || ('Failed (' + (r.error || r._status) + ')'));
     }
+    Store.s.demo = false;
     Store.s.token = r.token; Store.s.user = r.user; Store.s.emis = {}; Store.s.cursor = 0; Store.save();
     UI.closeOv('ov-auth');
     toast('Welcome, ' + (r.user.name.split(' ')[0]) + '!');
@@ -83,22 +95,25 @@ const Auth = {
     else $('#fg-msg').textContent = 'Invalid or expired code.';
   },
   sessionExpired() {
-    if (!Store.s.token) return;
+    if (!Store.s.token || Store.s.demo) return;
     Store.s.token = null; Store.save();
     toast('Session expired — sign in again', true);
     App.enter();
   },
   async logout() {
+    if (Store.s.demo) { Store.reset(); App.enter(); return; }
     await api('/auth/logout', {method: 'POST'});
     Store.s.token = null; Store.save(); App.enter(); toast('Logged out');
   },
   async logoutAll() {
+    if (Store.s.demo) return confirmBox('Leave demo?', 'Sample data will be cleared.', () => { Store.reset(); App.enter(); });
     confirmBox('Log out everywhere?', 'All sessions on all devices will end. You\'ll sign in again here.', async () => {
       await api('/auth/logout-all', {method: 'POST'});
       Store.s.token = null; Store.save(); App.enter(); toast('Logged out of all devices');
     });
   },
   deleteAccount() {
+    if (Store.s.demo) return toast('Nothing to delete in demo', true);
     confirmBox('Delete account permanently?', 'Every EMI, payment record and your account will be erased. This cannot be undone.', async () => {
       const pass = prompt('Confirm your password to delete:');
       if (pass == null) return;
@@ -110,11 +125,7 @@ const Auth = {
 };
 
 /* ---------------- add / edit sheet ---------------- */
-const Sheet = {
-  openAdd() {
-    Edit.open(null);
-  },
-};
+const Sheet = { openAdd() { if (Store.s.demo) toast('Demo — sign up to add your own', true); else Edit.open(null); } };
 const Edit = {
   current: null, lender: 'other', cat: 'personal',
   open(id) {
@@ -136,17 +147,16 @@ const Edit = {
     $('#ed-save').textContent = id ? 'Save changes' : 'Save EMI';
     this.renderPickers();
     UI.openOv('ov-edit');
-    if (id) { const del = document.getElementById('ed-del') || document.createElement('button'); }
   },
   renderPickers() {
     $('#ed-lenders').innerHTML = LENDERS.map(l =>
-      `<div class="lpick ${l.id === this.lender ? 'on' : ''}" data-id="${l.id}" onclick="Edit.pickLender('${l.id}')">${LENDER_ICONS[l.id] ? `<img src="${LENDER_ICONS[l.id]}" alt="">` : `<div style="width:34px;height:34px;border-radius:9px;background:${l.c};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:11px">${esc(l.n.slice(0, 2).toUpperCase())}</div>`}<span>${esc(l.n)}</span></div>`).join('');
+      `<div class="lpick ${l.id === this.lender ? 'on' : ''}" data-id="${l.id}" onclick="Edit.pickLender('${l.id}')">${LENDER_ICONS[l.id] ? `<img src="${LENDER_ICONS[l.id]}" alt="">` : `<div style="width:34px;height:34px;border-radius:10px;background:${l.c};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:10px">${esc(l.n.slice(0, 2).toUpperCase())}</div>`}<span>${esc(l.n)}</span></div>`).join('');
     $('#ed-cats').innerHTML = CATS.map(c =>
-      `<button class="cpick ${c.id === this.cat ? 'on' : ''}" onclick="Edit.pickCat('${c.id}')">${c.ic} ${esc(c.n)}</button>`).join('');
+      `<button class="cpick ${c.id === this.cat ? 'on' : ''}" onclick="Edit.pickCat('${c.id}')">${ic(c.ic, 'ic xs')} ${esc(c.n)}</button>`).join('');
   },
   pickLender(id) { this.lender = id; this.renderPickers(); vib(8); },
   pickCat(id) { this.cat = id; this.renderPickers(); vib(8); },
-  async save() {
+  save() {
     const name = $('#ed-name').value.trim();
     const amt = Number($('#ed-amt').value), n = Math.round(Number($('#ed-n').value));
     const first = $('#ed-first').value, paid = Math.max(0, Math.round(Number($('#ed-paid').value) || 0));
@@ -162,14 +172,12 @@ const Edit = {
       name, lender: this.lender, cat: this.cat, amt, n, paid, firstDue: first,
       autopay: $('#ed-autopay').checked, remind: Number($('#ed-remind').value),
       notes: $('#ed-notes').value.trim(), createdAt: prev ? prev.createdAt : Date.now(),
-      paidDates: prev ? prev.paidDates : [],
+      paidDates: prev && prev.paid !== paid ? prev.paidDates.slice(0, paid) : (prev ? prev.paidDates : []),
     });
-    if (prev && (prev.paid !== paid)) { // recompute paidDates lazily: keep as-is (history only via pay flow)
-      doc.paidDates = prev.paidDates.slice(0, paid);
-    }
     Sync.queueLocal(doc);
     UI.closeOv('ov-edit');
     toast(this.current ? 'EMI updated' : 'EMI added');
+    vib(10);
     Remind.banner(); Render.all(); Sync.full();
   },
 };
@@ -177,41 +185,42 @@ const Edit = {
 /* ---------------- detail sheet ---------------- */
 const Detail = {
   id: null,
-  open(id, autoFocusPay) {
+  open(id) {
     const e = Store.s.emis[id]; if (!e) return;
     this.id = id;
     const L = LMAP[e.lender] || LMAP.other, C = CMAP[e.cat] || CMAP.other;
     const nd = EMI.nextDue(e), od = EMI.overdueCount(e), prog = EMI.progress(e);
     const upcoming = EMI.statusOf(e).filter(r => r.state !== 'paid').slice(0, 4);
-    const hist = (e.paidDates || []).slice(-6).reverse().map((d, i) =>
-      `<div class="hrow"><div class="d"><small>${parseYmd(d).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(d).getDate()}</div>
-       <div class="grow"><b>${fmtINR(e.amt)}</b> <span class="mut small">paid</span></div>
-       <span class="chip ok">✓</span></div>`).join('');
+    const hist = (e.paidDates || []).slice(-5).reverse().map((d) =>
+      `<div class="hrow"><div class="dd ok"><small>${parseYmd(d).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(d).getDate()}</div>
+       <div class="grow"><b>${fmtINR(e.amt)}</b> <span class="mut small" style="font-weight:600">paid</span></div>
+       <span class="statechip done">${ic('check', 'ic xs')}</span></div>`).join('');
     $('#dt-title').textContent = e.name;
     $('#dt-body').innerHTML = `
-      <div class="row" style="margin:4px 0 12px">
-        ${lenderIconSm(e.lender)}
-        <div class="grow"><b>${esc(L.n)}</b> <span class="chip acc">${C.ic} ${esc(C.n)}</span> ${e.autopay ? '<span class="chip">⚡ autopay</span>' : ''}</div>
+      <div class="row" style="margin:6px 0 2px">
+        ${licSm(e.lender)}
+        <div class="grow" style="min-width:0"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(L.n)}</b></div>
+        <span class="chip acc">${ic(C.ic, 'ic xs')} ${esc(C.n)}</span> ${e.autopay ? `<span class="chip">${ic('bolt', 'ic xs')}autopay</span>` : ''}
       </div>
-      <div class="sumgrid" style="grid-template-columns:1fr 1fr 1fr;background:var(--field);border-radius:16px;padding:12px 0">
-        <div class="sumcell" style="background:none;padding:0 14px"><div class="k" style="color:var(--mut)">EMI</div><div class="v" style="color:var(--ink)">${fmtINR(e.amt)}</div></div>
-        <div class="sumcell" style="background:none;padding:0 14px"><div class="k" style="color:var(--mut)">Paid</div><div class="v" style="color:var(--ink)">${e.paid}/${e.n}</div></div>
-        <div class="sumcell" style="background:none;padding:0 14px"><div class="k" style="color:var(--mut)">Left</div><div class="v" style="color:var(--ink)">${fmtINR(EMI.outstanding(e))}</div></div>
+      <div class="dsumgrid">
+        <div><div class="k">EMI</div><div class="v">${fmtINR(e.amt)}</div></div>
+        <div><div class="k">Paid</div><div class="v">${e.paid}<span class="mut" style="font-size:12px">/${e.n}</span></div></div>
+        <div><div class="k">Left</div><div class="v">${fmtINR(EMI.outstanding(e))}</div></div>
       </div>
-      <div class="pbar" style="margin:14px 0 4px"><i style="width:${prog}%"></i></div>
-      <div class="small mut" style="text-align:center">${prog}% done · started ${prettyDate(e.firstDue)}${e.notes ? ' · 📝 ' + esc(e.notes) : ''}</div>
-      ${od ? `<div class="banner" style="margin-top:14px">⚠️ <span class="grow">${od} installment${od > 1 ? 's' : ''} overdue</span></div>` : ''}
-      ${nd ? `<button class="btn pri wide" id="dt-pay" style="margin-top:14px" onclick="Detail.pay()">Mark ${od ? 'overdue' : 'next'} as paid · ${fmtINR(e.amt)}</button>`
-           : `<div class="chip ok" style="margin-top:14px;width:100%;justify-content:center;padding:10px">🎉 Loan completed — well done!</div>`}
-      ${upcoming.length ? `<label>Upcoming</label>${upcoming.map(r => `<div class="hrow"><div class="d" style="background:var(--field);color:var(--ink)"><small>${parseYmd(r.date).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(r.date).getDate()}</div><div class="grow">${fmtINR(e.amt)} <span class="mut small">· installment ${r.i + 1}</span></div><span class="chip ${r.state === 'overdue' ? 'danger' : ''}">${r.state}</span></div>`).join('')}` : ''}
+      <div class="pbar" style="margin:2px 0 6px"><i style="width:${prog}%"></i></div>
+      <div class="small mut" style="text-align:center;font-weight:600">${prog}% done · started ${prettyDate(e.firstDue)}${e.notes ? '<br><span class=mut>note:</span> ' + esc(e.notes) : ''}</div>
+      ${od ? `<div class="banner">${ic('alert', 'ic sm')}<span class="grow">${od} installment${od > 1 ? 's' : ''} overdue</span></div>` : ''}
+      ${nd ? `<button class="btn pri wide" style="margin-top:14px" onclick="Detail.pay()">${od ? 'Clear overdue' : 'Mark paid'} · ${fmtINR(e.amt)}</button>`
+           : `<div class="chip ok" style="margin-top:14px;width:100%;justify-content:center;padding:11px">${ic('spark', 'ic xs')} Loan completed — well done!</div>`}
+      ${upcoming.length ? `<label>Upcoming</label>${upcoming.map(r => `<div class="hrow"><div class="dd mut2"><small>${parseYmd(r.date).toLocaleDateString('en-IN', {month: 'short'})}</small>${parseYmd(r.date).getDate()}</div><div class="grow">${fmtINR(e.amt)} <span class="mut small">· #${r.i + 1}</span></div><span class="statechip ${r.state === 'overdue' ? 'over' : 'due'}">${r.state}</span></div>`).join('')}` : ''}
       ${hist ? `<label>Recent payments</label>${hist}` : ''}
-      <div class="row" style="gap:10px;margin-top:18px">
-        <button class="btn ghost grow" onclick="Edit.open('${e.id}');UI.closeOv('ov-detail')">Edit</button>
+      <div class="row" style="gap:10px;margin-top:20px">
+        <button class="btn ghost grow" onclick="UI.closeOv('ov-detail');Edit.open('${e.id}')">Edit</button>
         <button class="btn danger grow" onclick="Detail.remove()">Delete</button>
       </div>`;
     UI.openOv('ov-detail');
   },
-  async pay() {
+  pay() {
     const e = Store.s.emis[this.id]; if (!e) return;
     const nd = EMI.nextDue(e); if (!nd) return;
     e.paid = Math.min(e.n, e.paid + 1);
@@ -219,13 +228,14 @@ const Detail = {
     vib([12, 40, 12]);
     Sync.queueLocal({...e});
     toast(`Paid ${fmtINR(e.amt)} — ${e.name}`);
-    try { fetch('/api/payments', {method: 'POST', headers: {'content-type': 'application/json', authorization: 'Bearer ' + Store.s.token}, body: JSON.stringify({emiId: e.id, amt: e.amt})}); } catch {}
+    if (!Store.s.demo) { try { fetch('/api/payments', {method: 'POST', headers: {'content-type': 'application/json', authorization: 'Bearer ' + Store.s.token}, body: JSON.stringify({emiId: e.id, amt: e.amt})}); } catch {} }
     Remind.banner(); Render.all();
     UI.closeOv('ov-detail');
     Sync.full();
   },
   remove() {
     const e = Store.s.emis[this.id]; if (!e) return;
+    if (Store.s.demo) return toast('Demo — nothing is deleted', true);
     confirmBox(`Delete “${e.name}”?`, 'It will be removed from all your devices.', () => {
       Sync.queueLocal({...e, deleted: true, updatedAt: Date.now()});
       delete Store.s.emis[e.id];
@@ -240,26 +250,26 @@ const Cal = {
   off: 0, sel: null,
   nav(d) { this.off += d; this.sel = null; $('#calday').classList.add('hidden'); this.render(); },
   render() {
+    const g = $('#calgrid'); if (!g) return;
     const base = new Date(); const m = new Date(base.getFullYear(), base.getMonth() + this.off, 1);
     $('#caltitle').textContent = m.toLocaleDateString('en-IN', {month: 'long', year: 'numeric'});
     const ymStr = ymd(m).slice(0, 7);
-    const firstDow = (m.getDay() + 6) % 7; // Monday-first
+    const firstDow = (m.getDay() + 6) % 7;
     const dim = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
     const dues = EMI.duesInMonth(ymStr);
     const byDay = {};
-    for (const d of dues) { (byDay[d.date] = byDay[d.date] || []).push(d); }
+    for (const d of dues) (byDay[d.date] = byDay[d.date] || []).push(d);
     const t = today(); const sel = this.sel;
     let html = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(d => `<div class="dow">${d}</div>`).join('');
     for (let i = 0; i < firstDow; i++) html += '<div></div>';
     for (let day = 1; day <= dim; day++) {
       const ds = ymStr + '-' + pad(day);
       const list = byDay[ds] || [];
-      const hasOver = list.some(x => x.state === 'overdue');
       const dots = list.slice(0, 3).map(x => `<i class="${x.state === 'overdue' ? 'd-red' : 'd-amb'}"></i>`).join('');
       const cls = ['day', ds === t ? 'today' : '', ds === sel ? 'sel' : ''].join(' ');
       html += `<div class="${cls}" onclick="Cal.selDay('${ds}')">${day}<div class="dots">${dots}</div></div>`;
     }
-    $('#calgrid').innerHTML = html;
+    g.innerHTML = html;
   },
   selDay(ds) {
     this.sel = ds; this.render();
@@ -267,11 +277,11 @@ const Cal = {
     const el = $('#calday');
     if (!list.length) { el.classList.add('hidden'); return; }
     el.classList.remove('hidden');
-    el.innerHTML = `<h3>${prettyDate(ds)}</h3>` + list.map(x => `
+    el.innerHTML = `<h3 style="margin-bottom:4px">${prettyDate(ds)}</h3>` + list.map(x => `
       <div class="hrow" style="cursor:pointer" onclick="Detail.open('${x.emi.id}')">
-        ${lenderIconSm(x.emi.lender)}
-        <div class="grow"><b>${esc(x.emi.name)}</b><div class="small mut">${fmtINR(x.emi.amt)} ${x.emi.autopay ? '· ⚡ autopay' : ''}</div></div>
-        <span class="chip ${x.state === 'overdue' ? 'danger' : 'warn'}">${x.state}</span>
+        ${licSm(x.emi.lender)}
+        <div class="grow"><b>${esc(x.emi.name)}</b><div class="small mut" style="font-weight:600">${fmtINR(x.emi.amt)}${x.emi.autopay ? ' · autopay' : ''}</div></div>
+        <span class="statechip ${x.state === 'overdue' ? 'over' : 'soon'}">${x.state}</span>
       </div>`).join('');
   },
 };
@@ -283,59 +293,72 @@ const Render = {
     const s = EMI.summary();
     const hr = $('#herocard'); if (!hr) return;
     const hour = new Date().getHours();
-    const hello = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-    $('#greet').textContent = `${hello}, ${(Store.s.user?.name || 'there').split(' ')[0]} 👋`;
+    $('#greet').textContent = (hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening') + ', ' + ((Store.s.user?.name || Store.s.demo ? 'Demo' : 'there')).split(' ')[0];
+    $('#greet').textContent = (hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening') + (Store.s.demo ? '' : ', ' + (Store.s.user?.name || 'there').split(' ')[0]);
     hr.innerHTML = `
-      <div class="row"><div class="grow"><div class="small" style="color:rgba(255,255,255,.75);font-weight:700;letter-spacing:.05em;text-transform:uppercase">Due this month</div>
-        <div class="big" style="font-size:30px">${fmtINR(s.dueThisMonth)}</div></div>
-        <span class="chip" style="background:rgba(255,255,255,.18);color:#fff">${s.count} active EMI${s.count === 1 ? '' : 's'}</span></div>
-      <div class="sumgrid">
-        <div class="sumcell"><div class="k">Outstanding</div><div class="v">${fmtINR(s.outstanding)}</div></div>
-        <div class="sumcell"><div class="k">Paid this month</div><div class="v">${fmtINR(s.paidThisMonth)}</div></div>
-        <div class="sumcell"><div class="k">Overdue</div><div class="v" style="${s.overdue ? '' : 'opacity:.55'}">${s.overdue ? '⚠️ ' + fmtINR(s.overdue) : fmtINR(0)}</div></div>
-        <div class="sumcell"><div class="k">Next due</div><div class="v" style="font-size:15px;padding-top:4px">${s.next ? prettyDay(s.next.date) + ' · ' + fmtINR(s.next.amt) : '—'}</div></div>
-      </div>`;
+      <div class="hlabel">${ic('wallet', 'ic sm')} Total outstanding</div>
+      <div class="hamt" id="heroamt">₹0</div>
+      <div class="hsub">across ${s.count} active EMI${s.count === 1 ? '' : 's'}${s.overdue ? ` · <b style="color:#ffd7a0">${fmtINR(s.overdue)} overdue</b>` : ''}</div>
+      <div class="hgrid">
+        <div class="hcell"><div class="k">Due this month</div><div class="v">${fmtINR(s.dueThisMonth)}</div></div>
+        <div class="hcell"><div class="k">Paid this mo</div><div class="v">${fmtINR(s.paidThisMonth)}</div></div>
+        <div class="hcell"><div class="k">Monthly load</div><div class="v">${fmtINR(EMI.monthOutflow(today().slice(0, 7)))}</div></div>
+      </div>
+      ${s.next ? `<div class="hnext">${ic('clock', 'ic sm')}<div class="grow"><div class="t">Next due</div><div class="v">${prettyDay(s.next.date)} · ${fmtINR(s.next.amt)}</div></div>${statusChip(s.next.emi)}</div>` : ''}`;
+    countUp($('#heroamt'), s.outstanding);
     const list = Object.values(Store.s.emis).filter(e => !e.deleted)
-      .sort((a, b) => (EMI.active(b) - EMI.active(a)) || ((EMI.nextDue(a)?.date || '9') < (EMI.nextDue(b)?.date || '9') ? -1 : 1));
-    $('#loans').innerHTML = list.length ? list.map(e => {
+      .sort((a, b) => (EMI.active(b) - EMI.active(a)) || (((EMI.nextDue(a) || {date: '9'}).date < (EMI.nextDue(b) || {date: '9'}).date) ? -1 : 1));
+    const host = $('#loans');
+    host.innerHTML = list.length ? list.map((e, i) => {
       const nd = EMI.nextDue(e), od = EMI.overdueCount(e), prog = EMI.progress(e);
       const L = LMAP[e.lender] || LMAP.other;
-      return `<div class="loan" onclick="Detail.open('${e.id}')">
-        ${lenderIcon(e.lender)}
+      const dl = Store.s.meta.anim === false ? '0' : String(Math.min(i * 55, 440));
+      return `<div class="loan" style="animation-delay:${dl}ms" onclick="Detail.open('${e.id}')">
+        ${licBig(e.lender)}
         <div class="grow">
-          <div class="t">${esc(e.name)} ${e.autopay ? '<span style="opacity:.6">⚡</span>' : ''}</div>
-          <div class="s">${esc(L.n)} · ${e.paid}/${e.n} paid${nd ? ` · next ${prettyDay(nd.date)}` : ' · done 🎉'}</div>
+          <div class="t">${esc(e.name)} ${e.autopay ? `<span class="mut" title="autopay">${ic('bolt', 'ic xs')}</span>` : ''}</div>
+          <div class="s">${esc(L.n)} · <span class="num">${e.paid}/${e.n}</span> paid</div>
           <div class="pbar"><i style="width:${prog}%"></i></div>
         </div>
-        <div class="amt">${fmtINR(e.amt)}<div class="s">${od ? `<span style="color:var(--danger);font-weight:700">${od} overdue</span>` : nd ? `<span class="mut small">${EMI.dueInWindow(e, 2) && EMI.dueInWindow(e, 2).in === 0 ? 'due today' : ''}</span>` : '<span class="mut small">closed</span>'}</div></div>
+        <div class="right">
+          <div class="amt">${fmtINR(e.amt)}</div>
+          <div style="margin-top:5px">${statusChip(e)}</div>
+        </div>
       </div>`;
-    }).join('') : `<div class="empty"><div class="big">🗂️</div><p><b>No EMIs yet</b></p><p class="small">Tap <b>+</b> to add your first EMI — pick your lender, amount and due date.</p><button class="btn pri" style="margin-top:14px" onclick="Sheet.openAdd()">Add your first EMI</button></div>`;
+    }).join('') : `<div class="card" style="text-align:center;padding:40px 24px">
+      <div style="width:64px;height:64px;border-radius:20px;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;margin:0 auto 14px">${ic('wallet', 'ic lg')}</div>
+      <h3>No EMIs yet</h3><p class="mut small" style="margin-top:5px;font-weight:600">Tap + to add your first — pick a lender,<br>amount and due date. That's it.</p>
+      <button class="btn pri" style="margin-top:18px" onclick="Sheet.openAdd()">${ic('plus', 'ic sm')} Add your first EMI</button></div>`;
   },
   stats() {
     const s = EMI.summary();
-    $('#statcards').innerHTML = [
-      ['Active', s.count], ['Monthly', fmtINR(EMI.monthOutflow(today().slice(0, 7)))],
-      ['Owe', fmtINR(s.outstanding)], ['Paid', fmtINR(s.paidThisMonth)],
-    ].map(([k, v]) => `<div class="sumcell" style="background:var(--card);border:1px solid var(--bd)"><div class="k" style="color:var(--mut)">${k}</div><div class="v" style="font-size:15px;color:var(--ink)">${v}</div></div>`).join('');
+    const tiles = [
+      ['wallet', '', 'Active EMIs', s.count],
+      ['cal', 'teal', 'Due this month', fmtINR(s.dueThisMonth)],
+      ['alert', 'amber', 'Overdue', s.overdue ? fmtINR(s.overdue) : '₹0'],
+      ['spark', 'violet', 'Paid this mo', fmtINR(s.paidThisMonth)],
+    ];
+    $('#statcards').innerHTML = tiles.map(([icn, cls, k, v]) =>
+      `<div class="stat ${cls}">${ic(icn, 'ic sm')}<div class="k">${k}</div><div class="v num">${v}</div></div>`).join('');
     const proj = EMI.projection(6); const max = Math.max(...proj.map(p => p.amt), 1);
     $('#projbars').innerHTML = proj.map((p, i) =>
-      `<div class="b ${i === 0 ? '' : 'past'}"><span class="small mono" style="font-size:10px;color:var(--mut)">${p.amt ? (p.amt / 1000).toFixed(p.amt >= 100000 ? 0 : 1) + 'k' : ''}</span><i style="height:${Math.max(4, Math.round(p.amt / max * 100))}%"></i><span class="l">${p.label}</span></div>`).join('');
+      `<div class="b ${i === 0 ? '' : 'past'}"><span class="val">${p.amt ? (p.amt >= 100000 ? Math.round(p.amt / 1000) + 'k' : (p.amt / 1000).toFixed(1) + 'k') : '·'}</span><i style="height:${Math.max(4, Math.round(p.amt / max * 100))}%"></i><span class="l">${p.label}</span></div>`).join('');
     const lr = EMI.byLender(); const lmax = Math.max(...lr.map(x => x.amt), 1);
     $('#lenderrows').innerHTML = lr.length ? lr.slice(0, 8).map(x =>
-      `<div class="lrow">${lenderIconSm(x.lender.id)}<div class="grow"><div class="row"><b class="small">${esc(x.lender.n)}</b><span class="mut small grow" style="text-align:right">${x.count} EMI${x.count > 1 ? 's' : ''} · ${fmtINR(x.amt)}</span></div><div class="lbar"><i style="width:${Math.round(x.amt / lmax * 100)}%"></i></div></div></div>`).join('')
-      : '<p class="mut small" style="padding:8px 0">Add EMIs to see lender-wise outstanding.</p>';
+      `<div class="lrow">${licSm(x.lender.id)}<div class="grow"><div class="row" style="justify-content:space-between"><span class="nm">${esc(x.lender.n)}</span><span class="rt">${fmtINR(x.amt)}</span></div><div class="lbar"><i style="width:${Math.round(x.amt / lmax * 100)}%"></i></div><div class="ct">${x.count} EMI${x.count > 1 ? 's' : ''} outstanding</div></div></div>`).join('')
+      : '<div class="emptyst">Lender-wise outstanding shows up once you add EMIs.</div>';
     const cr = EMI.byCat(); const cmax = Math.max(...cr.map(x => x.amt), 1);
     $('#catrows').innerHTML = cr.length ? cr.map(x =>
-      `<div class="lrow"><div style="width:30px;height:30px;border-radius:8px;background:var(--field);display:flex;align-items:center;justify-content:center">${x.cat.ic}</div><div class="grow"><div class="row"><b class="small">${esc(x.cat.n)}</b><span class="mut small grow" style="text-align:right">${fmtINR(x.amt)}</span></div><div class="lbar"><i style="width:${Math.round(x.amt / cmax * 100)}%"></i></div></div></div>`).join('')
-      : '<p class="mut small" style="padding:8px 0">Category breakdown appears once you add EMIs.</p>';
+      `<div class="lrow"><div class="lic2 ph" style="background:var(--field);color:var(--ink)">${ic(x.cat.ic, 'ic sm')}</div><div class="grow"><div class="row" style="justify-content:space-between"><span class="nm">${esc(x.cat.n)}</span><span class="rt">${fmtINR(x.amt)}</span></div><div class="lbar"><i style="width:${Math.round(x.amt / cmax * 100)}%"></i></div></div></div>`).join('')
+      : '<div class="emptyst">Category split appears once you add EMIs.</div>';
   },
   profile() {
-    const u = Store.s.user; if (!u) return;
+    const u = Store.s.user || {name: 'Demo User', email: 'demo · local only', created_at: Date.now()};
     $('#pavatar').textContent = (u.name || 'A')[0].toUpperCase();
     $('#pname').textContent = u.name;
     $('#pemail').textContent = u.email;
     const n = Object.values(Store.s.emis).filter(e => !e.deleted).length;
-    $('#pmeta').textContent = `Member since ${new Date(u.created_at).toLocaleDateString('en-IN', {month: 'short', year: 'numeric'})} · ${n} EMI${n === 1 ? '' : 's'}`;
+    $('#pmeta').textContent = (Store.s.demo ? 'Sample data · not synced' : `Member since ${new Date(u.created_at).toLocaleDateString('en-IN', {month: 'short', year: 'numeric'})}`) + ` · ${n} EMI${n === 1 ? '' : 's'}`;
     document.querySelectorAll('#segtheme button').forEach(b => b.classList.toggle('on', b.dataset.v === (Store.s.meta.theme || 'system')));
     $('#swanim').checked = Store.s.meta.anim !== false;
     $('#swnotify').checked = !!Store.s.meta.notify;
@@ -348,7 +371,7 @@ function applyTheme() {
   const dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   document.body.classList.toggle('noanim', Store.s.meta.anim === false);
-  document.querySelector('meta[name=theme-color]').content = dark ? '#0b0b10' : '#f5f6fa';
+  document.querySelector('meta[name=theme-color]').content = dark ? '#070b14' : '#eef1f8';
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
 
@@ -358,20 +381,56 @@ const App = {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
     $('#scr-' + tab).classList.add('on');
     document.querySelectorAll('.navbtn').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+    this.pill();
     if (tab === 'calendar') Cal.render();
     if (tab === 'stats') Render.stats();
     vib(6);
   },
+  pill() {
+    const dock = $('#dock'), pill = $('#dockpill'); if (!dock || !pill) return;
+    const on = dock.querySelector('.navbtn.on'); if (!on) return;
+    pill.style.left = on.offsetLeft + 'px';
+    pill.style.width = on.offsetWidth + 'px';
+  },
+  demo() {
+    const D = [
+      {name: 'Smart TV 55″', lender: 'bajaj', cat: 'consumer', amt: 5499, n: 12, paid: 4, off: -4, dayOff: 0, autopay: true, notes: 'Smart TV 55″ 4K'},
+      {name: 'Card bill', lender: 'phonepe', cat: 'card', amt: 2400, n: 6, paid: 2, off: -3, dayOff: 6, autopay: false, notes: ''},
+      {name: 'Personal loan', lender: 'navi', cat: 'personal', amt: 8250, n: 36, paid: 9, off: -10, dayOff: 0, autopay: false, notes: ''},
+      {name: 'Headphones', lender: 'simpl', cat: 'bnpl', amt: 1299, n: 3, paid: 0, off: 1, dayOff: 0, autopay: false, notes: 'Headphones'},
+      {name: 'Car loan', lender: 'hdfc', cat: 'car', amt: 14750, n: 60, paid: 22, off: -22, dayOff: 0, autopay: true, notes: ''},
+      {name: 'Closed loan', lender: 'kreditbee', cat: 'personal', amt: 3200, n: 6, paid: 6, off: -6, dayOff: 0, autopay: false, notes: ''},
+    ];
+    Store.reset();
+    Store.s.demo = true;
+    Store.s.user = {name: 'Demo User', email: 'demo · local only', created_at: Date.now()};
+    for (const d of D) {
+      const first = new Date(); first.setDate(first.getDate() + d.dayOff);
+      const fd = addMonths(first, d.off);
+      const e = EMI.normalize({...d, id: 'd' + Math.random().toString(36).slice(2, 8), firstDue: ymd(fd), createdAt: Date.now()});
+      e.paidDates = [];
+      for (let i = 0; i < e.paid; i++) { const pd = addMonths(parseYmd(e.firstDue), i); if (cmpYmd(ymd(pd), today()) < 0) e.paidDates.push(ymd(pd)); }
+      Store.s.emis[e.id] = e;
+    }
+    Store.save();
+    $('#scr-onboard').classList.add('hidden');
+    this.enter();
+    toast('Demo loaded — look around!');
+  },
   enter() {
-    const logged = !!Store.s.token;
+    const logged = !!Store.s.token || !!Store.s.demo;
     $('#scr-onboard').classList.toggle('hidden', logged);
     $('#app').classList.toggle('hidden', !logged);
-    if (logged) { Render.all(); Sync.statusUI('', 'syncing…'); Sync.full(); Remind.check(); }
+    if (logged) {
+      if (!Store.s.demo) $('#greet').textContent = 'Hi there';
+      Render.all(); Sync.statusUI('', 'syncing…'); Sync.full(); Remind.check();
+      requestAnimationFrame(() => { this.pill(); setTimeout(() => this.pill(), 350); });
+    }
   },
 };
 
 /* ---------------- wire settings ---------------- */
-document.querySelectorAll('#segtheme button').forEach(b => b.onclick = () => Sync.saveMeta({theme: b.dataset.v}).then(applyTheme));
+document.querySelectorAll('#segtheme button').forEach(b => b.onclick = () => { Sync.saveMeta({theme: b.dataset.v}).then(applyTheme); vib(6); });
 $('#swanim').onchange = (e) => { Sync.saveMeta({anim: e.target.checked}).then(applyTheme); };
 $('#swnotify').onchange = async (e) => {
   if (e.target.checked) {
@@ -382,14 +441,16 @@ $('#swnotify').onchange = async (e) => {
     Sync.saveMeta({notify: true}).then(() => Remind.check());
   } else Sync.saveMeta({notify: false});
 };
+window.addEventListener('resize', () => App.pill());
 
 /* ---------------- boot ---------------- */
 document.getElementById('buildid').textContent = 'build ' + APP_VERSION;
 applyTheme();
-App.enter();
-setInterval(() => { if (Store.s.token) Sync.full(); }, 60000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden && Store.s.token) Sync.full(); });
-window.addEventListener('online', () => { toast('Back online'); if (Store.s.token) Sync.full(); });
+if (new URLSearchParams(location.search).get('demo') === '1') App.demo();
+else App.enter();
+setInterval(() => { if (Store.s.token && !Store.s.demo) Sync.full(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && Store.s.token && !Store.s.demo) Sync.full(); });
+window.addEventListener('online', () => { toast('Back online'); if (Store.s.token && !Store.s.demo) Sync.full(); });
 window.addEventListener('offline', () => { Sync.statusUI(' off', 'offline — changes queued'); });
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
-try { fetch('/api/analytics', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({e: 'open', s: APP_VERSION})}); } catch {}
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
+if (!Store.s.demo) { try { fetch('/api/analytics', {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({e: 'open', s: APP_VERSION})}); } catch {} }

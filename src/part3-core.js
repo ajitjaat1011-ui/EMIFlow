@@ -4,10 +4,10 @@
 'use strict';
 
 const CATS = [
-  {id:'personal', n:'Personal', ic:'💼'}, {id:'consumer', n:'Consumer', ic:'📺'},
-  {id:'bike', n:'Bike', ic:'🏍️'}, {id:'car', n:'Car', ic:'🚗'},
-  {id:'home', n:'Home', ic:'🏠'}, {id:'card', n:'Card bill', ic:'💳'},
-  {id:'bnpl', n:'BNPL', ic:'🛍️'}, {id:'other', n:'Other', ic:'📁'},
+  {id:'personal', n:'Personal', ic:'briefcase'}, {id:'consumer', n:'Consumer', ic:'tv'},
+  {id:'bike', n:'Bike', ic:'bike'}, {id:'car', n:'Car', ic:'car'},
+  {id:'home', n:'Home', ic:'home'}, {id:'card', n:'Card bill', ic:'card2'},
+  {id:'bnpl', n:'BNPL', ic:'bag'}, {id:'other', n:'Other', ic:'folder'},
 ];
 const LENDERS = [
   {id:'bajaj',    n:'Bajaj Finserv', c:'#2563eb'},
@@ -29,11 +29,12 @@ const LENDERS = [
 ];
 const LMAP = Object.fromEntries(LENDERS.map(l => [l.id, l]));
 const CMAP = Object.fromEntries(CATS.map(c => [c.id, c]));
-const APP_VERSION = '2.0.0';
+const APP_VERSION = '2.1.0';
 
 /* ---------------- tiny utils ---------------- */
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ic = (n, cls = 'ic') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
 const fmtINR = (n) => '₹' + Number(n || 0).toLocaleString('en-IN', {maximumFractionDigits: 0});
 const fmtINR2 = (n) => '₹' + Number(n || 0).toLocaleString('en-IN', {maximumFractionDigits: 2});
 const pad = (x) => String(x).padStart(2, '0');
@@ -51,6 +52,18 @@ function toast(msg, err) {
   t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg;
   $('#toasts').appendChild(t);
   setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .4s'; setTimeout(() => t.remove(), 420); }, 2400);
+}
+/* animated money counter */
+function countUp(el, target, prefix = '₹') {
+  if (!el) return;
+  if (Store.s.meta.anim === false || matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = prefix + Number(target).toLocaleString('en-IN', {maximumFractionDigits: 0}); return; }
+  const t0 = performance.now(), dur = 750;
+  const step = (t) => {
+    const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    el.textContent = prefix + Math.round(target * e).toLocaleString('en-IN', {maximumFractionDigits: 0});
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
 }
 function confirmBox(title, text, onOk) {
   $('#cf-title').textContent = title; $('#cf-text').textContent = text;
@@ -71,6 +84,7 @@ Store.load();
 
 /* ---------------- api ---------------- */
 function api(path, opts = {}) {
+  if (Store.s.demo) return Promise.resolve({ok: false, error: 'demo', _status: -1});
   const h = {'content-type': 'application/json', ...(opts.headers || {})};
   if (Store.s.token) h.authorization = 'Bearer ' + Store.s.token;
   return fetch('/api' + path, {...opts, headers: h}).then(async (r) => {
@@ -184,6 +198,7 @@ const Sync = {
     if (t2) t2.textContent = txt + (Store.s.lastSync ? ' · ' + new Date(Store.s.lastSync).toLocaleTimeString('en-IN', {hour: '2-digit', minute: '2-digit'}) : '');
   },
   async full(force) {
+    if (Store.s.demo) { this.statusUI('', 'demo — sample data'); return; }
     if (this.busy || !Store.s.token) return;
     if (navigator.onLine === false) { this.statusUI(' off', 'offline — changes queued'); return; }
     this.busy = true; this.statusUI('', 'syncing…');
@@ -229,6 +244,13 @@ const Sync = {
     await api('/meta', {method: 'POST', body: JSON.stringify({json: Store.s.meta})});
   },
   async exportCloud() {
+    if (Store.s.demo) {
+      const dump = {exported_at: new Date().toISOString(), app: 'EMIFlow (demo)', emis: Object.values(Store.s.emis), meta: Store.s.meta};
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(dump, null, 2)], {type: 'application/json'}));
+      a.download = 'emiflow-demo-' + today() + '.json'; a.click();
+      return toast('Demo backup downloaded');
+    }
     const r = await fetch('/api/account/export', {headers: {authorization: 'Bearer ' + Store.s.token}});
     if (!r.ok) return toast('Export failed', true);
     const blob = await r.blob();
@@ -266,7 +288,7 @@ const Remind = {
     }
     if (!urgent.length) { host.innerHTML = ''; return; }
     const u = urgent.sort((a, b) => a.e.name.localeCompare(b.e.name))[0];
-    host.innerHTML = `<div class="banner">⏰ <span class="grow">${esc(u.txt)}</span>
+    host.innerHTML = `<div class="banner">${ic('alert', 'ic sm')}<span class="grow">${esc(u.txt)}</span>
       <button class="btn sm" style="background:var(--warn);color:#fff" onclick="Detail.open('${u.id}',true)">Pay</button></div>`;
   },
 };
