@@ -115,7 +115,7 @@
   <section class="app-scr on" id="scr-home">
     <header class="topbar">
       <div class="grow"><div class="tb-title" id="hgreet">Good Morning,</div><h1 id="hname">—</h1>
-        <div class="sync" style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);margin-top:3px"><span class="syncdot" id="syncdot" style="width:7px;height:7px;border-radius:50%;background:#e0a23e"></span><span id="synctext">syncing…</span></div></div>
+        <div class="sync" id="syncrow" style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);margin-top:3px"><span class="syncdot" id="syncdot" style="width:7px;height:7px;border-radius:50%;background:#e0a23e"></span><span id="synctext">syncing…</span></div></div>
       <button class="tb-ic" onclick="Route.go('emis')" aria-label="Search EMIs"><svg class="ic sm"><use href="#i-search"/></svg></button>
       <button class="tb-ic" onclick="Route.go('calendar')" aria-label="Calendar"><svg class="ic sm"><use href="#i-bell"/></svg><span class="dot hidden" id="belldot"></span></button>
     </header>
@@ -243,6 +243,7 @@
       <button class="mrow" onclick="Sync.exportCloud()"><span class="mic"><svg class="ic sm"><use href="#i-dl"/></svg></span><span class="mt grow">Export Report</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <div class="mrow"><span class="mic"><svg class="ic sm"><use href="#i-bell"/></svg></span><span class="mt grow">Reminders</span>
         <label class="sw"><input type="checkbox" id="swnotify"><i></i></label></div>
+      <button class="mrow" onclick="Profile.appearance()"><span class="mic"><svg class="ic sm"><use href="#i-moon"/></svg></span><span class="mt grow">Appearance</span><span class="chip" id="themechoice">Auto</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="Profile.settings()"><span class="mic"><svg class="ic sm"><use href="#i-gear"/></svg></span><span class="mt grow">App Settings</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="toast('Support: ajitjaat1011@gmail.com')"><span class="mic"><svg class="ic sm"><use href="#i-help"/></svg></span><span class="mt grow">Help &amp; Support</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="Profile.about()"><span class="mic"><svg class="ic sm"><use href="#i-info"/></svg></span><span class="mt grow">About EMI Flow</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>

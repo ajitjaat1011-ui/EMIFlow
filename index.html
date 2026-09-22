@@ -21,6 +21,7 @@
   --ok:#1fa971; --okbg:#e7f7f0; --warn:#c07c10; --warnbg:#fdf3df;
   --danger:#e05252; --dangerbg:#fdeeed;
   --pill:linear-gradient(118deg,#6a63f0 0%,#4c53d8 45%,#23263c 120%);
+  --sh:0 1px 2px rgba(24,27,42,.04),0 10px 30px -14px rgba(24,27,42,.12);
   --r:20px; --rs:14px; --ease:cubic-bezier(.25,.8,.3,1);
 }
 [data-theme="dark"]{
@@ -30,6 +31,7 @@
   --ok:#3ec78f; --okbg:#122720; --warn:#e8ab48; --warnbg:#2a2115;
   --danger:#f07171; --dangerbg:#2c1a1e;
   --pill:linear-gradient(118deg,#6a63f0 0%,#4c53d8 60%,#181a2e 130%);
+  --sh:0 1px 2px rgba(0,0,0,.2),0 12px 32px -16px rgba(0,0,0,.5);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{height:100%}
@@ -38,6 +40,8 @@ body.noanim *{transition:none!important;animation:none!important}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 input,select,textarea{font:inherit;color:var(--ink);background:var(--field);border:1.5px solid var(--bd);border-radius:14px;padding:13px 15px;width:100%;outline:none;transition:border-color .15s}
 input:focus,select:focus,textarea:focus{border-color:var(--acc)}
+select{appearance:none;-webkit-appearance:none;padding-right:42px;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238a8fa6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+select option{color:#181b2a;background:#fff}
 input::placeholder,textarea::placeholder{color:var(--mut)}
 label.fl{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:16px 2px 7px}
 h1{font-size:24px;font-weight:800;letter-spacing:-.02em}
@@ -46,6 +50,20 @@ h3{font-size:16px;font-weight:700;letter-spacing:-.01em}
 .hidden{display:none!important}
 .mut{color:var(--mut)} .small{font-size:13px} .tiny{font-size:11.5px}
 .num{font-variant-numeric:tabular-nums}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;background:var(--field);border:1px solid var(--bd);font-size:11.5px;font-weight:650;color:var(--mut);white-space:nowrap}
+.chip.ok{background:var(--okbg);border-color:transparent;color:var(--ok)}
+.chip.acc{background:var(--acc-soft);border-color:transparent;color:var(--acc)}
+.pill:active{transform:scale(.975)}
+.navplus:active{transform:scale(.92)}
+button:active{opacity:.92}
+.mrow:active,.tl:active,.cattile:active{opacity:.75}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.syncdot{transition:background .25s;animation:syncpulse 1.5s ease-in-out infinite}
+.syncdot.on{background:var(--ok);animation:none}
+.syncdot.off{background:var(--danger);animation:none}
+.syncdot.space{background:transparent;animation:none}
+@keyframes syncpulse{0%,100%{opacity:1}50%{opacity:.35}}
 .row{display:flex;align-items:center;gap:10px} .grow{flex:1;min-width:0}
 
 /* ---------- icons ---------- */
@@ -165,7 +183,7 @@ h3{font-size:16px;font-weight:700;letter-spacing:-.01em}
 @keyframes scrin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .pgtitle{display:flex;align-items:center;gap:12px;padding:max(20px,env(safe-area-inset-top)) 0 16px}
 .pgtitle h1{font-size:22px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:12px;box-shadow:var(--sh)}
 
 /* ---------- home hero ---------- */
 .hero{background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:20px;margin-top:2px;position:relative;overflow:hidden}
@@ -358,6 +376,8 @@ h3{font-size:16px;font-weight:700;letter-spacing:-.01em}
 <symbol id="i-kebab" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="18.5" r="1.4" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.8 5.8v6c0 4.6 3 7.7 7.2 9.2 4.2-1.5 7.2-4.6 7.2-9.2v-6Z"/><path d="m9 11.8 2.2 2.2 4-4.2"/></symbol>
 <symbol id="i-g" viewBox="0 0 24 24"><path d="M21 12.2h-8.6V9h5.3a5.9 5.9 0 1 0-1.6 6.4l2.3 1.9A9 9 0 1 1 21 12.2Z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.4"/><path d="M12 2.5v2.2M12 19.3v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.4 13.2A8.5 8.5 0 0 1 10.8 3.6a8.5 8.5 0 1 0 9.6 9.6Z"/></symbol>
 <symbol id="i-apple" viewBox="0 0 24 24"><path d="M16.6 12.6c0-2.3 1.9-3.4 2-3.5a4.4 4.4 0 0 0-3.4-1.9c-1.4-.1-2.8.9-3.5.9s-1.9-.9-3-.8A4.6 4.6 0 0 0 4.8 9.6c-1.6 2.9-.4 7.1 1.2 9.4.8 1.1 1.7 2.4 3 2.3s1.7-.8 3.2-.8 1.9.8 3.2.8 2.2-1.1 3-2.3a10 10 0 0 0 1.4-2.8 4.3 4.3 0 0 1-2.7-4ZM14.3 5.6A4.3 4.3 0 0 0 15.3 2.5a4.4 4.4 0 0 0-2.9 1.5 4.1 4.1 0 0 0-1 3.1 3.7 3.7 0 0 0 2.9-1.5Z" fill="currentColor" stroke="none"/></symbol>
 <symbol id="i-spark2" viewBox="0 0 24 24"><path d="M12 3.5 13.8 9l5.7 1.8-5.7 1.8L12 18.5l-1.8-5.9L4.5 10.8 10.2 9Z"/></symbol>
 </defs></svg>
@@ -478,7 +498,7 @@ h3{font-size:16px;font-weight:700;letter-spacing:-.01em}
   <section class="app-scr on" id="scr-home">
     <header class="topbar">
       <div class="grow"><div class="tb-title" id="hgreet">Good Morning,</div><h1 id="hname">—</h1>
-        <div class="sync" style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);margin-top:3px"><span class="syncdot" id="syncdot" style="width:7px;height:7px;border-radius:50%;background:#e0a23e"></span><span id="synctext">syncing…</span></div></div>
+        <div class="sync" id="syncrow" style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--mut);margin-top:3px"><span class="syncdot" id="syncdot" style="width:7px;height:7px;border-radius:50%;background:#e0a23e"></span><span id="synctext">syncing…</span></div></div>
       <button class="tb-ic" onclick="Route.go('emis')" aria-label="Search EMIs"><svg class="ic sm"><use href="#i-search"/></svg></button>
       <button class="tb-ic" onclick="Route.go('calendar')" aria-label="Calendar"><svg class="ic sm"><use href="#i-bell"/></svg><span class="dot hidden" id="belldot"></span></button>
     </header>
@@ -606,6 +626,7 @@ h3{font-size:16px;font-weight:700;letter-spacing:-.01em}
       <button class="mrow" onclick="Sync.exportCloud()"><span class="mic"><svg class="ic sm"><use href="#i-dl"/></svg></span><span class="mt grow">Export Report</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <div class="mrow"><span class="mic"><svg class="ic sm"><use href="#i-bell"/></svg></span><span class="mt grow">Reminders</span>
         <label class="sw"><input type="checkbox" id="swnotify"><i></i></label></div>
+      <button class="mrow" onclick="Profile.appearance()"><span class="mic"><svg class="ic sm"><use href="#i-moon"/></svg></span><span class="mt grow">Appearance</span><span class="chip" id="themechoice">Auto</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="Profile.settings()"><span class="mic"><svg class="ic sm"><use href="#i-gear"/></svg></span><span class="mt grow">App Settings</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="toast('Support: ajitjaat1011@gmail.com')"><span class="mic"><svg class="ic sm"><use href="#i-help"/></svg></span><span class="mt grow">Help &amp; Support</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="Profile.about()"><span class="mic"><svg class="ic sm"><use href="#i-info"/></svg></span><span class="mt grow">About EMI Flow</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
@@ -680,6 +701,9 @@ const LENDERS = [
   {id:'icici',    n:'ICICI Bank',    c:'#ab1f24'},
   {id:'sbi',      n:'SBI',           c:'#280071'},
   {id:'axis',     n:'Axis Bank',     c:'#a51d2b'},
+  {id:'snapmint', n:'Snapmint',      c:'#1e7145'},
+  {id:'iblmoney', n:'IBL Money',     c:'#d92b2b'},
+  {id:'branch',   n:'Branch',        c:'#16295c'},
   {id:'other',    n:'Other',         c:'#64748b'},
 ];
 const LMAP = Object.fromEntries(LENDERS.map(l => [l.id, l]));
@@ -1543,6 +1567,28 @@ const Profile = {
       ${used.has(l.id) ? '<span class="chip acc">in use</span>' : '<span class="chip">available</span>'}</div>`).join('');
     UI.openOv('ov-gen');
   },
+  appearance() {
+    const cur = Store.s.meta.theme || 'system';
+    const opts = [
+      {v:'light', ic:'i-sun',  t:'Light',  d:'Bright and airy'},
+      {v:'dark',  ic:'i-moon', t:'Dark',   d:'Easy on the eyes at night'},
+      {v:'system',ic:'i-gear', t:'Auto',   d:'Follows your phone setting'}];
+    $('#gen-title').textContent = 'Appearance';
+    $('#gen-body').innerHTML = opts.map(o => `
+      <button class="mrow" data-v="${o.v}" style="border:0;width:100%;text-align:left;background:none;padding:12px 2px">
+        <span class="mic"><svg class="ic sm"><use href="#${o.ic}"/></svg></span>
+        <span class="grow"><span style="font-weight:700;font-size:14.5px">${o.t}</span><div class="tiny mut" style="font-weight:600">${o.d}</div></span>
+        ${cur === o.v ? '<svg class="ic sm" style="color:var(--acc)"><use href="#i-check"/></svg>' : ''}</button>`).join('');
+    document.querySelectorAll('#gen-body [data-v]').forEach(b => {
+      b.onclick = () => { Sync.saveMeta({theme: b.dataset.v}).then(() => { applyTheme(); Profile.appearance(); Profile.paintTheme(); }); };
+    });
+    UI.openOv('ov-gen');
+  },
+  paintTheme() {
+    const c = $('#themechoice');
+    if (c) c.textContent = {light:'Light', dark:'Dark'}[Store.s.meta.theme || 'system'] || 'Auto';
+    if (c) c.className = 'chip' + ((Store.s.meta.theme || 'system') === 'dark' ? ' acc' : '');
+  },
   settings() {
     $('#gen-title').textContent = 'App Settings';
     $('#gen-body').innerHTML = `
@@ -1623,7 +1669,8 @@ applyTheme();
 
 function firstRoute() {
   if (!Store.s.onboarded && !Store.s.token) { Route.to('onboard'); return; }
-  if (Store.s.token || Store.s.demo) { Route.cur = 'home'; Route.to('app'); Render.all(); Sync.statusUI('', 'demo — sample data'); Remind.check(); if (!Store.s.demo) Sync.full(); return; }
+  if (Store.s.token || Store.s.demo) { Route.cur = 'home'; Route.to('app'); Render.all(); Sync.statusUI('', Store.s.demo ? 'demo — sample data' : 'syncing…'); Profile.paintTheme(); Remind.check(); if (!Store.s.demo) Sync.full(); return; }
+  const sr = $('#syncrow'); if (sr) sr.style.display = 'none';
   Route.to('login');
 }
 setTimeout(() => { $('#scr-splash').classList.add('hidden'); $('#scr-splash').style.display = 'none'; firstRoute(); }, 1500);

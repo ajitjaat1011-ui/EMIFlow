@@ -26,6 +26,9 @@ const LENDERS = [
   {id:'icici',    n:'ICICI Bank',    c:'#ab1f24'},
   {id:'sbi',      n:'SBI',           c:'#280071'},
   {id:'axis',     n:'Axis Bank',     c:'#a51d2b'},
+  {id:'snapmint', n:'Snapmint',      c:'#1e7145'},
+  {id:'iblmoney', n:'IBL Money',     c:'#d92b2b'},
+  {id:'branch',   n:'Branch',        c:'#16295c'},
   {id:'other',    n:'Other',         c:'#64748b'},
 ];
 const LMAP = Object.fromEntries(LENDERS.map(l => [l.id, l]));

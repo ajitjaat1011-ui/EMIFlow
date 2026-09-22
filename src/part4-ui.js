@@ -577,6 +577,28 @@ const Profile = {
       ${used.has(l.id) ? '<span class="chip acc">in use</span>' : '<span class="chip">available</span>'}</div>`).join('');
     UI.openOv('ov-gen');
   },
+  appearance() {
+    const cur = Store.s.meta.theme || 'system';
+    const opts = [
+      {v:'light', ic:'i-sun',  t:'Light',  d:'Bright and airy'},
+      {v:'dark',  ic:'i-moon', t:'Dark',   d:'Easy on the eyes at night'},
+      {v:'system',ic:'i-gear', t:'Auto',   d:'Follows your phone setting'}];
+    $('#gen-title').textContent = 'Appearance';
+    $('#gen-body').innerHTML = opts.map(o => `
+      <button class="mrow" data-v="${o.v}" style="border:0;width:100%;text-align:left;background:none;padding:12px 2px">
+        <span class="mic"><svg class="ic sm"><use href="#${o.ic}"/></svg></span>
+        <span class="grow"><span style="font-weight:700;font-size:14.5px">${o.t}</span><div class="tiny mut" style="font-weight:600">${o.d}</div></span>
+        ${cur === o.v ? '<svg class="ic sm" style="color:var(--acc)"><use href="#i-check"/></svg>' : ''}</button>`).join('');
+    document.querySelectorAll('#gen-body [data-v]').forEach(b => {
+      b.onclick = () => { Sync.saveMeta({theme: b.dataset.v}).then(() => { applyTheme(); Profile.appearance(); Profile.paintTheme(); }); };
+    });
+    UI.openOv('ov-gen');
+  },
+  paintTheme() {
+    const c = $('#themechoice');
+    if (c) c.textContent = {light:'Light', dark:'Dark'}[Store.s.meta.theme || 'system'] || 'Auto';
+    if (c) c.className = 'chip' + ((Store.s.meta.theme || 'system') === 'dark' ? ' acc' : '');
+  },
   settings() {
     $('#gen-title').textContent = 'App Settings';
     $('#gen-body').innerHTML = `
@@ -657,7 +679,8 @@ applyTheme();
 
 function firstRoute() {
   if (!Store.s.onboarded && !Store.s.token) { Route.to('onboard'); return; }
-  if (Store.s.token || Store.s.demo) { Route.cur = 'home'; Route.to('app'); Render.all(); Sync.statusUI('', 'demo — sample data'); Remind.check(); if (!Store.s.demo) Sync.full(); return; }
+  if (Store.s.token || Store.s.demo) { Route.cur = 'home'; Route.to('app'); Render.all(); Sync.statusUI('', Store.s.demo ? 'demo — sample data' : 'syncing…'); Profile.paintTheme(); Remind.check(); if (!Store.s.demo) Sync.full(); return; }
+  const sr = $('#syncrow'); if (sr) sr.style.display = 'none';
   Route.to('login');
 }
 setTimeout(() => { $('#scr-splash').classList.add('hidden'); $('#scr-splash').style.display = 'none'; firstRoute(); }, 1500);
