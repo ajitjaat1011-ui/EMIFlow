@@ -2,7 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="EMIFlow — track every EMI across every lender. Smart reminders, calendar, insights, cloud sync. Free.">
+  <meta property="og:title" content="EMIFlow — Plan Today, Peace Tomorrow">
+  <meta property="og:description" content="Track every EMI, never miss a due date. Free EMI tracker with reminders, calendar and insights.">
+  <meta property="og:url" content="https://emiflow.pages.dev/">
+  <meta property="og:image" content="https://emiflow.pages.dev/icons/icon-512.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>EMI Flow — Small Payments. A Bigger Tomorrow.</title>
 <meta name="description" content="EMI Flow — track every EMI across every lender. Cloud-synced, offline-first, private.">
 <meta name="theme-color" content="#10121f">
@@ -650,6 +656,7 @@ button:active{opacity:.92}
         <label class="sw"><input type="checkbox" id="swnotify"><i></i></label></div>
       <button class="mrow" onclick="Profile.appearance()"><span class="mic"><svg class="ic sm"><use href="#i-moon"/></svg></span><span class="mt grow">Appearance</span><span class="chip" id="themechoice">Auto</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="Profile.settings()"><span class="mic"><svg class="ic sm"><use href="#i-gear"/></svg></span><span class="mt grow">App Settings</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <button class="mrow" onclick="window.open('/download','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-dl"/></svg></span><span class="mt grow">Get the App / APK</span><span class="chip acc">free</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="toast('Support: ajitjaat1011@gmail.com')"><span class="mic"><svg class="ic sm"><use href="#i-help"/></svg></span><span class="mt grow">Help &amp; Support</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
       <button class="mrow" onclick="Profile.about()"><span class="mic"><svg class="ic sm"><use href="#i-info"/></svg></span><span class="mt grow">About EMI Flow</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
     </div>
@@ -1645,7 +1652,11 @@ const Profile = {
       <div class="dsum"><div><div class="k">Version</div><div class="v">v${APP_VERSION}</div></div>
         <div><div class="k">Sync</div><div class="v">${Store.s.demo ? 'demo' : 'cloud'}</div></div>
         <div><div class="k">EMIs</div><div class="v">${Object.values(Store.s.emis).filter(e => !e.deleted).length}</div></div></div>
-      <p class="tiny mut" style="line-height:1.6">Your data lives only in your account — encrypted passwords, revocable sessions, never sold or shared. Lender names &amp; logos are trademarks of their respective owners, used as visual tags only.</p>`;
+      <p class="tiny mut" style="line-height:1.6">Your data lives only in your account — encrypted passwords, revocable sessions, never sold or shared. Lender names &amp; logos are trademarks of their respective owners, used as visual tags only.</p>
+      <div class="mrow" onclick="window.open('/download','_blank')" style="margin-top:10px"><span class="mic"><svg class="ic sm"><use href="#i-dl"/></svg></span><span class="mt grow">Get the Android app</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>
+      <div class="mrow" onclick="window.open('/privacy','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-shield"/></svg></span><span class="mt grow">Privacy Policy</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>
+      <div class="mrow" onclick="window.open('/terms','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-info"/></svg></span><span class="mt grow">Terms of Use</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <div class="mrow" onclick="window.open('/faq','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-help"/></svg></span><span class="mt grow">FAQ</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>`;
     UI.openOv('ov-gen');
   },
 };
