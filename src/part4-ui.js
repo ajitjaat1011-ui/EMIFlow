@@ -634,10 +634,10 @@ const Profile = {
         <div><div class="k">Sync</div><div class="v">${Store.s.demo ? 'demo' : 'cloud'}</div></div>
         <div><div class="k">EMIs</div><div class="v">${Object.values(Store.s.emis).filter(e => !e.deleted).length}</div></div></div>
       <p class="tiny mut" style="line-height:1.6">Your data lives only in your account — encrypted passwords, revocable sessions, never sold or shared. Lender names &amp; logos are trademarks of their respective owners, used as visual tags only.</p>
-      <div class="mrow" onclick="window.open('/download','_blank')" style="margin-top:10px"><span class="mic"><svg class="ic sm"><use href="#i-dl"/></svg></span><span class="mt grow">Get the Android app</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>
-      <div class="mrow" onclick="window.open('/privacy','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-shield"/></svg></span><span class="mt grow">Privacy Policy</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>
-      <div class="mrow" onclick="window.open('/terms','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-info"/></svg></span><span class="mt grow">Terms of Use</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
-      <div class="mrow" onclick="window.open('/faq','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-help"/></svg></span><span class="mt grow">FAQ</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>`;
+      <div class="mrow" style="width:100%;text-align:left" onclick="window.open('/download','_blank')" style="margin-top:10px"><span class="mic"><svg class="ic sm"><use href="#i-dl"/></svg></span><span class="mt grow">Get the Android app</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>
+      <div class="mrow" style="width:100%;text-align:left" onclick="window.open('/privacy','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-shield"/></svg></span><span class="mt grow">Privacy Policy</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>
+      <div class="mrow" style="width:100%;text-align:left" onclick="window.open('/terms','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-info"/></svg></span><span class="mt grow">Terms of Use</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></button>
+      <div class="mrow" style="width:100%;text-align:left" onclick="window.open('/faq','_blank')"><span class="mic"><svg class="ic sm"><use href="#i-help"/></svg></span><span class="mt grow">FAQ</span><svg class="ic sm chev"><use href="#i-chev-r"/></svg></div>`;
     UI.openOv('ov-gen');
   },
 };
