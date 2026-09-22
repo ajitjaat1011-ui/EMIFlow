@@ -11,7 +11,7 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const CLEAN = { '/download': '/download.html', '/privacy': '/privacy.html', '/terms': '/terms.html', '/faq': '/faq.html' };
+    const CLEAN = { '/download': '/download.html', '/privacy': '/privacy.html', '/terms': '/terms.html', '/faq': '/faq.html', '/ui-options': '/ui-options.html' };
     if (CLEAN[url.pathname] && request.method === 'GET') {
       const inner = await env.ASSETS.fetch(new URL(CLEAN[url.pathname], url.origin));
       if (inner && inner.status === 200) { const r = new Response(inner.body, inner); r.headers.set('content-type', 'text/html;charset=utf-8'); return r; }
