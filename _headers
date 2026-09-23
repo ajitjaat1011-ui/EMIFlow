@@ -1,8 +1,8 @@
 /*
   X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: frame-ancestors 'self' https://asvtr-web-designers.pages.dev https://*.asvtr-web-designers.pages.dev
 /sw.js
   Cache-Control: no-cache
 /manifest.webmanifest
