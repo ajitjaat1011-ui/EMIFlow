@@ -1,7 +1,7 @@
 /* EMIFlow service worker v2 — HTML is NETWORK-FIRST so updates land instantly.
    Static assets: cache-first. /api is NEVER cached (private data). */
-const CACHE = 'emiflow-shell-v3';
-const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-maskable-512.png', '/icons/apple-touch-icon.png', '/favicon.png', '/lenders.js'];
+const CACHE = 'emion-shell-v4';
+const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/icon-maskable-512.png', '/icons/apple-touch-icon.png', '/favicon.png', '/lenders.js', '/assets/emi-logo.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

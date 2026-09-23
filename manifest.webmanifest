@@ -1,18 +1,19 @@
 {
-  "name": "EMIFlow — Plan Today, Peace Tomorrow",
-  "short_name": "EMIFlow",
+  "name": "EMI ON — Your money, in flow",
+  "short_name": "EMI ON",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0b0b10",
-  "theme_color": "#0b0b10",
-  "description": "Track every EMI across every lender — cloud-synced, offline-first, private. Smart reminders, lender icons, projections and calendar.",
+  "background_color": "#eef6f4",
+  "theme_color": "#398ab5",
+  "description": "Track every EMI in one place. Smart reminders, insights, cloud-synced, offline-first.",
   "categories": ["finance", "productivity"],
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
   ]
 }
