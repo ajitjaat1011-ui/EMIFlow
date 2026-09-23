@@ -54,7 +54,9 @@ async function hashPassword(pw, salt) {
 
 /* ------------------------------ database --------------------------------- */
 
-const DB_HOST = 'https://emiflow-ajitjaat1011-ui.aws-ap-south-1.turso.io/v2/pipeline';
+const DB_HOST = (env && env.DB_HOST) ||
+  (env && env.TURSO_URL && env.TURSO_URL.replace(/^libsql:\/\//, 'https://') + '/v2/pipeline') ||
+  'https://emiflow-ajitjaat1011-ui.aws-ap-south-1.turso.io/v2/pipeline';
 
 async function pipeline(env, stmts) {
   if (!env.DB_TOKEN) throw new Error('DB_TOKEN secret missing');
