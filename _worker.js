@@ -9,7 +9,7 @@
    ============================================================================ */
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const CLEAN = { '/download': '/download.html', '/privacy': '/privacy.html', '/terms': '/terms.html', '/faq': '/faq.html', '/ui-options': '/ui-options.html' };
     if (CLEAN[url.pathname] && request.method === 'GET') {
@@ -17,13 +17,24 @@ export default {
       if (inner && inner.status === 200) { const r = new Response(inner.body, inner); r.headers.set('content-type', 'text/html;charset=utf-8'); return r; }
     }
     if (url.pathname.startsWith('/api/')) {
-      try { return await api(request, env, url); }
+      try { return await api(request, env, url, ctx); }
       catch (e) {
         console.error('api error', e);
         return json({ ok: false, error: 'server_error' }, 500);
       }
     }
-    return env.ASSETS.fetch(request);
+    // Static assets with long-cache immutable headers
+    const asset = await env.ASSETS.fetch(request);
+    if (asset && asset.status === 200) {
+      const h = new Headers(asset.headers);
+      if (/\.(js|css|png|jpg|jpeg|gif|svg|webp|woff2?|ttf|ico)(\?|$)/i.test(url.pathname)) {
+        h.set('Cache-Control', 'public, max-age=31536000, immutable');
+      } else if (url.pathname === '/' || url.pathname.endsWith('.html')) {
+        h.set('Cache-Control', 'public, max-age=0, must-revalidate');
+      }
+      return new Response(asset.body, { status: asset.status, headers: h });
+    }
+    return asset;
   },
 };
 
@@ -72,6 +83,7 @@ async function pipeline(env, stmts) {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${env.DB_TOKEN}`, 'content-type': 'application/json' },
     body: JSON.stringify({ requests: stmts.map(([sql, args]) => ({ type: 'execute', stmt: { sql, args: (args || []).map(encArg) } })) }),
+    cf: { cacheTtl: 0, cacheEverything: false },
   });
   if (!r.ok) {
     let body = '';
@@ -91,23 +103,32 @@ async function pipeline(env, stmts) {
 }
 const db = (env, sql, args = []) => pipeline(env, [[sql, args]]).then(a => a[0]);
 
-let _init = null;
+let _init = null, _initPromise = null;
 function initSchema(env) {
   if (_init) return _init;
-  _init = pipeline(env, [
-    [`CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, name TEXT NOT NULL, salt TEXT NOT NULL, pass_hash TEXT NOT NULL, created_at INTEGER NOT NULL, terms_version INTEGER DEFAULT 1, email_verified INTEGER DEFAULT 0)`],
-    [`CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id TEXT NOT NULL, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, last_seen INTEGER)`],
-    [`CREATE TABLE IF NOT EXISTS emis (id TEXT NOT NULL, uid TEXT NOT NULL, json TEXT NOT NULL, updated_at INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(uid,id))`],
-    [`CREATE TABLE IF NOT EXISTS payments (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL, emi_id TEXT, amt REAL, at INTEGER)`],
-    [`CREATE TABLE IF NOT EXISTS meta (uid TEXT PRIMARY KEY, json TEXT NOT NULL, updated_at INTEGER NOT NULL)`],
-    [`CREATE TABLE IF NOT EXISTS login_attempts (ip TEXT, email TEXT, ok INTEGER, ts INTEGER)`],
-    [`CREATE TABLE IF NOT EXISTS password_resets (token_hash TEXT PRIMARY KEY, user_id TEXT, expires_at INTEGER, used_at INTEGER)`],
-    [`CREATE TABLE IF NOT EXISTS analytics (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, e TEXT, s TEXT, x TEXT)`],
-    [`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`],
-    [`CREATE INDEX IF NOT EXISTS idx_login_attempts ON login_attempts(ip, ts)`],
-  ]).then(() => pipeline(env, [[`ALTER TABLE users ADD COLUMN phone TEXT`]]).catch(() => {}))
-    .catch(e => { _init = null; throw e; });
-  return _init;
+  if (_initPromise) return _initPromise;
+  _initPromise = (async () => {
+    try {
+      await pipeline(env, [
+        [`CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, email TEXT UNIQUE NOT NULL, name TEXT NOT NULL, phone TEXT, salt TEXT NOT NULL, pass_hash TEXT NOT NULL, created_at INTEGER NOT NULL, terms_version INTEGER DEFAULT 1, email_verified INTEGER DEFAULT 0)`],
+        [`CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id TEXT NOT NULL, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL, last_seen INTEGER)`],
+        [`CREATE TABLE IF NOT EXISTS emis (id TEXT NOT NULL, uid TEXT NOT NULL, json TEXT NOT NULL, updated_at INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(uid,id))`],
+        [`CREATE TABLE IF NOT EXISTS payments (id INTEGER PRIMARY KEY AUTOINCREMENT, uid TEXT NOT NULL, emi_id TEXT, amt REAL, at INTEGER)`],
+        [`CREATE TABLE IF NOT EXISTS meta (uid TEXT PRIMARY KEY, json TEXT NOT NULL, updated_at INTEGER NOT NULL)`],
+        [`CREATE TABLE IF NOT EXISTS login_attempts (ip TEXT, email TEXT, ok INTEGER, ts INTEGER)`],
+        [`CREATE TABLE IF NOT EXISTS password_resets (token_hash TEXT PRIMARY KEY, user_id TEXT, expires_at INTEGER, used_at INTEGER)`],
+        [`CREATE TABLE IF NOT EXISTS analytics (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, e TEXT, s TEXT, x TEXT)`],
+        [`CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id)`],
+        [`CREATE INDEX IF NOT EXISTS idx_login_attempts ON login_attempts(ip, ts)`],
+      ]);
+      _init = _initPromise;
+    } catch (e) {
+      _initPromise = null;
+      throw e;
+    }
+    return _init;
+  })();
+  return _initPromise;
 }
 
 /* ------------------------------ auth ------------------------------------- */
@@ -137,7 +158,7 @@ const ipOf = (req) => req.headers.get('cf-connecting-ip') || '0.0.0.0';
 
 /* ------------------------------ api router -------------------------------- */
 
-async function api(request, env, url) {
+async function api(request, env, url, ctx) {
   const route = url.pathname.replace(/^\/api/, '');
   const m = request.method;
   const ip = ipOf(request);
@@ -146,8 +167,15 @@ async function api(request, env, url) {
   if (route === '/health' && m === 'GET') {
     let okDb = false, ms = 0, dbErr = null;
     const t0 = Date.now();
-    try { await db(env, 'SELECT 1'); okDb = true; ms = Date.now() - t0; } catch (e) { dbErr = String(e.message || e).slice(0, 160); ms = Date.now() - t0; }
-    return json({ ok: true, service: 'emiflow', db: okDb, dbMs: ms, dbErr, time: Date.now() });
+    try {
+      // Minimal health: single SELECT 1, do NOT trigger schema init here
+      await pipeline(env, [['SELECT 1']]);
+      okDb = true; ms = Date.now() - t0;
+    } catch (e) { dbErr = String(e.message || e).slice(0, 160); ms = Date.now() - t0; }
+    return json({ ok: true, service: 'emiflow', db: okDb, dbMs: ms, dbErr, time: Date.now() }, 200, {
+      'Cache-Control': 'no-store',
+      'Access-Control-Allow-Origin': '*',
+    });
   }
 
   if (route === '/analytics' && m === 'POST') {
